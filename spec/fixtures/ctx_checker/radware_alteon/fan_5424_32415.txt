@@ -1,0 +1,7 @@
+Fans table:
+Fan-Number Type           Status           Speed
+---------- ------------   -----------      -----------
+1          Critical       Operational      36%
+2          Critical       Operational      36%
+
+

@@ -1,0 +1,8 @@
+Slot 1:
+Fan 1:
+State : Normal
+Airflow Direction: Port-to-power
+Prefer Airflow Direction: Port-to-power
+Fan 2 State: FanDirectionFault
+Slot 2:
+Fan 1 State: Absent

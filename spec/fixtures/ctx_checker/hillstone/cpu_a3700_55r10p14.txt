@@ -1,0 +1,5 @@
+Average cpu utilization :13.2%
+Current cpu utilization :11.7%
+Last 1 minute :11.7%
+Last 5 minutes :11.2%
+Last 15 minutes :11.1%

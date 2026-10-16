@@ -1,0 +1,35 @@
+------------------------------------------------------------------
+Alias    Port   Speed   Duplex    Flow Ctrl       Link
+------   ----   -----   -------   --TX---RX--     -----
+mgmt     1      1000    full      no     no       up
+mgmt     2      0?      0?        no     no       down
+1        1      10G*    full*     yes*   yes*     up
+2        2      10G*    full*     yes*   yes*     up
+3        3      auto*   full*     yes*   yes*     disabled
+4        4      auto*   full*     yes*   yes*     disabled
+5        5      1000    full      yes    yes      disabled
+6        6      1000    full      yes    yes      disabled
+7        7      1000    full      yes    yes      disabled
+8        8      1000    full      yes    yes      disabled
+9        9      1000    full      yes    yes      disabled
+10       10     1000    full      yes    yes      disabled
+11       11     1000    full      yes    yes      disabled
+12       12     1000    full      yes    yes      disabled
+13       13     1000    full      yes    yes      disabled
+14       14     1000    full      yes    yes      disabled
+15       15     1000    full      yes    yes      disabled
+16       16     1000    full      yes    yes      disabled
+17       17     1000    full      yes    yes      disabled
+18       18     1000    full      yes    yes      disabled
+19       19     1000    full      yes    yes      disabled
+20       20     1000    full      yes    yes      disabled
+21       21     any     any       yes    yes      disabled
+22       22     any     any       yes    yes      disabled
+23       23     any     any       yes    yes      disabled
+24       24     any     any       yes    yes      disabled
+25       25     any     any       yes    yes      disabled
+26       26     any     any       yes    yes      disabled
+27       27     1000    full      yes    yes      up
+28       28     1000    full      yes    yes      up
+* = value set by configuration; not autonegotiated.
+

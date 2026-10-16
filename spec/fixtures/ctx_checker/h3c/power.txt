@@ -1,0 +1,8 @@
+Slot 1:
+Input Power: -- W
+PowerID State Mode Current(A) Voltage(V) Power(W) FanDirection
+1 Normal AC 8.0 12.0 96.0 --
+2 Absent -- -- -- -- --
+Slot 2:
+PowerID State Mode Current(A) Voltage(V) Power(W)
+1 Fault DC -- -- 0

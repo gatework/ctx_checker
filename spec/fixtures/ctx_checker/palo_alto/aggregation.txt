@@ -1,0 +1,18 @@
+LACP:
+******************************************************************************
+AE group: ae1
+Members: Bndl Rx state Mux state Sel state
+ethernet1/1 yes Current Tx_Rx Selected
+ethernet1/2 no Current Detached Unselected(Negotiation failed)
+Status: Enabled
+Mode: Active
+Rate: Fast
+Max-port: 8
+Fast-failover: Enabled
+Pre-negotiation: Enabled
+Local: System Priority: 32768
+       System MAC: 00:00:00:00:00:01
+       Key: 48
+Partner: System Priority: 32768
+         System MAC: 00:00:00:00:00:02
+         Key: 10

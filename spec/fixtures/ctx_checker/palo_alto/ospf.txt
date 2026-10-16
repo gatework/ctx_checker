@@ -1,0 +1,19 @@
+Options: 0x80:reserved, O:Opaq-LSA capability, DC:demand circuits, EA:Ext-Attr LSA capability,
+         N/P:NSSA option, MC:multicase, E:AS external LSA capability, T:TOS capability
+==========
+virtual router: default
+neighbor address: 192.0.2.1
+local address binding: 0.0.0.0
+type: dynamic
+status: full
+neighbor router ID: 192.0.2.2
+area id: 0.0.0.0
+neighbor priority: 1
+lifetime remain: 30
+messages pending: 0
+LSA request pending: 0
+options: 0x52: O EA E
+hello suppressed: no
+restart helper status: not helping
+restart helper time remaining: 0
+restart helper exit reason: none

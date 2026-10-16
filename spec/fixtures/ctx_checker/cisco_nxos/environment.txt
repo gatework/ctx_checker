@@ -1,0 +1,37 @@
+Clock:
+----------------------------------------------------------
+Clock Model         Hw         Status
+----------------------------------------------------------
+A     Clock Module  --         NotSupported/None
+Fan:
+------------------------------------------------------
+Fan             Model                Hw        Status
+------------------------------------------------------
+Fan1(sys_fan1)  N7K-C7010-FAN-S      1.1       Ok
+Fan2(sys_fan2)  N7K-C7010-FAN-S      1.1       Failed
+Fan_in_PS1      --                  --        Ok
+Fan Air Filter : Absent
+Temperature:
+--------------------------------------------------------------------
+Module Sensor          MajorThresh MinorThres CurTemp Status
+                       (Celsius)   (Celsius)  (Celsius)
+--------------------------------------------------------------------
+1      Intake (s1)     60          45         25      Ok
+2      CPU (s2)        100         90         92      Minor
+Power Supply:
+Voltage: 50 Volts
+Power                              Actual        Total
+Supply Model                       Output        Capacity      Status
+                                   (Watts)       (Watts)
+------- -------------------        -----------   -----------   --------------
+1       N7K-AC-6.0KW                800 W         6000 W        Ok
+2       N7K-AC-6.0KW                0 W           6000 W        Failed
+                                  Actual        Power
+Module Model                      Draw          Allocated     Status
+------- -------------------       -----------   -----------   --------------
+1       N7K-M148GT-11              N/A           400 W         Powered-Up
+Power Usage Summary:
+--------------------
+Power Supply redundancy mode (configured) Redundant
+Power Supply redundancy mode (operational) Redundant
+Total Power Capacity (based on configured mode) 6000 W

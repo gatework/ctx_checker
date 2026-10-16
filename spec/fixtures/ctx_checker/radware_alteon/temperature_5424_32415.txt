@@ -1,0 +1,11 @@
+Sensor 1 has 46 degree Celsius
+Sensor 2 has 27 degree Celsius
+Sensor 3 has 34 degree Celsius
+Sensor 4 has 31 degree Celsius
+
+Current device temperature is OK
+Note:
+High temperature is 79-88 degree Celsius
+Critical temperature 88 and above degree Celsius
+System will shutdown if it reaches Critical temperature
+

@@ -1,0 +1,25 @@
+==========
+Peer: uplink (id 1)
+virtual router: default
+Peer router id: 192.0.2.1
+Remote AS: 65001
+Peer status: Established, for 60 seconds
+Remote Address: 192.0.2.1:179
+Local Address: 192.0.2.254:40000
+Capability: Multiprotocol Extensions(1) value: IPv4 Unicast
+Prefix counter for: bgpAfiIpv4 / unicast
+Incoming Prefix: Accepted 0, Rejected 0, Policy Rej 0, Total 0
+Outgoing Prefix: 1
+Advertised Prefix: 1
+Prefix counter for: bgpAfiIpv6 / unicast
+Incoming Prefix: Accepted 2, Rejected 0, Policy Rej 0, Total 2
+Outgoing Prefix: 2
+Advertised Prefix: 2
+==========
+Peer: backup (id 2)
+virtual router: blue
+Remote AS: 65002
+Peer status: Active
+Remote Address: [2001:db8::2]:179
+Prefix counter for: bgpAfiIpv6 / unicast
+Incoming Prefix: Accepted 0, Rejected 0, Policy Rej 0, Total 0

@@ -1,0 +1,7 @@
+top - 12:10:00 up 3 days, 2:10, 1 user, load average: 0.10, 0.20, 0.30
+Tasks: 100 total, 1 running, 99 sleeping, 0 stopped, 0 zombie
+%Cpu(s): 10.0 us, 5.0 sy, 0.0 ni, 84.0 id, 0.0 wa, 0.0 hi, 1.0 si, 0.0 st
+MiB Mem : 8000.0 total, 200.0 free, 3000.0 used, 4800.0 buff/cache
+MiB Swap: 2000.0 total, 1900.0 free, 100.0 used. 4000.0 avail Mem
+PID USER PR NI VIRT RES SHR S %CPU %MEM TIME+ COMMAND
+100 admin 20 0 100m 10m 2m S 1.0 1.0 00:10.00 top

@@ -1,0 +1,7 @@
+Interface Total (pkts) Broadcast (pkts) Multicast (pkts) Err (pkts)
+GE1/0/1 129384 83 14 2
+XGE1/0/2 938451 -- -- 0
+BAGG10 1067835 83 14 0
+RAGG20 18 0 0 0
+Overflow: More than 14 digits (7 digits for column "Err").
+--: Not supported.

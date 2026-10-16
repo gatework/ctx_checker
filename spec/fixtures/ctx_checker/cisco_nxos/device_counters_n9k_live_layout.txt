@@ -1,0 +1,41 @@
+default
+IP Software Processed Traffic Statistics
+----------------------------------------
+Errors:
+  Bad checksum: 0, packet too small: 0, bad version: 2,
+  Bad header length: 0, bad packet length: 0, bad destination: 0,
+  Bad ttl: 3, could not forward: 4, no buffer dropped: 0,
+  Bad encapsulation: 5, no route: 6, non-existent protocol: 0
+  Bad options: 0
+  Vinci Migration Packets : 0
+   Total packet snooped : 7
+   Total packet on down svi : 0
+   Stateful Restart Recovery: 0,  MBUF pull up fail: 0
+  Bad context id: 0, rpf drops: 0 Bad GW MAC 0
+  Ingress option processing failed: 8
+  NAT inside drop: 0, NAT outside drop: 0
+  Ingress option processing failed: 8  Ingress mforward failed: 9
+  Ingress lisp drop: 0
+  Ingress lisp decap drop: 0
+  Ingress lisp encap drop: 0
+  Ingress lisp encap: 10
+  Ingress Mfwd copy drop: 0
+  Ingress RA/Reass drop: 11
+  Ingress ICMP Redirect processing drop: 0
+  Ingress Drop (ifmgr init): 0,
+  Ingress Drop (invalid filter): 0
+  Ingress Drop (Invalid L2 msg): 0
+  ACL Filter Drops :
+       Ingress - 0
+       Egress -   12
+       Directed Broadcast - 0
+Fragmentation/reassembly:
+  Fragments received: 0, fragments sent: 0, fragments created: 0,
+  Fragments dropped: 0, packets with DF: 0, packets reassembled: 0,
+  Fragments timed out: 0
+Fragments created per protocol
+17 : 13
+ICMP Software Processed Traffic Statistics
+Transmission:
+  Format error: 999, checksum error: 999
+Statistics last reset: never

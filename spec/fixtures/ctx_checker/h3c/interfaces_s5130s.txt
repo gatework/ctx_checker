@@ -1,0 +1,50 @@
+Bridge-Aggregation10
+Current state: UP
+Line protocol state: UP
+Bandwidth: 2000000 kbps
+2Gbps-speed mode, full-duplex mode
+PVID: 1
+Port link-type: Trunk
+ VLAN Passing:   1(default vlan), 10-20, 30
+                 100-200
+ VLAN permitted: 1(default vlan), 2-4094
+ Trunk port encapsulation: IEEE 802.1q
+Last clearing of counters: Never
+Input:  0 input errors, 0 runts, 0 giants, 0 throttles
+       0 CRC, 0 frame, - overruns, 0 aborts
+       - ignored, - parity errors
+Output: 0 output errors, - underruns, - buffer failures
+       0 aborts, 0 deferred, 0 collisions, 0 late collisions
+       0 lost carrier, - no carrier
+
+GigabitEthernet1/0/1
+Current state: UP
+Line protocol state: UP
+Port link-type: Trunk
+ VLAN Passing:   1(default vlan), 10-20, 30
+                 100-200
+ VLAN permitted: 1(default vlan), 2-4094
+ Trunk port encapsulation: IEEE 802.1q
+Input:  10 input errors, 10 runts, 0 giants, 0 throttles
+       0 CRC, 0 frame, - overruns, 0 aborts
+Output: 0 output errors, - underruns, - buffer failures
+
+InLoopBack0
+Current state: UP
+Line protocol state: UP(spoofing)
+Maximum transmission unit: 1536
+Physical: InLoopBack
+Last 300 seconds input rate: 0 bytes/sec, 0 bits/sec, 0 packets/sec
+Last 300 seconds output rate: 0 bytes/sec, 0 bits/sec, 0 packets/sec
+Input: 0 packets, 0 bytes, 0 drops
+Output: 0 packets, 0 bytes, 0 drops
+
+NULL0
+Current state: UP
+Line protocol state: UP(spoofing)
+Bandwidth: 1000000 kbps
+Maximum transmission unit: 1500
+Physical: NULL DEV, baudrate: 1000000 kbps
+Last clearing of counters: Never
+Input: 0 packets, 0 bytes, 0 drops
+Output: 0 packets, 0 bytes, 0 drops

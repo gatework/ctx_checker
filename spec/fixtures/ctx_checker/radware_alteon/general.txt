@@ -1,0 +1,19 @@
+System Information at 04:10:11 Fri Oct 16, 2026
+Time zone: No timezone configured (GMT offset +00:00)
+
+Memory profile is Default
+
+Alteon Application Switch 5424 S Perform
+Switch is up 293 days, 14 hours, 40 minutes and 39 seconds.
+Last boot: 05:10:32 Fri Dec 26, 2025 (power cycle)
+Last apply: 02:33:25 Thu Oct 15, 2026
+Last save: 02:32:11 Thu Oct 15, 2026
+
+Note - When the measured temperature inside the switch EXCEEDs
+       the anomaly threshold at 79 degree Celsius or the critical
+       temperature at 88 degree Celsius different syslog messages
+       will be generated.
+
+Software Version 32.4.15.0 Image ID 1, active configuration.
+HA State:    BACKUP
+Mode of operation: by Name

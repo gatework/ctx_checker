@@ -1,0 +1,6 @@
+Sensor List:  Environmental Monitoring
+ Sensor           Location          State             Reading
+ V1: VMA          F0                Normal            1800 mV
+ Temp: CPU        R0                Normal            35 Celsius
+ PEM Vout         P0                Critical          0 V AC
+ Temp: FC         P0                Fan Speed 65%     27 Celsius

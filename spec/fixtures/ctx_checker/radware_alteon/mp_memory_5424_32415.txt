@@ -1,0 +1,8 @@
+------------------------------------------------------------------
+Memory stats:
+Total   device:                     32879916 KB
+Free    device:                     15044068 KB
+Cached (Linux):                      9117032 KB
+MP Virtual Memory:                   2886.934 MB
+MP Resident(RSS Linux) Memory: 	     2322.867 MB
+

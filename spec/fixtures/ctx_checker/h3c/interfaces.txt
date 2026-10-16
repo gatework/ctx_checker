@@ -1,0 +1,28 @@
+GigabitEthernet1/0/1
+Current state: UP
+Line protocol state: UP
+Description: uplink
+Last clearing of counters: 1 day 3 hours
+Input: 7 input errors, 0 runts, 0 giants, 0 throttles
+       5 CRC, 0 frame, 0 overruns, 2 aborts
+Output: 2 output errors, 0 underruns, 0 buffer failures
+GigabitEthernet1/0/2 current state: Administratively DOWN
+Line protocol current state: DOWN
+Input: 0 input errors, 0 runts, 0 giants, 0 throttles
+       0 CRC, 0 frame, 0 overruns, 0 aborts
+Output: 0 output errors, 0 underruns, 0 buffer failures
+Bridge-Aggregation10
+Current state: UP
+Line protocol state: UP
+Vlan-interface20
+Current state: UP
+Line protocol state: UP
+LoopBack0
+Current state: UP
+Line protocol state: UP(spoofing)
+Tunnel0
+Current state: DOWN
+Line protocol state: DOWN
+GigabitEthernet1/0/1.20
+Current state: UP
+Line protocol state: UP

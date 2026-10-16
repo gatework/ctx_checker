@@ -1,0 +1,19 @@
+mA: milliamperes, dBm: decibels (milliwatts), NA or N/A: not applicable.
+++ : high alarm, +  : high warning, -  : low warning, -- : low alarm.
+A2D readouts (if they differ), are reported in parentheses.
+The threshold values are calibrated.
+                                High Alarm  High Warn  Low Warn   Low Alarm
+             Temperature        Threshold   Threshold  Threshold  Threshold
+Port         (Celsius)          (Celsius)   (Celsius)  (Celsius)  (Celsius)
+---------    -----------------  ----------  ---------  ---------  ---------
+Twe1/0/1     23.0                   75.0       70.0        0.0       -5.0
+                 Optical          High Alarm  High Warn  Low Warn   Low Alarm
+                 Transmit Power   Threshold   Threshold  Threshold  Threshold
+Port       Lane  (dBm)            (dBm)       (dBm)      (dBm)      (dBm)
+---------  ----  ---------------  ----------  ---------  ---------  ---------
+Twe1/0/1   N/A   -1.0              3.0        2.0       -6.0       -7.0
+                 Optical          High Alarm  High Warn  Low Warn   Low Alarm
+                 Receive Power    Threshold   Threshold  Threshold  Threshold
+Port       Lane  (dBm)            (dBm)       (dBm)      (dBm)      (dBm)
+---------  ----  ---------------  ----------  ---------  ---------  ---------
+Twe1/0/1   N/A   -3.0              3.0        2.0       -10.0      -11.0

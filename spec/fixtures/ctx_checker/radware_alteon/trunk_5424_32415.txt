@@ -1,0 +1,5 @@
+Trunk group 1, bw contract 1024, name: HA, port state:
+   27: STG  1 forwarding
+   28: STG  1 forwarding
+
+

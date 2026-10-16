@@ -1,0 +1,12 @@
+------------------------------------------------------------------
+[OSPF Information Menu]
+     general  - Show general information
+     aindex   - Show area(s) information
+     if       - Show interface(s) information
+     virtual  - Show details of virtual links
+     nbr      - Show neighbor(s) information
+     dbase    - Database Menu
+     sumaddr  - Show summary address list
+     nsumadd  - Show NSSA summary address list
+     routes   - Show OSPF routes
+     dump     - Show OSPF information

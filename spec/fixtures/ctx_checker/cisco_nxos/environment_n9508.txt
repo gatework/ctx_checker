@@ -1,0 +1,31 @@
+Power Supply:
+Voltage: 12 Volts
+Power                         Actual      Actual       Total
+Supply Model                  Output      Input        Capacity Status
+                              (Watts )    (Watts )     (Watts )
+------ ---------------------- ----------- ------------ -------- ------
+1      N9K-PAC-3000W-B         510 W       560 W        3000 W   Ok
+2      ------------           N/A W       N/A W        0 W      Absent
+4      N9K-PAC-3000W-B         0 W         0 W          3000 W   shut
+                              Actual      Power
+Module Model                  Draw        Allocated    Status
+                              (Watts )    (Watts )
+------ ---------------------- ----------- ------------ --------
+28     N9K-SUP-A+             N/A W       72 W         Powered-Up
+Power Usage Summary:
+--------------------
+Power Supply redundancy mode (configured) PS-Redundant
+Total Power Capacity (based on configured mode) 3000 W
+Fan:
+---------------------------------------------------------------------------
+Fan             Model              Hw   Direction       Status
+---------------------------------------------------------------------------
+Fan1(sys_fan1)  N9K-C9508-FAN       --   front-to-back   Ok
+Fan_in_PS2      --                 --   front-to-back   None
+Fan_in_PS4      --                 --   front-to-back   Shutdown
+Fan Zone Speed: Zone 1: 0x80
+Fan Air Filter : NotSupported
+Temperature:
+Module Sensor MajorThresh MinorThres CurTemp Status
+       (Celsius) (Celsius) (Celsius)
+1 Intake (s1) 60 45 28 Ok

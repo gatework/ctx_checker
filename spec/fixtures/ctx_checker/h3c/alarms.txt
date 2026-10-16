@@ -1,0 +1,3 @@
+Seq Level Time Info
+51 Warning 2026-10-16 05:04:00 CPU sample exceeded a configured warning limit.
+50 Major 2026-10-16 05:03:00 Example component reported a failure.

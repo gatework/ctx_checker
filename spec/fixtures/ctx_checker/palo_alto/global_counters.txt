@@ -1,0 +1,10 @@
+Global counters:
+Elapsed time since last sampling: 30.000 seconds
+name value rate severity category aspect description
+------------------------------------------------------------
+pkt_recv 50000 100 info packet pktproc Received test packets
+flow_rcv_err 5 0 drop flow parse Receive error test counter
+aho_lookup_error 3 0 error appid lookup Lookup error test counter
+------------------------------------------------------------
+Total counters shown: 3
+------------------------------------------------------------

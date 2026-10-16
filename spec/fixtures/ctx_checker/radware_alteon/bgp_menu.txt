@@ -1,0 +1,5 @@
+------------------------------------------------------------------
+[BGP Menu]
+     peer     - Show all BGP peers
+     summary  - Show all BGP peers in summary
+     dump     - Show BGP routing table

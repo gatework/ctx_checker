@@ -1,0 +1,13 @@
+------------------------------------------------------------------
+NTP server statistics:
+Primary Server:
+Requests Sent:             679
+Responses Received:        492
+Updates:                   184
+Secondary Server:
+Requests Sent:             679
+Responses Received:        492
+Updates:                    11
+Last update based on response from primary server.
+Last update time:     00:28:10 Fri Oct 16, 2026
+Current system time:  04:11:03 Fri Oct 16, 2026

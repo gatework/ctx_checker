@@ -1,0 +1,17 @@
+Ten-GigabitEthernet1/0/1 transceiver diagnostic information:
+  Current diagnostic parameters:
+    Temp(C) Voltage(V) Bias(mA) RX power(dBm) TX power(dBm)
+    30 3.30 5.00 -12.00 -2.00
+  Alarm thresholds:
+    Temp(C) Voltage(V) Bias(mA) RX power(dBm) TX power(dBm)
+    High 80 3.60 10.00 2.00 3.00
+    Low -10 3.00 1.00 -10.00 -8.00
+  Warning thresholds:
+    Temp(C) Voltage(V) Bias(mA) RX power(dBm) TX power(dBm)
+    High 70 3.50 9.00 1.00 2.00
+    Low 0 3.10 2.00 -8.00 -7.00
+HundredGigE1/0/2 transceiver diagnostic information:
+  Current diagnostic parameters:
+    [channel] Bias(mA) RX power(dBm) TX power(dBm)
+    1 6.00 -1.00 -2.00
+    2 6.00 N/A -2.00

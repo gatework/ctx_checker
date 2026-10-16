@@ -1,0 +1,11 @@
+OSPF Process 10 with Router ID 192.0.2.254
+Neighbor Brief Information
+Area: 0.0.0.0
+Router ID Address Pri Dead-Time State Interface
+192.0.2.1 192.0.2.10 1 39 Full/DR Vlan20
+192.0.2.2 192.0.2.11 1 38 2-Way/DROther GE1/0/1
+OSPF Process 20 with Router ID 192.0.2.254
+Neighbor Brief Information
+Area: 0.0.0.1
+Router ID Address Pri Dead-Time State Interface
+192.0.2.1 192.0.2.10 1 39 Exstart/- Vlan20

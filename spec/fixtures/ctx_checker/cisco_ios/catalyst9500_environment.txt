@@ -1,0 +1,31 @@
+Sensor List:  Environmental Monitoring
+ Sensor                  Location        State           Reading
+ PSOC-MB_0: VOUT         Switch2-R0      Normal          12121 mV
+ Temp: Outlet_A          Switch2-R0      Normal          30 Celsius
+ Temp: Outlet_A          Switch1-R0      Normal          31 Celsius
+
+Switch:1
+
+Power                                                    Fan States
+Supply  Model No              Type  Capacity  Status     0     1
+------  --------------------  ----  --------  ---------  ----  ----
+PS0     C9K-PWR-650WAC-R      AC    650 W     ok         good  N/A
+PS1     C9K-PWR-650WAC-R      AC    650 W     ok         bad   N/A
+
+Fan                 Fan States
+Tray    Status      0     1     2     3
+------  ----------  ----  ----  ----  ----
+FM0     ok          good  good  good  good
+FM1     ok          good  good  bad   good
+
+Switch:2
+
+Power                                                    Fan States
+Supply  Model No              Type  Capacity  Status     0     1
+------  --------------------  ----  --------  ---------  ----  ----
+PS0     C9K-PWR-650WAC-R      AC    650 W     ok         good  N/A
+
+Fan                 Fan States
+Tray    Status      0     1     2     3
+------  ----------  ----  ----  ----  ----
+FM0     ok          good  good  good  good

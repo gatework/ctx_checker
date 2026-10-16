@@ -1,0 +1,6 @@
+Clock is synchronized, stratum 3, reference assoc id 1, reference is 192.0.2.20
+nominal freq is 250.0000 Hz, actual freq is 250.0000 Hz, precision is 2**7
+reference time is D2352258.243DDF14 (06:12:40.141 UTC Fri Oct 16 2026)
+clock offset is -2.5000 msec, root delay is 1.00 msec, time resolution 1000 (1 msec),
+root dispersion is 10.00 msec, peer dispersion is 7.00 msec
+system poll interval is 64, last update was 5 sec ago.

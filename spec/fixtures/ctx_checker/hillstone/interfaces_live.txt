@@ -1,0 +1,13 @@
+H:physical state;A:admin state;L:link state;P:protocol state;U:up;D:down;K:ha keep up;C:lacp down
+========================================================================================================
+Interface name       IP address/mask    Zone name       H A L P MAC address     Description
+--------------------------------------------------------------------------------------------------------
+HA0                  0.0.0.0/0          HA              U U U D 0200.0000.0001  ------
+MGT0                 192.0.2.203/24     trust           U U U U 0200.0000.0002  ------
+cellular0/0          0.0.0.0/0          NULL            D U D D 0200.0000.0003  ------
+vswitchif1           0.0.0.0/0          NULL            U U U D 0200.0000.0004  ------
+ethernet0/0          0.0.0.0/0          HA              U U U D 0200.0000.0005  ------
+ethernet0/1          0.0.0.0/0          NULL            D U D D 0200.0000.0006  ------
+xethernet0/24        0.0.0.0/0          l2-trust        U U U D 0200.0000.0007  TO_EDGE_INSIDE
+xethernet0/25        0.0.0.0/0          l2-untrust      U U U D 0200.0000.0008  TO_EDGE_OUTSIDE
+========================================================================================================

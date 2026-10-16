@@ -1,0 +1,14 @@
+total configured hardware interfaces: 3
+name id speed/duplex/state mac address
+ethernet1/1 16 1000/full/up 00:00:00:00:00:01
+ethernet1/2 17 unknown/unknown/down 00:00:00:00:00:02
+ae1 48 [n/a]/[n/a]/up 00:00:00:00:00:03
+aggregation groups: 1
+ae1 members:
+  ethernet1/1 ethernet1/2
+total configured logical interfaces: 4
+name id vsys zone forwarding tag address
+ethernet1/1 16 1 trusted vr:default 0 192.0.2.1/24
+ethernet1/1.20 276 1 trusted vr:default 20 198.51.100.1/24
+tunnel.1 261 1 vpn vr:default 0 203.0.113.1/30
+loopback.1 262 1 trusted vr:default 0 192.0.2.254/32

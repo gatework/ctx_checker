@@ -1,0 +1,24 @@
+Ethernet1/1 is up
+admin state is up, Dedicated Interface
+  Hardware: 100/1000/10000 Ethernet, address: 0000.0000.0001
+  MTU 1500 bytes, BW 10000000 Kbit, DLY 10 usec
+  Last clearing of "show interface" counters never
+  RX
+    100 unicast packets 0 multicast packets 0 broadcast packets
+    100 input packets 8000 bytes
+    0 runts 0 giants 2 CRC 0 no buffer
+    2 input error 0 short frame 0 overrun 0 underrun 0 ignored
+    0 input with dribble 3 input discard
+  TX
+    100 output packets 8000 bytes
+    4 output error 0 collision 0 deferred 0 late collision
+    0 lost carrier 0 no carrier 0 babble 5 output discard
+Ethernet1/2 is down (Administratively down)
+admin state is down, Dedicated Interface
+    0 runts 0 giants 0 CRC/FCS 0 no buffer
+    0 input error 0 short frame 0 overrun 0 underrun 0 ignored
+    0 output error 0 collision 0 deferred 0 late collision
+port-channel1 is up
+admin state is up,
+Vlan20 is up, line protocol is up
+Loopback0 is up

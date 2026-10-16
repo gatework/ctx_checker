@@ -1,0 +1,157 @@
+
+ cpu Port Send  Rev Counter:
+================================================================================
+         Port      Receive           Send
+================================================================================
+       port-01646983679454  1697064272687
+       port-11566989567566  1566408992711
+       port-2    171279948    76778504881
+       port-3    195599421       13625194
+       port-4            0              0
+       port-5            0              0
+       port-6            0              0
+       port-7            0              0
+       port-8            0              0
+       port-9            0              0
+      port-10            0              0
+      port-11            0              0
+      port-12            0              0
+      port-13            0              0
+      port-14            0              0
+      port-15            0              0
+MGT0, physical port 2:
+    InGoodOctets:       19244375904        InBadOctets:                  0
+    InGoodPkts:          171279948        InBadPkts:                    0
+    InUnicastPkts:               0        InBroadcastPkts:              0
+    InMulticastPkts:             0        InControlPkts:                0
+    InUndersizePkts:             0        InOversizePkts:               0
+    InFragments:                 0        InJabbers:                    0
+    InMACRcvErrors:              0        InCRCAlignErrors:             0
+    DropEvents:                  0        InOver1518Pkts:           0
+    OutGoodOctets:      35705770154363        OutGoodPkts:         76778504882
+    OutUnicastPkts:              0        OutBroadcastPkts:             0
+    OutMulticastPkts:            0        OutControlPkts:               0
+    Collisions:                  0        OutDropDeferrals:             0
+    SingleCollisions:            0        MultipleCollisions:           0
+    ExcessiveCollisions:         0        LateCollisions:               0
+    Pkts64Octets:        124087373        Pkts65to127Octets:     31306091
+    Pkts128to255Octets:    1150707        Pkts256to511Octets:    11467209
+    Pkts512to1023Octets:    669763        Pkts1024toMaxOctets:    2598744
+
+2 RX Queue(s):
+===========================================================================
+Queue ID               In Pkts            In Bytes              Errors
+---------------------------------------------------------------------------
+0                    147003490         12513240171                   0
+1                     24276458          6731135733                   0
+===========================================================================
+
+2 TX Queue(s):
+===========================================================================
+Queue ID              Out Pkts           Out Bytes              Errors
+---------------------------------------------------------------------------
+0                  76778504882      35705767774920                   0
+1                            0                   0                   0
+===========================================================================
+HA0, physical port 3:
+    InGoodOctets:       32322930735        InBadOctets:                  0
+    InGoodPkts:          195599421        InBadPkts:                    0
+    InUnicastPkts:               0        InBroadcastPkts:              0
+    InMulticastPkts:             0        InControlPkts:                0
+    InUndersizePkts:             0        InOversizePkts:               0
+    InFragments:                 0        InJabbers:                    0
+    InMACRcvErrors:              0        InCRCAlignErrors:             0
+    DropEvents:                  0        InOver1518Pkts:           0
+    OutGoodOctets:      49641692816        OutGoodPkts:          206231428
+    OutUnicastPkts:              0        OutBroadcastPkts:             0
+    OutMulticastPkts:            0        OutControlPkts:               0
+    Collisions:                  0        OutDropDeferrals:             0
+    SingleCollisions:            0        MultipleCollisions:           0
+    ExcessiveCollisions:         0        LateCollisions:               0
+    Pkts64Octets:                0        Pkts65to127Octets:      2978149
+    Pkts128to255Octets:  192614606        Pkts256to511Octets:         649
+    Pkts512to1023Octets:      4309        Pkts1024toMaxOctets:       1649
+
+2 RX Queue(s):
+===========================================================================
+Queue ID               In Pkts            In Bytes              Errors
+---------------------------------------------------------------------------
+0                      1175521            88049417                   0
+1                    194423900         32234881318                   0
+===========================================================================
+
+2 TX Queue(s):
+===========================================================================
+Queue ID              Out Pkts           Out Bytes              Errors
+---------------------------------------------------------------------------
+0                    206231428         49641688800                   0
+1                            0                   0                   0
+===========================================================================
+internal0/28, physical port 0:
+    InGoodOctets:       1937403212861651        InBadOctets:                  0
+    InGoodPkts:         1646983682244        InBadPkts:                  922
+    InUnicastPkts:               0        InBroadcastPkts:              0
+    InMulticastPkts:             0        InControlPkts:                0
+    InUndersizePkts:             0        InOversizePkts:               0
+    InFragments:                 0        InJabbers:                    0
+    InMACRcvErrors:              0        InCRCAlignErrors:             0
+    DropEvents:                  0        InOver1518Pkts:           0
+    OutGoodOctets:      1959779675534657        OutGoodPkts:         1697254162569
+    OutUnicastPkts:              0        OutBroadcastPkts:             0
+    OutMulticastPkts:            0        OutControlPkts:               0
+    Collisions:                  0        OutDropDeferrals:             0
+    SingleCollisions:            0        MultipleCollisions:           0
+    ExcessiveCollisions:         0        LateCollisions:               0
+    Pkts64Octets:                0        Pkts65to127Octets:   222465371196
+    Pkts128to255Octets: 61593348128        Pkts256to511Octets:  83483445552
+    Pkts512to1023Octets:44866924013        Pkts1024toMaxOctets: 1234574594085
+
+2 RX Queue(s):
+===========================================================================
+Queue ID               In Pkts            In Bytes              Errors
+---------------------------------------------------------------------------
+0                 768061295127     888092676256013                   0
+1                 878922387117    1049310536605638                   0
+===========================================================================
+
+2 TX Queue(s):
+===========================================================================
+Queue ID              Out Pkts           Out Bytes              Errors
+---------------------------------------------------------------------------
+0                 792438849044     899620075949006                   0
+1                 904815313524    1060159000271955                   0
+===========================================================================
+internal0/29, physical port 1:
+    InGoodOctets:       1805333222249045        InBadOctets:                  0
+    InGoodPkts:         1566989569090        InBadPkts:                    0
+    InUnicastPkts:               0        InBroadcastPkts:              0
+    InMulticastPkts:             0        InControlPkts:                0
+    InUndersizePkts:             0        InOversizePkts:               0
+    InFragments:                 0        InJabbers:                    0
+    InMACRcvErrors:              0        InCRCAlignErrors:             0
+    DropEvents:                  0        InOver1518Pkts:           0
+    OutGoodOctets:      1804789707970114        OutGoodPkts:         1566408994236
+    OutUnicastPkts:              0        OutBroadcastPkts:             0
+    OutMulticastPkts:            0        OutControlPkts:               0
+    Collisions:                  0        OutDropDeferrals:             0
+    SingleCollisions:            0        MultipleCollisions:           0
+    ExcessiveCollisions:         0        LateCollisions:               0
+    Pkts64Octets:                0        Pkts65to127Octets:   229310723907
+    Pkts128to255Octets: 49340253988        Pkts256to511Octets:  89198765742
+    Pkts512to1023Octets:46853040992        Pkts1024toMaxOctets: 1152286777829
+
+2 RX Queue(s):
+===========================================================================
+Queue ID               In Pkts            In Bytes              Errors
+---------------------------------------------------------------------------
+0                 691234559124     783325405197472                   0
+1                 875755009966    1022007817051573                   0
+===========================================================================
+
+2 TX Queue(s):
+===========================================================================
+Queue ID              Out Pkts           Out Bytes              Errors
+---------------------------------------------------------------------------
+0                 690811892460     782926623617597                   0
+1                 875597101775    1021863082305933                   0
+===========================================================================

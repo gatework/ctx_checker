@@ -1,0 +1,40 @@
+IP information:
+  Router ID: 198.51.100.1,  AS number 0, IP fragtbl 20k,, IP tnltbl 1k
+
+,Interface information:
+  1: IP4 192.0.2.1 255.255.255.0 192.0.2.255, vlan 100, up, BFD off
+ 11: IP4 192.0.2.1 255.255.255.0 192.0.2.255, vlan 100, up, BFD off
+ 12: IP4 192.0.2.1 255.255.255.0 192.0.2.255, vlan 100, up, BFD off
+ 13: IP4 192.0.2.1 255.255.255.0 192.0.2.255, vlan 100, up, BFD off
+ 14: IP4 192.0.2.1 255.255.255.0 192.0.2.255, vlan 100, up, BFD off
+ 15: IP4 192.0.2.1 255.255.255.0 192.0.2.255, vlan 100, up, BFD off
+ 41: IP4 192.0.2.1 255.255.255.0 192.0.2.255, vlan 100, up, BFD off
+ 42: IP4 192.0.2.1 255.255.255.0 192.0.2.255, vlan 100, up, BFD off
+
+IPv6 Link Local Address Information:
+
+Default gateway information: metric strict
+  2: 198.51.100.1,                               vlan any,  up
+  3: 198.51.100.1,                                vlan any,  up
+  4: 198.51.100.1,                                 vlan any,  up
+ 11: 198.51.100.1,                               vlan  101, up
+ 12: 198.51.100.1,                                vlan  102, up
+ 13: 198.51.100.1,                                 vlan  103, up
+ 14: 198.51.100.1,                                vlan  104, up
+ 15: 198.51.100.1,                                  vlan  105, up
+
+Current IP forwarding settings: ON, dirbr disabled, noicmprd disabled, rtcache enabled
+
+Current local networks:
+None
+-----------------------------------------------
+Current IPv6 local networks:
+
+Current IP port settings:
+  All other ports have forwarding ON
+
+Current network filter settings:
+  none
+
+Current route map settings:
+

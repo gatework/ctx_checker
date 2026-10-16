@@ -1,0 +1,45 @@
+Transceiver status information is shown as below:
+================       xethernet0/24       =====================
+SFP+/XFP information:		EXAMPLE / 260101
+Part Number:   			EXAMPLE-SFP-10G
+Serial Number: TESTMODULE
+Transmission media: 		Other Mode
+Module temperature: 		34.29	 C
+Module temperature normal range:[0.00 , 70.00]
+Tx supply voltage: 		3.36	 V
+Tx supply voltage normal range:[ 3.13 , 3.46]
+Tx bias current: 		7.56	mA
+Tx bias current normal range:[5.00 , 10.80]
+Tx optical power:		-2.27 	dBm
+Tx optical power normal range:[-7.30 , -1.30]
+Rx optical power:		-2.84	dBm
+Rx optical power normal range:[-9.90 , -1.00]
+Module Wavelength:		850.00	nm
+single module max transmit distance:	0	km
+OM1 max transmit distance:		20	m
+OM2 max transmit distance:		80	m
+OM3 max transmit distance:		300	m
+OM4 or copper max transmit distance:	400	m
+===============================================================
+================       xethernet0/25       =====================
+SFP+/XFP information:		EXAMPLE / 260101
+Part Number:   			EXAMPLE-SFP-10G
+Serial Number: TESTMODULE
+Transmission media: 		Other Mode
+Module temperature: 		35.96	 C
+Module temperature normal range:[0.00 , 70.00]
+Tx supply voltage: 		3.36	 V
+Tx supply voltage normal range:[ 3.13 , 3.46]
+Tx bias current: 		7.82	mA
+Tx bias current normal range:[5.00 , 10.80]
+Tx optical power:		-2.76 	dBm
+Tx optical power normal range:[-7.30 , -1.30]
+Rx optical power:		-2.49	dBm
+Rx optical power normal range:[-9.90 , -1.00]
+Module Wavelength:		850.00	nm
+single module max transmit distance:	0	km
+OM1 max transmit distance:		20	m
+OM2 max transmit distance:		80	m
+OM3 max transmit distance:		300	m
+OM4 or copper max transmit distance:	400	m
+===============================================================

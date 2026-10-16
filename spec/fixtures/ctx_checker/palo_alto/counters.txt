@@ -1,0 +1,27 @@
+Interface: ethernet1/1
+Hardware interface counters read from CPU:
+bytes received 12345
+bytes transmitted 54321
+packets received 100
+packets transmitted 200
+receive incoming errors 3
+receive discarded 2
+receive errors 7
+packets dropped 1
+Logical interface counters read from CPU:
+receive errors 9
+packets dropped 4
+Interface: tunnel.1
+Logical interface counters read from CPU:
+bytes received 20
+bytes transmitted 10
+receive errors 2
+packets dropped 3
+forwarding errors 0
+no route 0
+Interface: Management Interface
+Logical interface counters:
+receive errors 1
+transmit errors 2
+receive packets dropped 3
+transmit packets dropped 4

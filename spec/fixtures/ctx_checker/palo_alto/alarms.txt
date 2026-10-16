@@ -1,0 +1,5 @@
+chassis.alarm: { }
+chassis.leds: { 'alarm': Off, 'fans': Green, 'status': Green, }
+env.s1.fan.0: { 'alarm': False, 'avg': True, 'desc': Fan #1 Operational, 'min': 1, }
+env.s1.fan.1: { 'alarm': True, 'avg': False, 'desc': Fan #2 Operational, 'min': 1, }
+ha.runtime.device.alarm: False

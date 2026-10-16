@@ -1,0 +1,9 @@
+IP statistics:
+ Rcvd: 100 total, 80 local destination
+ 0 format errors, 2 checksum errors, 0 bad hop count
+ 0 unknown protocol, 3 not a gateway
+ 0 security failures, 0 bad options, 0 with options
+ Drop: 4 encapsulation failed, 0 unresolved, 0 no adjacency
+ 5 no route, 7 unicast RPF, 0 forced drop
+ICMP statistics:
+ Rcvd: 100 checksum errors

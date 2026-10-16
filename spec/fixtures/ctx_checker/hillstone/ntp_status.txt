@@ -1,0 +1,5 @@
+ntp version is 4
+ntp client is enabled, authentication is disabled
+ntp query-interval is 5 minute, max-adjustment time is 400 seconds
+ntp server ntp.example.net, vrouter trust-vr, prefer, last sync: 2026-10-16 11:45:20 (Error)
+ntp server 192.0.2.20, vrouter mgt-vr, last sync: 2026-10-16 11:45:20 (Error)

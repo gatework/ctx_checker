@@ -1,0 +1,16 @@
+IP Software Processed Traffic Statistics
+----------------------------------------
+Transmission and reception:
+  Packets received: 500, sent: 200, consumed: 0,
+Errors:
+  Bad checksum: 1, packet too small: 0, bad version: 0,
+  Bad header length: 0, bad packet length: 0, bad destination: 0,
+  Bad ttl: 0, could not forward: 3, no buffer dropped: 0,
+  Bad encapsulation: 0, no route: 4, non-existent protocol: 0
+Fragmentation/reassembly:
+  Fragments received: 0, fragments sent: 0, fragments created: 0,
+  Fragments dropped: 0, packets with DF: 0, packets reassembled: 0,
+  Fragments timed out: 0
+ICMP Software Processed Traffic Statistics
+  Format error: 0, checksum error: 10
+Statistics last reset: never

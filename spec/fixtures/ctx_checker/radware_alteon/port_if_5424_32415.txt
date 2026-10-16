@@ -1,0 +1,15 @@
+------------------------------------------------------------------
+Interface statistics for port 27:
+                     ifHCIn Counters       ifHCOut Counters
+Octets:                      2993752             1583869065
+UcastPkts:                     45181               23180981
+BroadcastPkts:                  4507                  43618
+MulticastPkts:                     0                      0
+Discards:                          0                      0
+Errors:                            0                      0
+Per second Interface statistics:
+Octets:                            0                      0
+UcastPkts:                         0                      0
+Discards:                          0                      0
+Errors:                            0                      0
+

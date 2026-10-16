@@ -1,0 +1,6 @@
+System temperature information (degree centigrade):
+----------------------------------------------------------------------
+Slot Sensor Temperature Lower Warning Alarm Shutdown
+1 hotspot 1 42 0 75 90 105
+1 inflow 1 31 -5 55 65 NA
+2 hotspot 1 97 0 80 95 110

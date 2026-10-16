@@ -1,0 +1,5 @@
+ Slot 1:
+ Fan 1:
+ State    : Normal
+
+

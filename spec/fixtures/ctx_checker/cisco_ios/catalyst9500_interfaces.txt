@@ -1,0 +1,16 @@
+Vlan7 is up, line protocol is up , Autostate Enabled
+  Hardware is Ethernet SVI, address is 0200.0000.0007 (bia 0200.0000.0007)
+  Input queue: 0/375/0/0 (size/max/drops/flushes); Total output drops: 0
+  0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored
+  Output 0 broadcasts (0 IP multicasts)
+  0 output errors, 0 interface resets
+TwentyFiveGigE1/0/1 is up, line protocol is up (connected)
+  Full-duplex, 25Gb/s, media type is SFP-25GBase-SR
+  Fec is auto
+  3 input errors, 2 CRC, 0 frame, 0 overrun, 0 ignored
+  Output 4 broadcasts (5 multicasts)
+  1 output errors, 0 interface resets
+GigabitEthernet0/0 is down, line protocol is down
+  Unknown, Unknown, link type is auto, media type is RJ45
+  0 input errors, 0 CRC
+  0 output errors

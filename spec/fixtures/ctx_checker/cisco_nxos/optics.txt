@@ -1,0 +1,22 @@
+Ethernet1/1
+    transceiver is present
+    type is QSFP-100G-SR4
+    name is LAB
+    serial number is FIXTURE
+    QSFP Detail Diagnostics Information (internal calibration)
+    Lane Number:1 Network Lane
+                Current              Alarms                  Warnings
+                Measurement     High        Low         High          Low
+  Tx Power       -1.00 dBm       3.00 dBm   -9.00 dBm    2.00 dBm     -7.00 dBm
+  Rx Power      -12.00 dBm --    3.00 dBm   -9.00 dBm    2.00 dBm     -7.00 dBm
+    Lane Number:2 Network Lane
+                Current              Alarms                  Warnings
+                Measurement     High        Low         High          Low
+  Tx Power       -1.10 dBm       3.00 dBm   -9.00 dBm    2.00 dBm     -7.00 dBm
+  Rx Power       -1.20 dBm       3.00 dBm   -9.00 dBm    2.00 dBm     -7.00 dBm
+Ethernet1/2
+    transceiver is present
+    type is SFP-1000BASE-T
+    DOM is not supported
+Ethernet1/3
+    transceiver is not present

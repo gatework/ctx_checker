@@ -1,0 +1,16 @@
+------------------------------------------------------------------
+Ethernet statistics for port 27:
+dot3StatsAlignmentErrors:                   0
+dot3StatsFCSErrors:                         0
+dot3StatsSingleCollisionFrames:             0
+dot3StatsMultipleCollisionFrames:           0
+dot3StatsSQETestErrors:                    NA
+dot3StatsDeferredTransmissions:             0
+dot3StatsLateCollisions:                    0
+dot3StatsExcessiveCollisions:               0
+dot3StatsInternalMacTransmitErrors:         0
+dot3StatsCarrierSenseErrors:                0
+dot3StatsFrameTooLongs:                     0
+dot3StatsInternalMacReceiveErrors:          0
+dot3CollFrequencies [1-15]:                NA
+

@@ -1,0 +1,20 @@
+Loadsharing Type: Shar -- Loadsharing, NonS -- Non-Loadsharing
+Port Status: S -- Selected, U -- Unselected, I -- Individual
+Flags: A -- LACP_Activity, B -- LACP_Timeout, C -- Aggregation,
+       D -- Synchronization, E -- Collecting, F -- Distributing,
+       G -- Defaulted, H -- Expired
+Aggregate Interface: Bridge-Aggregation10
+Aggregation Mode: Dynamic
+Loadsharing Type: Shar
+Local:
+  Port Status Priority Oper-Key Flag
+  GE1/0/1 S 32768 10 {ACDEF}
+  GE1/0/2 U 32768 10 {AC}
+Remote:
+  Actor Partner Priority Oper-Key SystemID Flag
+  GE1/0/1 1 32768 11 0x8000,0000-0000-0001 {ACDEF}
+Aggregate Interface: Route-Aggregation20
+Aggregation Mode: Static
+Loadsharing Type: Shar
+  Port Status Priority Oper-Key
+  XGE1/0/3 I 32768 20

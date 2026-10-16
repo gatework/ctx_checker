@@ -1,0 +1,13 @@
+ Clock status: synchronized
+ Clock stratum: 3
+ System peer: 192.0.2.123
+ Local mode: client
+ Reference clock ID: 192.0.2.123
+ Leap indicator: 00
+ Clock jitter: 0.001312 s
+ Stability: 0.000 pps
+ Clock precision: 2^-19
+ Root delay: 97.51892 ms
+ Root dispersion: 50.72021 ms
+ Reference time: ee7c166a.82bafa17  Fri, Oct 16 2026 11:20:10.510
+ System poll interval: 64 s

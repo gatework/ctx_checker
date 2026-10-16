@@ -1,0 +1,18 @@
+----Thermal----
+Slot Description Alarm Degrees C Min C Max C
+S1 Temperature at MP False 32.50 -5.00 75.00
+S1 Temperature at DP True 86.00 -5.00 80.00
+----Fans----
+Slot Description Alarm RPMs Min RPM
+S1 Fan #1 RPM False 12000 2500
+S1 Fan #2 RPM True 0 2500
+----Fan Tray----
+Slot Description Alarm Inserted
+S1 Fan Tray #1 False True
+----Power----
+Slot Description Alarm Volts Min V Max V
+S1 12.0V Power Rail False 12.10 11.00 13.00
+----Power Supplies----
+Slot Description Alarm Inserted
+S1 Power Supply #1 False True
+S1 Power Supply #2 True True

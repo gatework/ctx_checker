@@ -1,0 +1,7 @@
+Memory statistics are measured in KB:
+Slot 1:
+             Total      Used      Free    Shared   Buffers    Cached   FreeRatio
+Mem:        506408    351588    154820         0         0    127644       33.1%
+-/+ Buffers/Cache:    223944    282464
+Swap:            0         0         0
+

@@ -1,0 +1,10 @@
+NTP state:
+NTP synched to time.example.test
+NTP server: time.example.test
+status: synched
+reachable: yes
+authentication-type: none
+NTP server: time2.example.test
+status: rejected
+reachable: yes
+authentication-type: none

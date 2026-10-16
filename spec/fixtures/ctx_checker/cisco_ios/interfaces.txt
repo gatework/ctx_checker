@@ -1,0 +1,16 @@
+GigabitEthernet1/0/1 is up, line protocol is up (connected)
+  Hardware is Gigabit Ethernet, address is 0000.0000.0001
+  MTU 1500 bytes, BW 1000000 Kbit/sec, DLY 10 usec,
+     reliability 255/255, txload 1/255, rxload 1/255
+  Last clearing of "show interface" counters never
+  0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored
+  0 output errors, 0 collisions, 0 interface resets
+GigabitEthernet1/0/2 is administratively down, line protocol is down (disabled)
+  Hardware is Gigabit Ethernet, address is 0000.0000.0002
+  2 input errors, 2 CRC, 0 frame, 0 overrun, 0 ignored
+  3 output errors, 0 collisions, 0 interface resets
+Port-channel1 is up, line protocol is up (connected)
+Vlan20 is up, line protocol is down
+Loopback0 is up, line protocol is up
+Tunnel10 is up, line protocol is up
+GigabitEthernet1/0/1.100 is up, line protocol is up

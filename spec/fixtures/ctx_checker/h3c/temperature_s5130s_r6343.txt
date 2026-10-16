@@ -1,0 +1,11 @@
+ System temperature information (degree centigrade):
+ ----------------------------------------------------------------------
+ Slot  Sensor    Temperature  Lower  Warning  Alarm  Shutdown
+ 1     hotspot 1  58           0      84       98     105
+ 1     hotspot 2  63           0      84       98     105
+ 1     hotspot 3  36           0      100      110    NA
+ 1     hotspot 4  33           0      100      110    NA
+ 1     hotspot 5  37           0      100      110    NA
+ 1     hotspot 6  44           0      100      110    NA
+ 1     hotspot 7  43           0      100      110    NA
+ 1     hotspot 8  45           0      100      110    NA
