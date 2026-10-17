@@ -2,6 +2,10 @@
 
 Changes to the public contract are recorded here. Versions follow Semantic Versioning.
 
+## 0.2.1 (2026-10-17)
+
+- Validate time-limit snapshot compatibility during policy construction; reject unsupported Numeric objects before evaluation while preserving exact Rational values.
+
 ## 0.2.0 (2026-10-17)
 
 - Require ctx_parser and ctx_driver 0.2.x for the renamed public contracts.

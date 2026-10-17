@@ -27,7 +27,7 @@ module CtxChecker
       @resource_thresholds = CtxParser::Immutable.copy(DEFAULT_RESOURCES.merge(resource_thresholds))
       @temperature_thresholds, @required_components, @required_dimensions, @device_counter_limits =
         [ temperature_thresholds, required_components, required_dimensions, device_counter_limits ].map { |value| CtxParser::Immutable.copy(value) }
-      @max_clock_skew_seconds, @max_ntp_offset_ms = max_clock_skew_seconds, max_ntp_offset_ms
+      @max_clock_skew_seconds, @max_ntp_offset_ms = CtxParser::Immutable.copy([ max_clock_skew_seconds, max_ntp_offset_ms ])
       freeze
     end
 
