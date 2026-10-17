@@ -83,6 +83,19 @@ RSpec.describe "CtxChecker domain contracts" do
     end
   end
 
+  it "keeps required interface membership exact and independent of caller mutations" do
+    name = +"Ethernet1/1"
+    names = [ name ]
+    policy = CtxChecker::Policy.new(required_interfaces: names)
+    name.replace("Ethernet1/2")
+    names << "Ethernet1/3"
+    expect(policy.required_interface?("Ethernet1/1")).to be(true)
+    expect(policy.required_interface?("ethernet1/1")).to be(false)
+    expect(policy.required_interface?("Ethernet1/2")).to be(false)
+    expect(policy.required_interface?("Ethernet1/3")).to be(false)
+    expect(CtxChecker::Policy.new.required_interface?("Ethernet1/1")).to be(false)
+  end
+
   it "requires unique optical policy identities and complete ordered threshold pairs" do
     thresholds = { interface: "Ethernet1/1", lane: 0, metric: :rx_power, low_alarm: -18.0, high_alarm: 3.5 }
     policy = CtxChecker::Policy.new(optical_thresholds: [ thresholds ])
@@ -105,5 +118,19 @@ RSpec.describe "CtxChecker domain contracts" do
     expect(report.to_text.lines.last.length).to be < 700
     expect { CtxChecker::Finding.new(id: "unsafe\n", dimension: :optics, status: :fail, reason: :optical_threshold) }.to raise_error(ArgumentError)
     expect { CtxChecker::Finding.new(id: "optics.error", dimension: :optics, status: :fail, reason: :"unsafe\n") }.to raise_error(ArgumentError)
+  end
+end
+
+RSpec.describe "Required observation dimensions" do
+  it "distinguishes required dimensions from individual interface and optical identities" do
+    policy = CtxChecker::Policy.new(required_interfaces: [ "Ethernet1/1" ], required_dimensions: [ :cpu ],
+      required_components: { power: [ "PSU1" ] })
+    %i[interfaces cpu power].each do |dimension|
+      expect(policy.required_dimension?(dimension)).to be(true)
+    end
+    expect(policy.required_dimension?(:optics)).to be(false)
+    expect(policy.required_dimension?("Ethernet1/1")).to be(false)
+    expect(policy.required_interface?("Ethernet1/1")).to be(true)
+    expect(policy.system.required_dimension?(:power)).to be(true)
   end
 end

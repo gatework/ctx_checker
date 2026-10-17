@@ -2,12 +2,12 @@
 
 require "ctx_parser/immutable"
 require "time"
-require_relative "system_record"
+require_relative "system_fields"
 
 module CtxChecker
   # 提供经过校验的不可变运行事实，与后续健康评估相互独立。
   class Observation
-    NAMES = (%i[interfaces counters aggregation optics bgp ospf] + SystemRecord::FIELDS.keys).freeze
+    NAMES = (%i[interfaces counters aggregation optics bgp ospf] + SystemFields::FIELDS.keys).freeze
     STATUSES = %i[complete partial failed unsupported not_requested not_applicable].freeze
     METRICS = %i[in_errors out_errors in_discards out_discards crc_errors stomped_crc_errors out_carrier_errors].freeze
     COUNTER_UNITS = %i[packets bytes events unknown].freeze
@@ -19,13 +19,13 @@ module CtxChecker
       aggregation: %i[group member member_status oper_status],
       optics: %i[interface lane metric value unit low_alarm low_warning high_warning high_alarm alarm present dom_supported applicable],
       bgp: %i[vrf afi_safi peer state received_prefixes remote_as],
-      ospf: %i[vrf process_id area interface router_id neighbor_address state network_type local_role neighbor_role], **SystemRecord::FIELDS
+      ospf: %i[vrf process_id area interface router_id neighbor_address state network_type local_role neighbor_role], **SystemFields::FIELDS
     }.transform_values { |fields| fields + [ :source_complete ] })
     IDENTITIES = CtxParser::Immutable.copy(interfaces: %i[name], counters: %i[interface metric],
       aggregation: %i[group member], optics: %i[interface lane metric], bgp: %i[vrf afi_safi peer],
-      ospf: %i[vrf process_id interface router_id neighbor_address], **SystemRecord::IDENTITIES)
+      ospf: %i[vrf process_id interface router_id neighbor_address], **SystemFields::IDENTITIES)
     REQUIRED = CtxParser::Immutable.copy(interfaces: %i[name], counters: %i[interface metric],
-      aggregation: %i[group], optics: %i[interface metric], bgp: %i[peer], ospf: %i[router_id], **SystemRecord::REQUIRED)
+      aggregation: %i[group], optics: %i[interface metric], bgp: %i[peer], ospf: %i[router_id], **SystemFields::REQUIRED)
     ISSUE_FIELDS = %i[code line lines field count skipped interface metric metrics lane section expected observed group stage component scope window_seconds command error_type].freeze
     ERROR_TYPE_PATTERN = /\A(?:[A-Z][A-Za-z0-9_]*::)*[A-Z][A-Za-z0-9_]*\z/
     ENUMS = CtxParser::Immutable.copy(
@@ -47,6 +47,10 @@ module CtxChecker
         raise ArgumentError, "Unavailable observations cannot contain records"
       end
       @name, @status = name, status
+      validate_scopes!(covered_scopes)
+      covered_scopes = covered_scopes.map do |scope|
+        scope[:process_id].is_a?(Integer) ? scope.merge(process_id: scope[:process_id].to_s) : scope
+      end
       validate_scopes!(covered_scopes)
       normalized = records.map { |record| validate_record(record) }
       identities = normalized.map { |record| identity(record) }
@@ -128,10 +132,10 @@ module CtxChecker
         next if value.nil?
         valid = if key == :source_complete
           value == true || value == false
-        elsif SystemRecord::FIELDS.key?(name)
-          SystemRecord.valid?(name, key, value)
+        elsif SystemFields::FIELDS.key?(name)
+          SystemFields.valid_value?(name, key, value)
         elsif key == :sampled_at
-          SystemRecord.timestamp?(value)
+          SystemFields.timestamp?(value)
         elsif name == :counters && key == :unit
           COUNTER_UNITS.include?(value)
         elsif name == :counters && key == :scope
@@ -156,6 +160,7 @@ module CtxChecker
         end
         raise ArgumentError, "Invalid #{name} field #{key}" unless valid
       end
+      row[:process_id] = row[:process_id].to_s if name == :ospf && row[:process_id].is_a?(Integer)
       row
     end
 

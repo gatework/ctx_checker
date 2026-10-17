@@ -2,7 +2,7 @@
 
 require_relative "../../parsers/base"
 require_relative "system_values"
-require "ctx_parser/result_set"
+require "ctx_parser/results"
 
 module CtxChecker
   module CiscoIos
@@ -16,7 +16,7 @@ module CtxChecker
         # 解析 show environment all，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           @rows = { temperature: [], environment: [], power: [] }
-          @problems = @rows.transform_values { [] }
+          @problems = @rows.transform_values { diagnostics }
           @switch = "active"
           @temperature = nil
           @sensor_table = false
@@ -33,7 +33,7 @@ module CtxChecker
             identity = dimension == :temperature ? [ :component ] : %i[component kind]
             [ dimension, build_result(rows, complete: complete, recognized: rows.any?, issues: @problems[dimension], identity: identity) ]
           end
-          CtxParser::ResultSet.new(results: results)
+          CtxParser::Results.new(by_dimension: results)
         end
 
         # Catalyst StackWise Virtual 在传感器后按交换机报告电源和风扇托盘。

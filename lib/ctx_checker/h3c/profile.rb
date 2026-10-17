@@ -22,7 +22,7 @@ module CtxChecker
   module H3c
     # 声明 Comware 只读查询；BGP 明确限定为公网 IPv4 单播。
     class Profile < CtxParser::Profile
-      CATALOG = CtxParser::CommandCatalog.new([
+      DECLARATIONS = CtxParser::Commands.new([
         { dimensions: %i[interfaces counters], command: "display interface", parser: Parsers::DisplayInterface },
         { dimensions: [ :counters ], command: "display counters inbound interface", parser: Parsers::DisplayCountersInboundInterface },
         { dimensions: [ :counters ], command: "display counters outbound interface", parser: Parsers::DisplayCountersOutboundInterface },
@@ -39,8 +39,8 @@ module CtxChecker
         { dimensions: [ :ntp ], command: "display ntp-service status", parser: Parsers::DisplayNtpServiceStatus },
         { dimensions: [ :alarms ], command: "display alarm active", parser: Parsers::DisplayAlarmActive }
       ], multi_command: true)
-      COMMANDS = CATALOG.commands
-      PARSERS = CATALOG.parsers
+      COMMANDS = DECLARATIONS.by_dimension
+      PARSERS = DECLARATIONS.parsers
 
       # 每个已观察接口都必须保留入站与出站两个方向的证据状态。
       def counter_metrics = %i[in_errors out_errors].freeze

@@ -11,7 +11,7 @@ module CtxChecker
       # 按策略评估资源，同时保留测量值缺失的状态。
       def assess(record)
         name = record[:name]
-        required = @policy.required_interfaces.include?(name)
+        required = @policy.required_interface?(name)
         status, reason = if record[:admin_status] == :down && !required
           [ :not_applicable, :administratively_down ]
         elsif record[:oper_status] == :down || record[:protocol_status] == :down && record[:protocol_applicable] != false || required && record[:admin_status] == :down

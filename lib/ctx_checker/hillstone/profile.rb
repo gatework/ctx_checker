@@ -17,7 +17,7 @@ module CtxChecker
   module Hillstone
     # StoneOS 命令已在 SG-6000-A3700 验证；未覆盖作用域明确保留不可用。
     class Profile < CtxParser::Profile
-      CATALOG = CtxParser::CommandCatalog.new([
+      DECLARATIONS = CtxParser::Commands.new([
         { dimensions: %i[interfaces aggregation], command: "show interface", parser: Parsers::ShowInterface },
         { dimensions: [ :counters ], command: "show interface counter", parser: Parsers::ShowInterfaceCounter },
         { dimensions: [ :optics ], command: "show transceiver", parser: Parsers::ShowTransceiver },
@@ -30,8 +30,8 @@ module CtxChecker
         { dimensions: [ :ntp ], command: "show ntp status", parser: Parsers::ShowNtpStatus },
         { dimensions: [ :device_counters ], command: "show cpu-cntr", parser: Parsers::ShowCpuCntr }
       ])
-      COMMANDS = CATALOG.commands
-      PARSERS = CATALOG.parsers
+      COMMANDS = DECLARATIONS.by_dimension
+      PARSERS = DECLARATIONS.parsers
 
       # 在线接口丢弃表不提供错误包或 CRC 测量。
       def counter_metrics = %i[in_errors out_errors crc_errors].freeze

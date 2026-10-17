@@ -18,7 +18,7 @@ module CtxChecker
         # 要求存在数据表或明确空表证据；标志图例不能作为成员记录。
         def parse_output(text, complete:)
           text = clean(text)
-          rows, issues, groups, totals = [], [], [], []
+          rows, issues, groups, totals = [], diagnostics, [], []
           current, header, empty = nil, false, false
           text.each_line.with_index(1) do |source, number|
             line = source.strip
@@ -49,16 +49,19 @@ module CtxChecker
           totals.each do |total|
             issues << { code: :count_mismatch, expected: total, observed: groups.size } unless total == groups.size
           end
+          member_groups = rows.to_h { |row| [ row[:group], true ] }
           groups.each do |group|
-            next if rows.any? { |row| row[:group] == group[:group] }
+            next if member_groups.key?(group[:group])
 
             rows << group.merge(member: nil, member_status: :unknown)
+            member_groups[group[:group]] = true
             issues << { code: :aggregation_members_missing, group: group[:group] }
           end
           repeated_groups = groups.group_by { |group| group[:group] }.select { |_, entries| entries.size > 1 }.keys
           if repeated_groups.any?
             issues << { code: :duplicate_aggregation_group, count: repeated_groups.size }
-            rows.reject! { |row| repeated_groups.include?(row[:group]) }
+            repeated = repeated_groups.to_h { |name| [ name, true ] }
+            rows.reject! { |row| repeated.key?(row[:group]) }
           end
           issues << { code: :contradictory_empty } if empty && groups.any?
           build_result(rows, complete: complete, recognized: empty || (header && groups.any?), issues: issues, identity: %i[group member])

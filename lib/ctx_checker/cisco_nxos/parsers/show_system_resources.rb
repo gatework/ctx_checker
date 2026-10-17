@@ -2,7 +2,7 @@
 
 require_relative "../../parsers/base"
 require_relative "../../cisco_ios/parsers/system_values"
-require "ctx_parser/result_set"
+require "ctx_parser/results"
 
 module CtxChecker
   module CiscoNxos
@@ -15,9 +15,10 @@ module CtxChecker
 
         # 解析 show system resources，保留不完整或不支持的证据。
         def parse_output(text, complete:)
-          cpu, memory, cpu_issues, memory_issues = [], [], [], []
+          cpu, memory, cpu_issues, memory_issues = [], [], diagnostics, diagnostics
           caches, statuses = [], []
           kernel_cache = {}
+          duplicate_cache = false
           clean(text).each_line.with_index(1) do |source, number|
             line = source.strip
             next if line.empty?
@@ -38,7 +39,10 @@ module CtxChecker
               caches << match.captures.sum { |value| Integer(value, 10) * 1024 }
             elsif (match = /\AKernel (buffers|cached)\s*:\s*(\d+)K Used\z/i.match(line))
               key = match[1].downcase
-              memory_issues << { code: :duplicate_memory_cache, line: number } if kernel_cache.key?(key)
+              if kernel_cache.key?(key)
+                duplicate_cache = true
+                memory_issues << { code: :duplicate_memory_cache, line: number }
+              end
               kernel_cache[key] = Integer(match[2], 10) * 1024
             elsif (match = /\ACurrent memory status:\s*(.+)\z/i.match(line))
               state = match[1].casecmp?("severe") ? :critical : component_status(match[1])
@@ -56,7 +60,6 @@ module CtxChecker
             end
           end
           memory_issues << { code: :incomplete_memory_cache } if kernel_cache.size == 1
-          duplicate_cache = memory_issues.any? { |issue| issue[:code] == :duplicate_memory_cache }
           caches << kernel_cache.values.sum if kernel_cache.size == 2 && !duplicate_cache
           memory_issues << { code: :duplicate_memory_cache } if caches.size > 1
           memory_issues << { code: :duplicate_memory_status } if statuses.size > 1
@@ -78,7 +81,7 @@ module CtxChecker
               memory_issues << { code: :inconsistent_memory_cache }
             end
           end
-          CtxParser::ResultSet.new(results: {
+          CtxParser::Results.new(by_dimension: {
             cpu: build_result(cpu, complete: complete, recognized: cpu.any?, issues: cpu_issues, identity: %i[component scope window_seconds]),
             memory: build_result(memory, complete: complete, recognized: memory.any?, issues: memory_issues, identity: %i[component scope])
           })

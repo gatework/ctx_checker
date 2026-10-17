@@ -16,7 +16,7 @@ module CtxChecker
         # 解析 show counter global，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           source = clean(text)
-          rows, totals, issues = [], [], []
+          rows, totals, issues = [], [], diagnostics
           title, header = false, false
           source.each_line.with_index(1) do |raw, number|
             line = raw.strip

@@ -19,10 +19,10 @@ module CtxChecker
           return results + [ finding(:unknown, :clock_time_unavailable, entity: entity) ]
         end
         observed_at = @observation.observed_at || @snapshot.observed_at
-        skew = (Time.iso8601(record[:time]) - observed_at).abs
+        skew_seconds = (Time.iso8601(record[:time]) - observed_at).abs
         limit = @policy.system.max_clock_skew_seconds
-        results << finding(skew > limit ? :fail : :pass, :clock_skew, entity: entity,
-          actual: { time: record[:time], skew_seconds: skew }, expected: { maximum_seconds: limit }, severity: skew > limit ? :warning : :info)
+        results << finding(skew_seconds > limit ? :fail : :pass, :clock_skew, entity: entity,
+          actual: { time: record[:time], skew_seconds: skew_seconds }, expected: { maximum_seconds: limit }, severity: skew_seconds > limit ? :warning : :info)
         results
       end
     end

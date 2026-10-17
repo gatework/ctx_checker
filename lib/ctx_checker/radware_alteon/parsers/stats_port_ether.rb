@@ -17,7 +17,7 @@ module CtxChecker
 
         # 将各 IEEE 计数器绑定到其明确的数据端口标题。
         def parse_output(text, complete:)
-          blocks, issues, current = [], [], nil
+          blocks, issues, current = [], diagnostics, nil
           clean(text).each_line do |raw|
             line = raw.strip
             next if line.empty? || /\A-+\z/.match?(line)

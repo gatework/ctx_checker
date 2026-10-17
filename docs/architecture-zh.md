@@ -23,12 +23,12 @@ net-connector session -> Collector / CtxDriver::Reader -> 逐命令 Parser
 ### 文件组织
 
 * `lib/ctx_checker/{observation,snapshot,policy,finding,report}.rb`：不可变领域对象和公共契约。
-* `lib/ctx_checker/{system_record,system_policy,observation_merger}.rb`：系统指标字段、运行阈值及多命令证据组合。
+* `lib/ctx_checker/{system_fields,system_policy,observation_merger}.rb`：系统指标字段、运行阈值及多命令证据组合。
 * `lib/ctx_checker/{evaluator,collector,runtime_parser,parser_registry}.rb`：判定组合、采集和离线入口。
 * `lib/ctx_checker/checks/*.rb`：按指标组织的厂商无关检查。
 * `lib/ctx_checker/parsers/{base,interface_names,scoped_result}.rb`：文本边界、完整性、接口名称及协议表范围证明。
 * `lib/ctx_checker/{h3c,cisco_ios,cisco_nxos,palo_alto,hillstone,radware_alteon}/profile.rb`：只读查询目录及厂商发现策略。
-* `lib/ctx_checker/<platform>/parsers/<command>.rb`：一个命令一个解析器；一份回显包含多个指标时返回 ResultSet。
+* `lib/ctx_checker/<platform>/parsers/<command>.rb`：一个命令一个解析器；一份回显包含多个指标时返回 Results。
 
 不创建每厂商一个巨型解析模板。共享同一语法才共享解析机制；健康规则集中在 checks。
 型号变体通过 Profile 策略或 MODEL_PARSERS 显式扩展，不按未知型号猜测命令。

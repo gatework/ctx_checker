@@ -12,7 +12,7 @@ module CtxChecker
         # 解析 show ntp，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           source = clean(text)
-          rows, globals, issues = [], [], []
+          rows, globals, issues = [], [], diagnostics
           current, fields, header, peer_fields = nil, {}, false, {}
           source.each_line.with_index(1) do |raw, number|
             line = raw.strip

@@ -25,7 +25,7 @@ module CtxChecker
     # Alteon 菜单查询独立于其他 Radware 产品系列。
     class Profile < CtxParser::Profile
       MAX_DISCOVERED_PORTS = 256
-      CATALOG = CtxParser::CommandCatalog.new([
+      DECLARATIONS = CtxParser::Commands.new([
         { dimensions: [ :interfaces ], command: "/info/link", parser: Parsers::InfoLink },
         { dimensions: [ :interfaces ], command: "/info/l3/ip", parser: Parsers::InfoL3Ip },
         { dimensions: [ :aggregation ], command: "/info/l2/trunk", parser: Parsers::InfoL2Trunk },
@@ -41,33 +41,33 @@ module CtxChecker
         { dimensions: [ :clock ], command: "/info/sys/general", parser: Parsers::InfoSysGeneral },
         { dimensions: %i[ntp device_counters], command: "/stats/sys/ntp", parser: Parsers::StatsSysNtp }
       ], multi_command: true)
-      COMMANDS = CATALOG.commands
-      PARSERS = CATALOG.parsers
+      COMMANDS = DECLARATIONS.by_dimension
+      PARSERS = DECLARATIONS.parsers
 
       # 打开连接器前，拒绝已知不兼容的产品系列。
       def initialize(model: nil)
         super
         raise ArgumentError, "DefensePro requires a separate checker profile" if /defen[cs]e[\s_-]*pro/i.match?(model.to_s)
 
-        @catalog = CATALOG
+        @declarations = DECLARATIONS
       end
 
       # 扩展后的实例保留不可变命令与实现索引。
-      def commands = @catalog.commands
+      def commands = @declarations.by_dimension
 
       # 绑定端口的解析器复用基础型号覆盖及命令选择契约。
-      def parsers = @catalog.parsers
+      def parsers = @declarations.parsers
 
       # 已知光模块命令缺陷根据固件事实判断，不依据型号名称猜测。
       def with_software_version(value)
         raise ArgumentError, "Software version must be text" unless value.nil? || value.is_a?(String)
 
-        entries = @catalog.entries.reject { |entry| entry[:dimensions].include?(:optics) }
+        entries = @declarations.entries.reject { |entry| entry[:dimensions].include?(:optics) }
         if transceiver_fixed?(value)
           entries += [ { dimensions: [ :optics ], command: "/info/transceiver", parser: Parsers::InfoTransceiver } ]
         end
         expanded = dup
-        expanded.instance_variable_set(:@catalog, CtxParser::CommandCatalog.new(entries, multi_command: true))
+        expanded.instance_variable_set(:@declarations, CtxParser::Commands.new(entries, multi_command: true))
         expanded
       end
 
@@ -91,7 +91,7 @@ module CtxChecker
             { dimensions: [ :counters ], command: "/stats/port #{port}/ether", parser: Parsers::StatsPortEther.for_port(port) } ]
         end
         expanded = dup
-        expanded.instance_variable_set(:@catalog, CtxParser::CommandCatalog.new(@catalog.entries + additions, multi_command: true))
+        expanded.instance_variable_set(:@declarations, CtxParser::Commands.new(@declarations.entries + additions, multi_command: true))
         expanded
       end
 

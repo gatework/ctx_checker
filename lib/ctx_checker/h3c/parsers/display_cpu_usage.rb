@@ -45,8 +45,9 @@ module CtxChecker
               @issues << { code: :unrecognized_cpu_line }
             end
           end
-          components.each do |component|
-            missing = [ 5, 60, 300 ] - rows.select { |row| row[:component] == component }.map { |row| row[:window_seconds] }
+          windows = rows.group_by { |row| row[:component] }.transform_values { |samples| samples.map { |row| row[:window_seconds] }.uniq }
+          components.uniq.each do |component|
+            missing = [ 5, 60, 300 ] - windows.fetch(component, [])
             @issues << { code: :missing_cpu_windows, component: component, count: missing.size } if missing.any?
           end
           build_result(rows, complete: complete, recognized: components.any?, identity: %i[component scope window_seconds])

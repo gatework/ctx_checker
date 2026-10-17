@@ -7,7 +7,7 @@ module CtxChecker
   {
     Observation: "observation", Snapshot: "snapshot", Policy: "policy", Finding: "finding",
     Report: "report", Evaluator: "evaluator", RuntimeParser: "runtime_parser", Collector: "collector", Applicability: "applicability",
-    SystemPolicy: "system_policy", SystemRecord: "system_record", ObservationMerger: "observation_merger", Failure: "failure",
+    SystemPolicy: "system_policy", SystemFields: "system_fields", ObservationMerger: "observation_merger", Failure: "failure",
     ParserRegistry: "parser_registry", Parsers: "parsers/base", H3c: "h3c/profile",
     CiscoIos: "cisco_ios/profile", CiscoNxos: "cisco_nxos/profile", PaloAlto: "palo_alto/profile",
     Hillstone: "hillstone/profile", RadwareAlteon: "radware_alteon"

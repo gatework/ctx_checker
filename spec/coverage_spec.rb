@@ -182,6 +182,6 @@ RSpec.describe "Runtime query coverage and explicit measurement requirements" do
     policy = CtxChecker::Policy.new(required_optics: source)
     source.first[:interface] = "changed"
     expect(policy.required_optics).to eq([ identity ])
-    expect(policy).to be_required(:optics)
+    expect(policy).to be_required_dimension(:optics)
   end
 end

@@ -2,7 +2,7 @@
 
 require_relative "../../parsers/base"
 require_relative "../../parsers/interface_names"
-require "ctx_parser/result_set"
+require "ctx_parser/results"
 
 module CtxChecker
   module CiscoIos
@@ -23,22 +23,24 @@ module CtxChecker
         # 分别跟踪覆盖率；有效状态头不能证明计数器已采集。
         def parse_output(text, complete:)
           text = clean(text)
-          interfaces, counters, state_issues, counter_issues = [], [], [], []
+          interfaces, counters, state_issues, counter_issues = [], [], diagnostics, diagnostics
           current = nil
+          states = {}
           text.each_line.with_index(1) do |source, number|
             line = source.strip
             next if line.empty?
 
             if (match = interface_header(line))
               current = interface_record(match)
+              states = current.slice(:admin_status, :protocol_status).transform_values { |value| value == :unknown ? [] : [ value ] }
               interfaces << current
             elsif (match = /\A(\S+) is /.match(line)) && CtxChecker::Parsers::InterfaceNames.kind(normalize_name(match[1])) != :unknown
               current = nil
               state_issues << { code: :unparsed_interface_header, line: number }
             elsif current && (match = /\Aadmin state is (up|down)\b/i.match(line))
-              current[:admin_status] = match[1].downcase.to_sym
+              assign_state(current, :admin_status, match[1].downcase.to_sym, states, state_issues, number)
             elsif current && (match = /\ALine protocol is (up|down)\b/i.match(line))
-              current[:protocol_status] = match[1].downcase.to_sym
+              assign_state(current, :protocol_status, match[1].downcase.to_sym, states, state_issues, number)
             elsif current && (match = /\ALast clearing of "show interfaces?" counters\s+(.+)\z/i.match(line))
               # 相对清零时长不能证明两个采样间的计数器连续性。
               current[:discontinuity] = nil
@@ -84,11 +86,23 @@ module CtxChecker
           interfaces.select { |record| record[:kind] == :physical }.each do |record|
             counters.concat(complete_counter_coverage(record, counters_by_interface.fetch(record[:name], []), counter_issues))
           end
-          CtxParser::ResultSet.new(results: {
+          CtxParser::Results.new(by_dimension: {
             interfaces: build_result(interfaces, complete: complete, recognized: interfaces.any?, issues: state_issues, identity: [ :name ]),
             counters: build_result(counters, complete: complete, recognized: counters.any?, issues: state_issues + counter_issues,
               identity: %i[interface metric])
           })
+        end
+
+        # 冲突协议状态保留 down；冲突管理状态不能据此豁免接口检查。
+        def assign_state(record, field, value, states, issues, number)
+          values = states.fetch(field)
+          values << value unless values.include?(value)
+          record[field] = if values.size > 1
+            issues << { code: :conflicting_interface_state, field: field, interface: record[:name], line: number }
+            field == :protocol_status ? :down : :unknown
+          else
+            value
+          end
         end
 
         # 按计数器标签匹配，不误取总包数，并保留格式错误的指标行。

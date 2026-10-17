@@ -33,6 +33,8 @@ module CtxChecker
           if !override && (state == :ok && severity || explicit_fault && !severity)
             results << finding(:unknown, :temperature_state_disagreement, entity: entity)
           end
+        elsif override && value.nil?
+          results << finding(:unknown, :temperature_value_unavailable, entity: entity, expected: bounds)
         elsif !explicit_fault
           results << finding(state == :ok ? :pass : :unknown, :temperature_state, entity: entity, actual: record)
         end

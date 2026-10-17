@@ -14,7 +14,7 @@ module CtxChecker
 
         # 将接口行限定在明确章节内，排除带编号的网关记录。
         def parse_output(text, complete:)
-          rows, issues, section = [], [], :preamble
+          rows, issues, section = [], diagnostics, :preamble
           header, interfaces, ipv6, closed = false, false, false, false
           clean(text).each_line do |raw|
             line = raw.strip

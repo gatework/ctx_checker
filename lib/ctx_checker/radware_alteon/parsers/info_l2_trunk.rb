@@ -14,15 +14,15 @@ module CtxChecker
 
         # 将成员限定在其所属 trunk 中，明确保留不完整聚合组。
         def parse_output(text, complete:)
-          rows, issues, groups, current = [], [], [], nil
+          rows, issues, groups, current = [], diagnostics, {}, nil
           clean(text).each_line do |raw|
             line = raw.strip
             next if line.empty? || /\A-+\z/.match?(line)
 
             if (match = GROUP.match(line)) && match[1].to_i.positive?
               current = "trunk#{Integer(match[1], 10)}"
-              issues << { code: :duplicate_aggregation_header, group: current } if groups.include?(current)
-              groups << current
+              issues << { code: :duplicate_aggregation_header, group: current } if groups.key?(current)
+              groups[current] = true
             elsif current && (match = MEMBER.match(line)) && match[1].to_i.positive?
               member = "port#{Integer(match[1], 10)}"
               state = match[2].downcase
@@ -34,7 +34,7 @@ module CtxChecker
               issues << { code: :unrecognized_aggregation_line }
             end
           end
-          (groups.uniq - rows.map { |row| row[:group] }).each do |group|
+          (groups.keys - rows.map { |row| row[:group] }).each do |group|
             rows << { group: group, member: nil, member_status: :unknown, oper_status: :unknown }
             issues << { code: :aggregation_members_unavailable, group: group }
           end

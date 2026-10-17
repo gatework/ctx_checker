@@ -18,7 +18,7 @@ module CtxChecker
   module PaloAlto
     # 声明传统路由引擎查询；高级路由格式需要独立平台策略。
     class Profile < CtxParser::Profile
-      CATALOG = CtxParser::CommandCatalog.new([
+      DECLARATIONS = CtxParser::Commands.new([
         { dimensions: [ :interfaces ], command: "show interface all", parser: Parsers::ShowInterfaceAll },
         { dimensions: [ :counters ], command: "show counter interface all", parser: Parsers::ShowCounterInterfaceAll },
         { dimensions: [ :aggregation ], command: "show lacp aggregate-ethernet all", parser: Parsers::ShowLacpAggregateEthernet },
@@ -32,8 +32,8 @@ module CtxChecker
         { dimensions: [ :alarms ], command: "show system state | match alarm", parser: Parsers::ShowSystemStateAlarms },
         { dimensions: [ :device_counters ], command: "show counter global", parser: Parsers::ShowCounterGlobal }
       ])
-      COMMANDS = CATALOG.commands
-      PARSERS = CATALOG.parsers
+      COMMANDS = DECLARATIONS.by_dimension
+      PARSERS = DECLARATIONS.parsers
     end
   end
 end

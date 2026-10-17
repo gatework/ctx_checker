@@ -15,7 +15,7 @@ module CtxChecker
         # 解析 show routing protocol bgp peer，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           text = clean(text)
-          rows, issues = [], []
+          rows, issues = [], diagnostics
           text.split(/(?=^\s*Peer:\s)/i).each do |block|
             next if block.strip.empty? || block.strip.match?(/\A=+\z/)
             unless block.match?(/\A\s*Peer:\s/i)
@@ -32,11 +32,11 @@ module CtxChecker
             address = block[/^\s*Remote Address:\s*(\S+)/i, 1]
             peer = address&.sub(/\A\[([^\]]+)\]:\d+\z/, '\1')
             peer = peer.sub(/:\d+\z/, "") if peer&.match?(/\A\d+(?:\.\d+){3}:\d+\z/)
-            unless CtxParser::Values.valid_host?(peer)
+            unless CtxParser::Values.ip_address?(peer)
               issues << { code: :bgp_peer_address_missing }
               next
             end
-            peer = CtxParser::Values.host(peer)
+            peer = CtxParser::Values.ip_address(peer)
             state = block[/^\s*Peer status:\s*([^,\n]+)/i, 1]&.strip&.downcase
             state = STATES.include?(state) ? state.to_sym : :unknown
             remote_as = block[/^\s*Remote AS:\s*(\d+)\s*$/i, 1]&.to_i

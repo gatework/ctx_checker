@@ -12,7 +12,7 @@ module CtxChecker
         # 解析 show system state alarms，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           source = clean(text)
-          rows, issues = [], []
+          rows, issues = [], diagnostics
           source.each_line.with_index(1) do |raw, number|
             line = raw.strip
             # 配置阈值和复制的 HA 对端状态不属于本地当前告警。

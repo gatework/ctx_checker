@@ -128,7 +128,7 @@ RSpec.describe "Hillstone SG-6000-A3700 5.5R10P14 system captures" do
       { component: "PS0", kind: :power_supply, status: :ok, present: true },
       { component: "PS1", kind: :power_supply, status: :ok, present: true }
     ])
-    result.results.each do |dimension, view|
+    result.by_dimension.each do |dimension, view|
       expect { CtxChecker::Observation.new(name: dimension, **view.to_h.slice(:status, :records, :issues)) }.not_to raise_error
     end
   end
@@ -173,7 +173,7 @@ RSpec.describe "Hillstone SG-6000-A3700 5.5R10P14 system captures" do
     expect(result.fetch(:power).status).to eq(:partial)
     expect(result.fetch(:power).records.map { |row| row[:component] }).to eq([ "PS0" ])
     result = parse(:environment, fixture(:environment) + "Future information:\nValue 1\n")
-    expect(result.results.values).to all(have_attributes(status: :partial))
+    expect(result.by_dimension.values).to all(have_attributes(status: :partial))
   end
 
   it "preserves transport incompleteness, empty output and command rejection" do

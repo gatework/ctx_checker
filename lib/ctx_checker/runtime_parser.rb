@@ -39,11 +39,15 @@ module CtxChecker
 
         return names.to_h { |name| [ name, unavailable_observation(name) ] }
       end
-      candidates = names.map { |name| profile.commands_for(name) }.reduce(:&)
-      command ||= candidates.first if candidates.one?
-      raise ArgumentError, "Select one declared command or use parse_outputs for multiple sources" unless candidates.include?(command)
-      implementation = profile.parser_for(names.first, command: command)
-      command_counts = names.to_h { |name| [ name, profile.commands_for(name).size ] }
+      unless command
+        candidates = names.map { |name| @implementations.fetch(name).keys }.reduce(:&)
+        command = candidates.first if candidates.one?
+      end
+      unless command && names.all? { |name| @implementations.fetch(name).key?(command) }
+        raise ArgumentError, "Select one declared command or use parse_outputs for multiple sources"
+      end
+      implementation = @implementations.fetch(names.first).fetch(command)
+      command_counts = names.to_h { |name| [ name, @implementations.fetch(name).size ] }
       evidence = [ { command: command, sha256: Digest::SHA256.hexdigest(text), bytes: text.bytesize } ]
       source = begin
         normalized = CtxParser::Input.text(text, encoding: :transcode, newlines: :lf, max_bytes: Parsers::Base::MAX_BYTES)
@@ -178,19 +182,21 @@ module CtxChecker
       unless profile.commands.is_a?(Hash) && profile.commands.any? && (profile.commands.keys - DIMENSIONS).empty?
         raise ArgumentError, "Checker profile must declare supported dimensions"
       end
-      profile.commands.each_key do |name|
-        profile.commands_for(name).each do |command|
+      @implementations = profile.commands.to_h do |name, _commands|
+        implementations = profile.commands_for(name).to_h do |command|
           implementation = profile.parser_for(name, command: command)
           unless implementation.is_a?(Class) && implementation < CtxParser::Parser
             raise ArgumentError, "Command parser must inherit from Parser"
           end
+          [ command, implementation ]
         end
-      end
+        [ name, implementations.freeze ]
+      end.freeze
     end
 
     # 单个投影缺失不能使同一回显的其他视图失效。
     def project(name, result, command:, command_count:, evidence:)
-      if result.is_a?(CtxParser::ResultSet)
+      if result.is_a?(CtxParser::Results)
         begin
           result = result.fetch(name)
         rescue StandardError => error
@@ -203,7 +209,7 @@ module CtxChecker
 
     # 来源状态归属于单个脚本，即使归并维度仅部分完整也独立保留。
     def build_observation(name, result, command:, command_count:, evidence:)
-      raise ArgumentError, "Command parser must return a Result or ResultSet" unless result.is_a?(CtxParser::Result)
+      raise ArgumentError, "Command parser must return a Result or Results" unless result.is_a?(CtxParser::Result)
 
       status, issues = result.status, result.issues.dup
       # 仅明确的全功能声明可证明不适用；局部空邻居表不能证明。

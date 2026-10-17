@@ -16,7 +16,7 @@ module CtxChecker
           if /\AOSPF is not configured\.\z/i.match?(text.strip)
             return build_result([], complete: complete, recognized: true, issues: [ { code: :protocol_not_configured } ])
           end
-          rows, issues, process, area, header = [], [], nil, nil, false
+          rows, issues, process, area, header = [], diagnostics, nil, nil, false
           text.each_line do |raw|
             line = raw.strip
             if (match = /\AOSPF Process (\d+) with Router ID ([\d.]+)\z/i.match(line))
@@ -26,7 +26,7 @@ module CtxChecker
             elsif /\ARouter ID\s+Address\s+Pri\s+Dead-Time\s+State\s+Interface\z/i.match?(line)
               header = true
             elsif (match = /\A([\d.]+)\s+([\d.]+)\s+\d+\s+\S+\s+(Down|Init|Attempt|2-Way|Exstart|Exchange|Loading|Full)(?:\/[ \t]*(DR|BDR|DROther|-))?\s+(\S+)\z/i.match(line))
-              if CtxParser::Values.valid_host?(match[1]) && CtxParser::Values.valid_host?(match[2])
+              if CtxParser::Values.ip_address?(match[1]) && CtxParser::Values.ip_address?(match[2])
                 issues << { code: :ospf_scope_missing } unless process && area
                 rows << { vrf: nil, process_id: process, area: area,
                   interface: CtxChecker::Parsers::InterfaceNames.normalize(match[5], platform: :h3c), router_id: match[1], neighbor_address: match[2],

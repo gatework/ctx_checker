@@ -14,7 +14,7 @@ module CtxChecker
         # 解析 display bgp peer，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           text = clean(text)
-          rows, issues, total, header = [], [], nil, false
+          rows, issues, total, header = [], diagnostics, nil, false
           text.each_line do |raw|
             line = raw.strip
             if (match = /\ATotal number of peers:\s*(\d+)\z/i.match(line))
@@ -24,7 +24,7 @@ module CtxChecker
               header = true
             elsif (match = /\A\*?\s*([\d.]+)\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+)\s+\S+\s+(.+)\z/.match(line))
               state = match[4].downcase.delete(" ")
-              if CtxParser::Values.valid_host?(match[1]) && STATES.include?(state) && (1..4_294_967_295).cover?(match[2].to_i)
+              if CtxParser::Values.ip_address?(match[1]) && STATES.include?(state) && (1..4_294_967_295).cover?(match[2].to_i)
                 rows << { vrf: "default", afi_safi: "ipv4_unicast", peer: match[1], state: state == "idle(admin)" ? :shutdown : state.to_sym,
                   received_prefixes: match[3].to_i, remote_as: match[2].to_i }
               else

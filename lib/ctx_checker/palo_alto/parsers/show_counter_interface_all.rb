@@ -19,7 +19,7 @@ module CtxChecker
         # 解析 show counter interface all，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           text = clean(text)
-          rows, issues, interfaces = [], [], {}
+          rows, issues, interfaces = [], diagnostics, {}
           text.split(/(?=^\s*Interface:)/i).each do |block|
             next if block.strip.empty?
             match = /\A\s*Interface:\s*([^\n]+)\n/i.match(block)

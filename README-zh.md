@@ -67,7 +67,15 @@ error、CRC、discard 保持独立，不相加；单次累计值不能当作当�
 
 生命周期 connector 是宿主适配器，提供 `open { |session| }`，VXLAN 和 Wireless 还要求 `platform`；原生 `Net::Connector::Base` 实例并不提供这一宿主生命周期协议。已连接的原生会话可传入 `CtxDriver::Reader` 或 `CtxChecker::Collector#collect_session`，不会隐式连接或重试。
 
+## 领域术语
+
+`Observation` 表示某维度的采集证据，`Finding` 表示健康判定。`Policy#required_dimension?`、`SystemPolicy#required_dimension?` 查询必需观测维度。接口与光学测量仍按其完整身份匹配要求。计数器阈值比较经过连续性验证的采样区间内增量，区间以秒计；阈值不是累计总量或每秒速率。
+
+整数 OSPF 进程 ID 在策略、观测记录和覆盖作用域中统一转换成字符串，再检查身份重复。明确配置温度阈值时必须有数值读数，只有 `ok` 状态不能满足阈值策略。每个解析结果最多保留 128 条诊断样本，额外的 `diagnostics_truncated` 摘要记录省略数量；截断不能证明证据完整。
+
 ## 开发与测试
+
+共享类按实际职责命名，平台信息放在命名空间中。直接对应设备命令的解析器保留文件名和类名。
 
 ```sh
 bundle install
@@ -77,6 +85,8 @@ bundle exec rake build
 ```
 
 `bundle exec rake` 执行 RSpec、RuboCop 及离线示例。测试放在 `spec/`，沿用项目 RSpec 约定；样例采用合成或脱敏证据。新增解析格式时补充成功、不完整、不支持及非法输入回归。离线测试不代表所有设备版本均通过实机验证。
+
+运行 `ruby script/verify_package.rb /path/to/ctx_checker.gem`，验证使用已发布依赖的隔离安装。联动开发时可追加明确构建的依赖包路径，例如 `/path/to/ctx_parser.gem`，先安装这些候选包；候选包验证通过不代表注册表中的依赖已兼容。`bundle exec ruby -Ilib benchmark/runtime.rb` 用合成输入测量本地命令查找和诊断开销。
 
 使用声明的最低 Ruby 版本检查兼容性。方法用途统一使用简明中文注释；复杂实现还需说明业务规则、实现思路及关键分支。保持公开返回值与错误契约。真实回显和凭据不可进入示例、fixture、日志或发布包。
 

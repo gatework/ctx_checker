@@ -18,7 +18,7 @@ module CtxChecker
   module CiscoIos
     # IOS 与 IOS-XE 共用命令契约；型号特有语法通过解析器覆盖。
     class Profile < CtxParser::Profile
-      CATALOG = CtxParser::CommandCatalog.new([
+      DECLARATIONS = CtxParser::Commands.new([
         { dimensions: %i[interfaces counters], command: "show interfaces", parser: Parsers::ShowInterfaces },
         { dimensions: [ :aggregation ], command: "show etherchannel summary", parser: Parsers::ShowEtherchannelSummary },
         { dimensions: [ :optics ], command: "show interfaces transceiver detail", parser: Parsers::ShowInterfacesTransceiverDetail },
@@ -32,8 +32,8 @@ module CtxChecker
         { dimensions: [ :alarms ], command: "show facility-alarm status", parser: Parsers::ShowFacilityAlarmStatus },
         { dimensions: [ :device_counters ], command: "show ip traffic", parser: Parsers::ShowIpTraffic }
       ])
-      COMMANDS = CATALOG.commands
-      PARSERS = CATALOG.parsers
+      COMMANDS = DECLARATIONS.by_dimension
+      PARSERS = DECLARATIONS.parsers
     end
   end
 end

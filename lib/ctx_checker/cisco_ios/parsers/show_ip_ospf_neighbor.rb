@@ -19,7 +19,7 @@ module CtxChecker
         # 解析 show ip ospf neighbor，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           text = clean(text)
-          rows, issues = [], []
+          rows, issues = [], diagnostics
           scope = { vrf: "default", process_id: nil, area: nil }
           sections = []
           section = { header: false, empty: false, count: 0, totals: [], declared: false, scope: scope }
@@ -81,14 +81,14 @@ module CtxChecker
             ipv4_address?(match[1]) && ipv4_address?(match[5])
 
           scope.merge(interface: CtxChecker::Parsers::InterfaceNames.normalize(match[6], platform: self.class::PLATFORM),
-            router_id: CtxParser::Values.host(match[1]), neighbor_address: CtxParser::Values.host(match[5]),
+            router_id: CtxParser::Values.ip_address(match[1]), neighbor_address: CtxParser::Values.ip_address(match[5]),
             state: STATES.fetch(match[3].upcase), network_type: :unknown, local_role: :unknown,
             neighbor_role: match[4] == "-" ? :unknown : match[4].downcase.to_sym)
         end
 
         # OSPFv2 路由器 ID 与接口地址必须是 IPv4 主机地址。
         def ipv4_address?(text)
-          text.match?(/\A\d+(?:\.\d+){3}\z/) && CtxParser::Values.valid_host?(text)
+          text.match?(/\A\d+(?:\.\d+){3}\z/) && CtxParser::Values.ip_address?(text)
         end
       end
     end

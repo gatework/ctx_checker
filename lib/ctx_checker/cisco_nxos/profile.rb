@@ -16,7 +16,7 @@ module CtxChecker
   module CiscoNxos
     # NX-OS 命令选择保留完整接口详情，并明确 IPv4 BGP 作用域。
     class Profile < CtxParser::Profile
-      CATALOG = CtxParser::CommandCatalog.new([
+      DECLARATIONS = CtxParser::Commands.new([
         { dimensions: %i[interfaces counters], command: "show interface", parser: Parsers::ShowInterface },
         { dimensions: [ :aggregation ], command: "show port-channel summary", parser: Parsers::ShowPortChannelSummary },
         { dimensions: [ :optics ], command: "show interface transceiver details", parser: Parsers::ShowInterfaceTransceiverDetails },
@@ -28,8 +28,8 @@ module CtxChecker
         { dimensions: [ :ntp ], command: "show ntp peer-status", parser: Parsers::ShowNtpPeerStatus },
         { dimensions: [ :device_counters ], command: "show ip traffic", parser: Parsers::ShowIpTraffic }
       ])
-      COMMANDS = CATALOG.commands
-      PARSERS = CATALOG.parsers
+      COMMANDS = DECLARATIONS.by_dimension
+      PARSERS = DECLARATIONS.parsers
     end
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "../../parsers/base"
-require "ctx_parser/result_set"
+require "ctx_parser/results"
 
 module CtxChecker
   module PaloAlto
@@ -17,7 +17,7 @@ module CtxChecker
         def parse_output(text, complete:)
           source = clean(text)
           rows = { temperature: [], environment: [], power: [] }
-          issues = rows.transform_values { [] }
+          issues = rows.transform_values { diagnostics }
           section, header, sections, section_rows = nil, nil, [], 0
           source.each_line.with_index(1) do |raw, number|
             line = raw.strip
@@ -88,7 +88,7 @@ module CtxChecker
           if rows[:power].any? && !sections.include?("power supplies")
             issues[:power] << { code: :power_supply_status_missing }
           end
-          CtxParser::ResultSet.new(results: rows.to_h do |dimension, values|
+          CtxParser::Results.new(by_dimension: rows.to_h do |dimension, values|
             identity = dimension == :temperature ? [ :component ] : %i[component kind]
             [ dimension, build_result(values, complete: complete, recognized: values.any?, issues: issues.fetch(dimension), identity: identity) ]
           end)

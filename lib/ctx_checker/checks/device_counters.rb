@@ -26,7 +26,7 @@ module CtxChecker
       # 优先使用资源专用阈值，再回退到策略默认值。
       def limit_for(record) = @policy.system.device_counter_limits.fetch(record[:metric], 0)
       # 组织累计量、已验证增量及采样间隔，并计算每秒速率。
-      def delta_measurement(value, delta, interval) = { cumulative: value, delta: delta, seconds: interval, per_second: delta / interval }
+      def delta_measurement(value, delta, interval_seconds) = { cumulative: value, delta: delta, seconds: interval_seconds, per_second: delta / interval_seconds }
     end
   end
 end

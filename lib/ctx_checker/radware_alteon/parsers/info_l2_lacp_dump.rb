@@ -14,7 +14,7 @@ module CtxChecker
 
         # 活跃模式需要额外运行证据，不能由重复的 trunk 记录替代。
         def parse_output(text, complete:)
-          issues, ports, header = [], [], false
+          issues, ports, header = diagnostics, {}, false
           clean(text).each_line do |raw|
             line = raw.strip
             next if line.empty? || /\A-+\z/.match?(line)
@@ -26,8 +26,8 @@ module CtxChecker
               next
             elsif header && (match = ROW.match(line)) && match[1].to_i.positive?
               port = "port#{Integer(match[1], 10)}"
-              issues << { code: :duplicate_lacp_port, interface: port } if ports.include?(port)
-              ports << port
+              issues << { code: :duplicate_lacp_port, interface: port } if ports.key?(port)
+              ports[port] = true
               if match[2].casecmp?("off")
                 unless match.captures[2..] == %w[n -- -- n]
                   issues << { code: :inconsistent_lacp_disabled_state, interface: port }

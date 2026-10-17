@@ -21,7 +21,7 @@ module CtxChecker
           if /\AInfo:\s+No link aggregation group defined at present\.\z/i.match?(text.strip)
             return build_result([], complete: complete, recognized: true, issues: [ { code: :aggregation_not_configured } ])
           end
-          rows, issues, group, remote, groups, columns, tables = [], [], nil, false, {}, nil, []
+          rows, issues, group, remote, groups, columns, tables = [], diagnostics, nil, false, {}, nil, []
           text.each_line do |raw|
             line = raw.strip
             if (match = /\AAggregate Interface:\s*(.*)\z/i.match(line))

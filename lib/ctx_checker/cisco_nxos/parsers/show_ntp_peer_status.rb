@@ -12,7 +12,7 @@ module CtxChecker
 
         # 解析 show ntp peer status，保留不完整或不支持的证据。
         def parse_output(text, complete:)
-          peers, issues, totals = [], [], []
+          peers, issues, totals = [], diagnostics, []
           vrf_column = nil
           each_ntp_line(clean(text), issues) do |line, number|
             next if line.empty? || /\A-+\z/.match?(line)

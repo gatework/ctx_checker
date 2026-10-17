@@ -17,7 +17,7 @@ module CtxChecker
 
         # 指定光学方向或单位前，先校验多行表头。
         def parse_output(text, complete:)
-          rows, issues, headings = [], [], []
+          rows, issues, headings = [], diagnostics, []
           clean(text).each_line do |raw|
             line = raw.strip
             next if line.empty? || /\A[-\s]+\z/.match?(line)

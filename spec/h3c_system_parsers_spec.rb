@@ -44,6 +44,28 @@ RSpec.describe "H3C system runtime parsers" do
       .not_to include(include(component: "slot 1 cpu 0", window_seconds: 5))
   end
 
+  it "keeps CPU window coverage scoped to each component with repeated and missing windows" do
+    source = "Slot 1 CPU usage:\n1% in last 5 seconds\n2% in last 1 minute\n3% in last 5 minutes\n" +
+      "Slot 2 CPU usage:\n4% in last 5 seconds\n5% in last 5 seconds\n6% in last 5 minutes\n" +
+      "Slot 3 CPU usage:\n"
+    result = parse(:cpu, source)
+    expect(result.status).to eq(:partial)
+    expect(result.records.select { |row| row[:component] == "slot 1" }.map { |row| row[:window_seconds] }).to eq([ 5, 60, 300 ])
+    expect(result.records.select { |row| row[:component] == "slot 2" }.map { |row| row[:window_seconds] }).to eq([ 300 ])
+    expect(result.issues).to include(include(code: :missing_cpu_windows, component: "slot 2", count: 1),
+      include(code: :missing_cpu_windows, component: "slot 3", count: 3), include(code: :duplicate_identity))
+  end
+
+  it "does not let repeated CPU headers restore ambiguous windows or hide absent ones" do
+    text = "Slot 1 CPU usage:\n1% in last 5 seconds\n" * 32
+    result = parse(:cpu, text)
+    expect(result.status).to eq(:partial)
+    expect(result.records).to be_empty
+    expect(result.issues).to include(include(code: :duplicate_identity, count: 1),
+      include(code: :missing_cpu_windows, component: "slot 1", count: 2))
+    expect(result.issues.count { |issue| issue[:code] == :missing_cpu_windows }).to eq(1)
+  end
+
   it "uses verified cache-adjusted application memory and preserves byte units and scope" do
     rows = parse(:memory).records
     expect(rows.first).to include(component: "slot 1", scope: "physical", utilization: 24.462890625,

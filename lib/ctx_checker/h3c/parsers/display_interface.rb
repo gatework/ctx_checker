@@ -24,7 +24,7 @@ module CtxChecker
         # 接口状态独立于各配置块提供的计数器进行投影。
         def parse_output(text, complete:)
           text = clean(text)
-          interfaces, counters, interface_issues, counter_issues = [], [], [], []
+          interfaces, counters, interface_issues, counter_issues = [], [], diagnostics, diagnostics
           sections = text.split(/(?=^[ \t]*#{INTERFACE}(?:[ \t]+current state[ \t]*:.*)?[ \t]*$)/i)
           sections.each do |section|
             header = /\A[ \t]*(#{INTERFACE})(?:[ \t]+current state[ \t]*:[ \t]*([^\n]+))?[ \t]*\n/i.match(section)
@@ -73,7 +73,7 @@ module CtxChecker
             end
             counters.concat(section_counters)
           end
-          CtxParser::ResultSet.new(results: {
+          CtxParser::Results.new(by_dimension: {
             interfaces: build_result(interfaces, complete: complete, recognized: interfaces.any?, issues: interface_issues, identity: [ :name ]),
             counters: build_result(counters, complete: complete, recognized: counters.any?, issues: counter_issues + interface_issues, identity: %i[interface metric])
           })

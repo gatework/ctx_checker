@@ -5,8 +5,8 @@ require "date"
 require "ctx_parser/immutable"
 
 module CtxChecker
-  # 标准化系统测量保留来源作用域与计算依据。
-  module SystemRecord
+  # 定义各系统观测维度的字段、身份及取值规则。
+  module SystemFields
     FIELDS = CtxParser::Immutable.copy(
       cpu: %i[component scope window_seconds utilization interrupt_utilization],
       memory: %i[component scope utilization total_bytes used_bytes free_bytes available_bytes basis status],
@@ -34,7 +34,7 @@ module CtxChecker
     CATEGORIES = %i[error discard policy informational unknown].freeze
 
     # 校验测量值，不将不可用读数转换为零或 false。
-    def self.valid?(name, key, value)
+    def self.valid_value?(name, key, value)
       case key
       when :status then STATES.include?(value)
       when :basis then BASES.include?(value)

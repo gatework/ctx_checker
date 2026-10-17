@@ -16,7 +16,7 @@ module CtxChecker
 
         # 逐模块隔离，避免未知块将测量值错误关联到前一模块。
         def parse_output(text, complete:)
-          rows, issues, blocks, current, header = [], [], [], nil, false
+          rows, issues, blocks, current, header = [], diagnostics, [], nil, false
           clean(text).each_line do |raw|
             line = raw.strip
             next if line.empty? || /\A=+\z/.match?(line)

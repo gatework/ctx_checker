@@ -16,7 +16,7 @@ module CtxChecker
         # 解析 show interfaces transceiver detail，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           text = clean(text)
-          rows, issues, ports = [], [], []
+          rows, issues, ports = [], diagnostics, []
           metric, header, lane_column = nil, false, false
           text.each_line.with_index(1) do |source, number|
             line = source.strip
@@ -48,11 +48,12 @@ module CtxChecker
               issues << { code: :unparsed_row, line: number }
             end
           end
+          measurements = rows.to_h { |row| [ row.values_at(:interface, :lane, :metric), true ] }
           identities = rows.map { |row| row.values_at(:interface, :lane) }
           identities.concat((ports.uniq - rows.map { |row| row[:interface] }).map { |name| [ name, nil ] })
           identities.uniq.each do |name, lane|
             %i[tx_power rx_power].each do |expected|
-              next if rows.any? { |row| row.values_at(:interface, :lane, :metric) == [ name, lane, expected ] }
+              next if measurements.key?([ name, lane, expected ])
 
               issues << { code: :optical_measurement_missing, interface: name, lane: lane, metric: expected }
             end

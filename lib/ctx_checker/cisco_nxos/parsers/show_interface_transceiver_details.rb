@@ -16,7 +16,7 @@ module CtxChecker
         # 保留 DOM 不可用和模块缺失状态，不虚构光功率。
         def parse_output(text, complete:)
           text = clean(text)
-          rows, issues, devices = [], [], []
+          rows, issues, devices = [], diagnostics, []
           current, lane, header, lane_valid = nil, nil, false, true
           text.each_line.with_index(1) do |source, number|
             line = source.strip
@@ -62,7 +62,8 @@ module CtxChecker
               issues << { code: :unparsed_row, line: number }
             end
           end
-          devices.each { |device| complete_measurements(rows, device, issues) }
+          by_interface = rows.group_by { |row| row[:interface] }
+          devices.each { |device| complete_measurements(rows, device, issues, by_interface) }
           build_result(rows, complete: complete, recognized: devices.any?, issues: issues, identity: %i[interface lane metric])
         end
 
@@ -80,8 +81,9 @@ module CtxChecker
         end
 
         # 即使配对指标解析成功，缺失指标仍须明确保留。
-        def complete_measurements(rows, device, issues)
-          device_rows = rows.select { |row| row[:interface] == device[:interface] }
+        def complete_measurements(rows, device, issues, by_interface)
+          device_rows = by_interface[device[:interface]] ||= []
+          measurements = device_rows.to_h { |row| [ row.values_at(:lane, :metric), true ] }
           if device[:applicable] == false && (!device[:presence_states].empty? || device[:lanes].any? || device_rows.any?)
             issues << { code: :contradictory_optical_applicability, interface: device[:interface] }
             device[:applicable] = nil
@@ -90,15 +92,18 @@ module CtxChecker
           if device[:presence_states].uniq.size > 1
             issues << { code: :contradictory_transceiver_presence, interface: device[:interface] }
           end
-          if device[:dom_unsupported] && rows.any? { |row| row[:interface] == device[:interface] && !row[:value].nil? }
+          if device[:dom_unsupported] && device_rows.any? { |row| !row[:value].nil? }
             issues << { code: :contradictory_dom_support, interface: device[:interface] }
           end
           lanes = device[:lanes].empty? ? [ nil ] : device[:lanes].uniq
           lanes.each do |lane|
             %i[tx_power rx_power].each do |metric|
-              next if rows.any? { |row| row.values_at(:interface, :lane, :metric) == [ device[:interface], lane, metric ] }
+              next if measurements.key?([ lane, metric ])
 
-              rows << base_record(device, lane, metric)
+              record = base_record(device, lane, metric)
+              rows << record
+              device_rows << record
+              measurements[[ lane, metric ]] = true
               unless device[:present] == false || device[:dom_supported] == false
                 issues << { code: :optical_measurement_missing, interface: device[:interface], lane: lane, metric: metric }
               end
@@ -107,7 +112,7 @@ module CtxChecker
           if device[:present].nil? && device[:applicable] != false
             issues << { code: :transceiver_presence_unknown, interface: device[:interface] }
           end
-          if device[:present] == false && rows.any? { |row| row[:interface] == device[:interface] && !row[:value].nil? }
+          if device[:present] == false && device_rows.any? { |row| !row[:value].nil? }
             issues << { code: :contradictory_transceiver_presence, interface: device[:interface] }
           end
         end

@@ -30,7 +30,7 @@ RSpec.describe CtxChecker::RuntimeParser, "failure isolation" do
   end
 
   it "keeps a valid view when another projection is absent without parsing twice" do
-    expect(implementation).to receive(:parse).once.and_return(CtxParser::ResultSet.new(results: { cpu: cpu_result }))
+    expect(implementation).to receive(:parse).once.and_return(CtxParser::Results.new(by_dimension: { cpu: cpu_result }))
     results = parse_resources
     expect(results[:cpu]).to be_complete
     expect(results[:cpu].records.first).to include(utilization: 10, source_complete: true)
@@ -40,7 +40,7 @@ RSpec.describe CtxChecker::RuntimeParser, "failure isolation" do
 
   it "isolates invalid observation schemas from sibling views" do
     bad_memory = CtxParser::Result.new(status: :complete, records: [ memory_record.merge(utilization: 101) ])
-    expect(implementation).to receive(:parse).once.and_return(CtxParser::ResultSet.new(results: { cpu: cpu_result, memory: bad_memory }))
+    expect(implementation).to receive(:parse).once.and_return(CtxParser::Results.new(by_dimension: { cpu: cpu_result, memory: bad_memory }))
     results = parse_resources
     expect(results[:cpu]).to be_complete
     expect(results[:memory].status).to eq(:failed)
@@ -48,14 +48,14 @@ RSpec.describe CtxChecker::RuntimeParser, "failure isolation" do
   end
 
   it "contains one projection's runtime exception without discarding an earlier valid view" do
-    result_set = Class.new(CtxParser::ResultSet) do
+    results_class = Class.new(CtxParser::Results) do
       def fetch(name)
         raise RuntimeError, "private projection details" if name == :memory
 
         super
       end
     end
-    result = result_set.new(results: { cpu: cpu_result, memory: memory_result })
+    result = results_class.new(by_dimension: { cpu: cpu_result, memory: memory_result })
     expect(implementation).to receive(:parse).once.and_return(result)
     results = parse_resources
     expect(results[:cpu]).to be_complete
@@ -72,7 +72,7 @@ RSpec.describe CtxChecker::RuntimeParser, "failure isolation" do
   it "derives source completeness instead of trusting parser-supplied metadata" do
     partial = CtxParser::Result.new(status: :partial, records: [ cpu_record.merge(source_complete: true) ])
     full = CtxParser::Result.new(status: :complete, records: [ memory_record.merge(source_complete: false) ])
-    expect(implementation).to receive(:parse).once.and_return(CtxParser::ResultSet.new(results: { cpu: partial, memory: full }))
+    expect(implementation).to receive(:parse).once.and_return(CtxParser::Results.new(by_dimension: { cpu: partial, memory: full }))
     results = parse_resources
     expect(results[:cpu].records.first[:source_complete]).to be(false)
     expect(results[:cpu].evidence.first[:status]).to eq(:partial)

@@ -15,11 +15,11 @@ module CtxChecker
       def call(observation)
         @observation = observation
         if observation.status == :not_applicable
-          return [ finding(:fail, :required_feature_not_configured, severity: :critical) ] if @policy.required?(observation.name)
+          return [ finding(:fail, :required_feature_not_configured, severity: :critical) ] if @policy.required_dimension?(observation.name)
 
           return [ finding(:not_applicable, :feature_not_configured) ]
         end
-        if observation.status == :not_requested && !@policy.required?(observation.name)
+        if observation.status == :not_requested && !@policy.required_dimension?(observation.name)
           return [ finding(:not_applicable, :not_requested) ]
         end
         results = observation.records.flat_map do |record|
@@ -51,8 +51,8 @@ module CtxChecker
       def missing_status = @observation.complete? ? :fail : :unknown
       # 仅在需要关联接口状态的检查中建立接口索引。
       def interface(name)
-        @interfaces ||= @snapshot.observation(:interfaces).records.to_h { |row| [ row[:name], row ] }
-        @interfaces[name]
+        @interfaces_by_name ||= @snapshot.observation(:interfaces).records.to_h { |row| [ row[:name], row ] }
+        @interfaces_by_name[name]
       end
 
       # 同级查询失败不能使其他来源的完整测量失效。

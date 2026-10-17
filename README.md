@@ -67,7 +67,15 @@ Detailed vendor behavior, historical validation notes, and Motor-only integratio
 
 The lifecycle connector is a host adapter exposing `open { |session| }` (and `platform` for VXLAN and Wireless). It is distinct from a native `Net::Connector::Base` device instance. Borrowed native sessions are accepted by `CtxDriver::Reader` and `CtxChecker::Collector#collect_session`; they are never implicitly connected or retried.
 
+## Domain vocabulary
+
+An `Observation` describes collected evidence for a dimension; a `Finding` describes its health assessment. `Policy#required_dimension?` and `SystemPolicy#required_dimension?` query required observation dimensions. Interface and optical requirements retain their scoped identity checks. Counter limits compare increments over a validated sampling interval in seconds; they are not cumulative totals or rates.
+
+Integer OSPF process IDs are normalized to strings in policies, observations, and covered scopes before checking identities. An explicit temperature threshold requires a numeric reading; an `ok` sensor state alone cannot satisfy it. Parsers retain at most 128 diagnostic samples per result, plus a `diagnostics_truncated` entry counting omitted diagnostics; truncation never proves complete evidence.
+
 ## Development and tests
+
+Name shared classes by their responsibility and use the namespace for platform context. Preserve filenames and class names that directly match device commands.
 
 ```sh
 bundle install
@@ -77,6 +85,8 @@ bundle exec rake build
 ```
 
 `bundle exec rake` runs RSpec, RuboCop, and the offline examples. Tests live in `spec/`, following the existing project's RSpec convention; fixtures use synthetic or sanitized evidence. Add regression cases for successful, incomplete, unsupported, and malformed inputs when extending a parser. Offline tests do not certify all device versions or replace live integration checks.
+
+Run `ruby script/verify_package.rb /path/to/ctx_checker.gem` to verify an isolated installation with published dependencies. During coordinated development, append explicitly built dependency artifacts, such as `/path/to/ctx_parser.gem`, to install those candidates first. Candidate verification does not establish that the published dependencies are compatible. `bundle exec ruby -Ilib benchmark/runtime.rb` measures synthetic command lookup and diagnostic overhead locally.
 
 Use the declared minimum Ruby version for compatibility checks. Document source methods and non-obvious business logic in concise Chinese, preserve public return/error contracts, and never add raw device captures or credentials to examples, fixtures, logs, or release archives.
 

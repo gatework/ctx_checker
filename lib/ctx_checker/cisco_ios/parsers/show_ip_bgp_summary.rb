@@ -19,7 +19,7 @@ module CtxChecker
         # 使用作用域与行身份，避免不同地址族或 VRF 相互覆盖。
         def parse_output(text, complete:)
           text = clean(text).gsub(/State\/\s*\n\s*PfxRcd/, "State/PfxRcd")
-          rows, issues = [], []
+          rows, issues = [], diagnostics
           scope = { vrf: "default", afi_safi: self.class::ADDRESS_FAMILY }
           sections = []
           section = { header: false, empty: false, count: 0, scope_fields: [], scope: scope }
@@ -46,7 +46,7 @@ module CtxChecker
               section[:empty] = true
             elsif parse_statistics(line, section, scope, issues, number)
               next
-            elsif CtxParser::Values.valid_host?(line)
+            elsif CtxParser::Values.ip_address?(line)
               issues << { code: :unparsed_row, line: number - 1 } if pending
               pending = line
             elsif peer_row?(line) || (pending && line.match?(/\A4\s/))
@@ -77,7 +77,7 @@ module CtxChecker
         end
 
         # 识别协议对等体记录，排除摘要和表头。
-        def peer_row?(line) = CtxParser::Values.valid_host?(line.split.first.to_s)
+        def peer_row?(line) = CtxParser::Values.ip_address?(line.split.first.to_s)
 
         # 解析单个路由作用域，不合并无关的 VRF 证据。
         def parse_scope(line, scope, issues, number)
@@ -124,7 +124,7 @@ module CtxChecker
         # 归一化单个路由对等体及其协议状态。
         def parse_peer(line, scope)
           match = /\A(\S+)\s+4\s+(\d+(?:\.\d+)?)\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\S+\s+(.+)\z/.match(line)
-          return unless match && CtxParser::Values.valid_host?(match[1])
+          return unless match && CtxParser::Values.ip_address?(match[1])
 
           remote_as = as_number(match[2])
           return unless remote_as
@@ -132,7 +132,7 @@ module CtxChecker
           state, prefixes = peer_state(match[3])
           return unless state
 
-          scope.merge(peer: CtxParser::Values.host(match[1]), state: state, received_prefixes: prefixes, remote_as: remote_as)
+          scope.merge(peer: CtxParser::Values.ip_address(match[1]), state: state, received_prefixes: prefixes, remote_as: remote_as)
         end
 
         # 仅在不存在平台附加标记时，末列数字才能证明会话已建立。

@@ -17,7 +17,7 @@ module CtxChecker
         # 解析 show routing protocol ospf neighbor，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           text = clean(text)
-          rows, issues = [], []
+          rows, issues = [], diagnostics
           text.split(/(?=^\s*virtual router:)/i).each do |block|
             unless block.match?(/\A\s*virtual router:/i)
               # 文档规定的图例位于首个邻居前，任意前导文本不构成证据。
@@ -34,12 +34,12 @@ module CtxChecker
             end
             neighbor = block[/^\s*neighbor address:\s*(\S+)/i, 1]
             router_id = block[/^\s*neighbor router ID:\s*(\S+)/i, 1]
-            unless CtxParser::Values.valid_host?(neighbor) && CtxParser::Values.valid_host?(router_id)
+            unless CtxParser::Values.ip_address?(neighbor) && CtxParser::Values.ip_address?(router_id)
               issues << { code: :ospf_neighbor_identity_missing }
               next
             end
-            neighbor = CtxParser::Values.host(neighbor)
-            router_id = CtxParser::Values.host(router_id)
+            neighbor = CtxParser::Values.ip_address(neighbor)
+            router_id = CtxParser::Values.ip_address(router_id)
             state = STATES.fetch(block[/^\s*status:\s*(.+)$/i, 1]&.strip&.downcase, :unknown)
             issues << { code: :ospf_state_unknown } if state == :unknown
             rows << { vrf: block[/^\s*virtual router:\s*(\S+)/i, 1], process_id: nil,

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "../../parsers/base"
-require "ctx_parser/result_set"
+require "ctx_parser/results"
 
 module CtxChecker
   module Hillstone
@@ -20,7 +20,7 @@ module CtxChecker
         # 跟踪各已声明章节，并分别要求其具备表头与测量值。
         def parse_output(text, complete:)
           rows = { temperature: [], environment: [], power: [] }
-          issues = rows.transform_values { [] }
+          issues = rows.transform_values { diagnostics }
           contexts, section, header = [], nil, false
           clean(text).each_line.with_index(1) do |raw, number|
             line = raw.strip
@@ -52,7 +52,7 @@ module CtxChecker
               issues[context[:section]] << { code: :incomplete_environment_section }
             end
           end
-          CtxParser::ResultSet.new(results: rows.to_h do |dimension, records|
+          CtxParser::Results.new(by_dimension: rows.to_h do |dimension, records|
             identity = dimension == :temperature ? [ :component ] : %i[component kind]
             [ dimension, build_result(records, complete: complete, recognized: records.any?, issues: issues[dimension], identity: identity) ]
           end)

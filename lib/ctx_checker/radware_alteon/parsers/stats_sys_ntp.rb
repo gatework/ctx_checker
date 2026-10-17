@@ -2,7 +2,7 @@
 
 require "date"
 require_relative "../../parsers/base"
-require "ctx_parser/result_set"
+require "ctx_parser/results"
 
 module CtxChecker
   module RadwareAlteon
@@ -17,7 +17,7 @@ module CtxChecker
         def parse_output(text, complete:)
           source = clean(text)
           rows, headers, sections, time_fields = [], 0, [], []
-          counter_issues, ntp_issues, section = [], [], nil
+          counter_issues, ntp_issues, section = diagnostics, diagnostics, nil
           source.each_line.with_index(1) do |raw, number|
             line = raw.strip
             next if line.empty? || /\A-+\z/.match?(line)
@@ -52,7 +52,7 @@ module CtxChecker
             ntp_issues << { code: :ambiguous_ntp_time_field, field: field, count: time_fields.count(field) } unless time_fields.count(field) == 1
           end
           ntp_rows = headers.positive? ? [ { component: "system", synchronized: nil, last_sync_status: :unknown, last_sync_at: nil } ] : []
-          CtxParser::ResultSet.new(results: {
+          CtxParser::Results.new(by_dimension: {
             ntp: build_result(ntp_rows, complete: complete, recognized: headers.positive?, issues: ntp_issues, identity: [ :component ]),
             device_counters: build_result(rows, complete: complete, recognized: rows.any?, issues: counter_issues, identity: %i[component metric])
           })

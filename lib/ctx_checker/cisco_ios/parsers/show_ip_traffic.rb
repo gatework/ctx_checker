@@ -28,7 +28,7 @@ module CtxChecker
 
         # 解析 show ip traffic，保留不完整或不支持的证据。
         def parse_output(text, complete:)
-          records, issues = [], []
+          records, issues = [], diagnostics
           active = false
           recognized = false
           clean(text).each_line.with_index(1) do |source, number|

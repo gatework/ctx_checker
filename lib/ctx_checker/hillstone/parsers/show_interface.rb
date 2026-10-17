@@ -17,7 +17,7 @@ module CtxChecker
 
         # 识别无地址链路时，仍保留 IP 协议 down 状态。
         def parse_output(text, complete:)
-          rows, issues, header = [], [], false
+          rows, issues, header = [], diagnostics, false
           clean(text).each_line do |raw|
             line = raw.strip
             next if line.empty? || /\A[-=]+\z/.match?(line) || LEGEND.match?(line)
@@ -38,7 +38,7 @@ module CtxChecker
             { group: row[:name], member: nil, member_status: :unknown, oper_status: row[:oper_status] }
           end
           missing_members = groups.map { |group| { code: :aggregation_members_unavailable, group: group[:group] } }
-          CtxParser::ResultSet.new(results: {
+          CtxParser::Results.new(by_dimension: {
             interfaces: interfaces,
             aggregation: build_result(groups, complete: complete, recognized: header,
               issues: interfaces.issues + missing_members, identity: %i[group member])

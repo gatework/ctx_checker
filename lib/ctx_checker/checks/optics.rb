@@ -20,7 +20,7 @@ module CtxChecker
         end
         context = interface(record[:interface])
         if context && record_complete?(context, @snapshot.observation(:interfaces)) &&
-            context[:admin_status] == :down && !@policy.required_interfaces.include?(record[:interface]) && !@policy.required_optics?(record)
+            context[:admin_status] == :down && !@policy.required_interface?(record[:interface]) && !@policy.required_optics?(record)
           return finding(:not_applicable, :administratively_down, entity: entity)
         end
         if (record[:present] == false || record[:dom_supported] == false) && !ALARMS.include?(record[:alarm])

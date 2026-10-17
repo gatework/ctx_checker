@@ -18,7 +18,7 @@ module CtxChecker
         # 解析 display transceiver diagnosis，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           text = clean(text)
-          rows, issues = [], []
+          rows, issues = [], diagnostics
           text.split(/(?=^\S+ transceiver diagnostic information:)/i).each do |block|
             next if block.strip.empty?
             match = /\A(\S+) transceiver diagnostic information:/i.match(block)

@@ -19,7 +19,7 @@ RSpec.describe "Alteon protocol and time evidence" do
 
   # 同一命令分别产生 NTP 与设备计数器观测。
   def ntp(text = fixture(:ntp), complete: true)
-    CtxChecker::RadwareAlteon::Parsers::StatsSysNtp.parse(text, complete: complete).results
+    CtxChecker::RadwareAlteon::Parsers::StatsSysNtp.parse(text, complete: complete).by_dimension
   end
 
   # 厂商协议语法不继承无关的 Cisco 回显布局。

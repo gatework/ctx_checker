@@ -10,7 +10,7 @@ module CtxChecker
       def initialize(**options)
         super
         @previous_counters = @previous&.observation(dimension)
-        @previous_records = @previous_counters&.records&.to_h { |row| [ row.values_at(*identity_fields), row ] } || {}
+        @previous_records_by_identity = @previous_counters&.records&.to_h { |row| [ row.values_at(*identity_fields), row ] } || {}
       end
 
       private
@@ -21,7 +21,7 @@ module CtxChecker
         value = record[:value]
         return finding(:unknown, :counter_unavailable, entity: entity) if value.nil?
         previous = @previous_counters
-        prior = @previous_records[record.values_at(*identity_fields)]
+        prior = @previous_records_by_identity[record.values_at(*identity_fields)]
         if (reason = packet_semantics_reason(record, prior))
           return finding(:unknown, reason, entity: entity, actual: record.slice(:value, :unit, :scope))
         end
@@ -30,9 +30,9 @@ module CtxChecker
           return finding(value.zero? ? :pass : :unknown, value.zero? ? :zero_cumulative_counter : :cumulative_errors,
             entity: entity, actual: value, severity: value.zero? ? :info : :warning)
         end
-        interval = sample_time(record, @observation, @snapshot) - sample_time(prior, previous, @previous)
+        interval_seconds = sample_time(record, @observation, @snapshot) - sample_time(prior, previous, @previous)
         # 先验证时间与重置标记；数值下降可能是清零或重启，不能按负增量计算。
-        reason = if interval <= 0
+        reason = if interval_seconds <= 0
           :counter_sample_time_invalid
         elsif record[:discontinuity].nil? || prior[:discontinuity].nil?
           :counter_continuity_unconfirmed
@@ -45,10 +45,10 @@ module CtxChecker
         limit = limit_for(record)
         # 超限是已观察故障；未超限仍需前后来源完整才能证明通过。
         if delta <= limit && (!record_complete?(prior, previous) || !record_complete?(record, @observation))
-          return finding(:unknown, :counter_evidence_incomplete, entity: entity, actual: { delta: delta, seconds: interval })
+          return finding(:unknown, :counter_evidence_incomplete, entity: entity, actual: { delta: delta, seconds: interval_seconds })
         end
         finding(delta > limit ? :fail : :pass, :counter_delta, entity: entity,
-          actual: delta_measurement(value, delta, interval), expected: { maximum_delta: limit }, severity: :warning)
+          actual: delta_measurement(value, delta, interval_seconds), expected: { maximum_delta: limit }, severity: :warning)
       end
 
       # 选择当前评估负责的观测维度。
@@ -58,7 +58,7 @@ module CtxChecker
       # 优先使用资源专用阈值，再回退到策略默认值。
       def limit_for(record) = @policy.counter_limits.fetch(record[:metric], 0)
       # 将已计算增量与采样间隔组织为报告测量值。
-      def delta_measurement(_value, delta, interval) = { delta: delta, seconds: interval }
+      def delta_measurement(_value, delta, interval_seconds) = { delta: delta, seconds: interval_seconds }
       # 解析速率或增量分析所需的采样时间。
       def sample_time(record, observation, snapshot) = record[:sampled_at] ? Time.iso8601(record[:sampled_at]) : observation.observed_at || snapshot.observed_at
 

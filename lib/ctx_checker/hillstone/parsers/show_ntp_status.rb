@@ -59,7 +59,7 @@ module CtxChecker
               fields[key] = value
             end
           end
-          peer = CtxParser::Values.valid_host?(host) ? CtxParser::Values.host(host) : host.downcase
+          peer = CtxParser::Values.ip_address?(host) ? CtxParser::Values.ip_address(host) : host.downcase
           { component: "peer/#{fields[:vrouter] || 'unspecified'}/#{peer}", peer: peer, synchronized: nil,
             last_sync_status: fields[:last_sync_status] || :unknown, last_sync_at: nil }
         end
@@ -99,7 +99,7 @@ module CtxChecker
 
         # 服务器名称仅接受主机名或主机地址，不接受任意 CLI 片段。
         def valid_peer?(text)
-          return true if CtxParser::Values.valid_host?(text)
+          return true if CtxParser::Values.ip_address?(text)
           return false if text.match?(/\A[\d.]+\z/) || text.length > 253
 
           text.delete_suffix(".").split(".", -1).all? { |label| /\A[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\z/.match?(label) }

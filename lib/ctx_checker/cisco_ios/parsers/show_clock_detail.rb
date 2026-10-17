@@ -14,7 +14,7 @@ module CtxChecker
 
         # 解析 show clock detail，保留不完整或不支持的证据。
         def parse_output(text, complete:)
-          records, issues = [], []
+          records, issues = [], diagnostics
           time_source = nil
           clean(text).each_line.with_index(1) do |source, number|
             line = source.strip

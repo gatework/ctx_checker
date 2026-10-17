@@ -14,7 +14,7 @@ module CtxChecker
         # 解析 show transceiver all，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           text = clean(text)
-          rows, issues, header = [], [], false
+          rows, issues, header = [], diagnostics, false
           text.each_line do |raw|
             line = raw.strip
             if /\APort\s+Temperature\s+Voltage\s+Current\s+Tx Power\s+Rx Power\z/i.match?(line)

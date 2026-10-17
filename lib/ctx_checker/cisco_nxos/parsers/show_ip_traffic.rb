@@ -52,7 +52,7 @@ module CtxChecker
 
         # 解析 show ip traffic，保留不完整或不支持的证据。
         def parse_output(text, complete:)
-          records, issues = [], []
+          records, issues = [], diagnostics
           recognized = false
           section = nil
           fragment_sections, acl_sections = 0, 0

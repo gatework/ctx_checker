@@ -14,7 +14,7 @@ module CtxChecker
 
         # 解析 show processes cpu，保留不完整或不支持的证据。
         def parse_output(text, complete:)
-          records, issues = [], []
+          records, issues = [], diagnostics
           recognized = false
           clean(text).each_line.with_index(1) do |source, number|
             line = source.strip

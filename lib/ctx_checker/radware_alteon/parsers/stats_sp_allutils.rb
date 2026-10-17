@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "../../parsers/base"
-require "ctx_parser/result_set"
+require "ctx_parser/results"
 
 module CtxChecker
   module RadwareAlteon
@@ -13,7 +13,7 @@ module CtxChecker
         # 校验回显的 SP 数量及汇总图，不混用 CPU 和内存数据。
         def parse_output(text, complete:)
           rows = { cpu: [], memory: [] }
-          issues = rows.transform_values { [] }
+          issues = rows.transform_values { diagnostics }
           sections, current = [], nil
           clean(text).each_line.with_index(1) do |raw, number|
             line = raw.strip
@@ -33,7 +33,7 @@ module CtxChecker
           end
           sections.each { |item| validate_section(item, issues.fetch(item[:dimension])) }
           validate_sections(sections, issues)
-          CtxParser::ResultSet.new(results: rows.to_h do |dimension, records|
+          CtxParser::Results.new(by_dimension: rows.to_h do |dimension, records|
             identity = dimension == :cpu ? %i[component scope window_seconds] : %i[component scope]
             [ dimension, build_result(records, complete: complete, recognized: records.any?, issues: issues.fetch(dimension), identity: identity) ]
           end)

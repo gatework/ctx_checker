@@ -14,7 +14,7 @@ module CtxChecker
 
         # 链路行缺失不能证明端口已禁用或健康。
         def parse_output(text, complete:)
-          rows, issues, header = [], [], false
+          rows, issues, header = [], diagnostics, false
           clean(text).each_line do |raw|
             line = raw.strip
             next if line.empty? || /\A[-\s]+\z/.match?(line)

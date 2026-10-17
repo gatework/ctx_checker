@@ -181,7 +181,7 @@ RSpec.describe "Radware Alteon 5424 S Perform 32.4.15.0 system captures" do
       result = parse(name)
       expect { CtxChecker::Observation.new(name: dimension, **result.to_h.slice(:status, :records, :issues)) }.not_to raise_error
     end
-    parse(:sp_allutils).results.each do |dimension, result|
+    parse(:sp_allutils).by_dimension.each do |dimension, result|
       expect { CtxChecker::Observation.new(name: dimension, **result.to_h.slice(:status, :records, :issues)) }.not_to raise_error
     end
     %i[mp_cpu mp_memory sp_allutils temperature fan power].each do |name|

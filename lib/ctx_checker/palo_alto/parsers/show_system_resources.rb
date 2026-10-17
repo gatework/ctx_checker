@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "../../parsers/base"
-require "ctx_parser/result_set"
+require "ctx_parser/results"
 
 module CtxChecker
   module PaloAlto
@@ -16,7 +16,7 @@ module CtxChecker
         # 解析 show system resources，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           source = clean(text)
-          cpus, memories, cpu_issues, memory_issues, shared_issues = [], [], [], [], []
+          cpus, memories, cpu_issues, memory_issues, shared_issues = [], [], diagnostics, diagnostics, diagnostics
           swap_lines = source.lines.grep(/\A\s*(?:(?:KiB|MiB|GiB|TiB)\s+)?Swap\s*:/)
           process_table = false
           source.each_line.with_index(1) do |raw, number|
@@ -33,7 +33,7 @@ module CtxChecker
               shared_issues << { code: :unrecognized_resource_row, line: number }
             end
           end
-          CtxParser::ResultSet.new(results: {
+          CtxParser::Results.new(by_dimension: {
             cpu: build_result(cpus, complete: complete, recognized: cpus.any?, issues: shared_issues + cpu_issues,
               identity: %i[component scope window_seconds]),
             memory: build_result(memories, complete: complete, recognized: memories.any?, issues: shared_issues + memory_issues,

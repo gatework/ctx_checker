@@ -215,7 +215,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
     cpu = CtxParser::Result.new(status: :complete, records: [ { component: "cpu", scope: "system", utilization: 10 } ])
     memory = CtxParser::Result.new(status: :complete, records: [ { component: "memory", scope: "system", utilization: 101 } ])
     allow(CtxChecker::CiscoNxos::Parsers::ShowSystemResources).to receive(:parse).and_return(
-      CtxParser::ResultSet.new(results: { cpu: cpu, memory: memory }))
+      CtxParser::Results.new(by_dimension: { cpu: cpu, memory: memory }))
     expect(session).to receive(:send_commands).with([ "show system resources" ]).once.and_return(successful("resources\n"))
 
     snapshot = collect(%i[cpu memory], platform: "cisco_nxos")
@@ -227,7 +227,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
 
   it "retains a valid shared-command view when its sibling projection is missing" do
     cpu = CtxParser::Result.new(status: :complete, records: [ { component: "cpu", scope: "system", utilization: 10 } ])
-    allow(CtxChecker::CiscoNxos::Parsers::ShowSystemResources).to receive(:parse).and_return(CtxParser::ResultSet.new(results: { cpu: cpu }))
+    allow(CtxChecker::CiscoNxos::Parsers::ShowSystemResources).to receive(:parse).and_return(CtxParser::Results.new(by_dimension: { cpu: cpu }))
     expect(session).to receive(:send_commands).with([ "show system resources" ]).once.and_return(successful("resources\n"))
 
     snapshot = collect(%i[cpu memory], platform: "cisco_nxos")

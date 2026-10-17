@@ -2,7 +2,7 @@
 
 require_relative "../../parsers/base"
 require_relative "../../cisco_ios/parsers/system_values"
-require "ctx_parser/result_set"
+require "ctx_parser/results"
 
 module CtxChecker
   module CiscoNxos
@@ -18,7 +18,7 @@ module CtxChecker
         # 解析 show environment，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           @rows = { temperature: [], environment: [], power: [] }
-          @problems = @rows.transform_values { [] }
+          @problems = @rows.transform_values { diagnostics }
           @section = nil
           @section_size = 0
           @power_columns = nil
@@ -34,7 +34,7 @@ module CtxChecker
             (dimension ? [ @problems[dimension] ] : @problems.values).each { |issues| issues << unparsed(number) }
           end
           finish_section
-          CtxParser::ResultSet.new(results: @rows.to_h do |dimension, rows|
+          CtxParser::Results.new(by_dimension: @rows.to_h do |dimension, rows|
             identity = dimension == :temperature ? [ :component ] : %i[component kind]
             [ dimension, build_result(rows, complete: complete, recognized: rows.any?, issues: @problems[dimension], identity: identity) ]
           end)

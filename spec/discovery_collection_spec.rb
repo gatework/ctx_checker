@@ -22,13 +22,13 @@ RSpec.describe "CtxChecker bounded discovery collection" do
   end
   let(:profile_class) do
     Class.new(CtxParser::Profile) do
-      def initialize(catalog:, expansion: nil)
+      def initialize(declarations:, expansion: nil)
         super()
-        @catalog, @expansion = catalog, expansion
+        @declarations, @expansion = declarations, expansion
       end
 
-      def commands = @catalog.commands
-      def parser_for(_name, command:) = @catalog.parsers.fetch(command)
+      def commands = @declarations.by_dimension
+      def parser_for(_name, command:) = @declarations.parsers.fetch(command)
       def discovery_dimensions(requested) = requested.include?(:counters) ? [ :interfaces ] : []
       def expand(observations, dimensions:) = @expansion ? @expansion.call(observations, dimensions) : self
     end
@@ -44,7 +44,7 @@ RSpec.describe "CtxChecker bounded discovery collection" do
   let(:parser) { CtxChecker::RuntimeParser.new(platform: :cisco_ios) }
 
   def build_profile(entries, expansion: nil)
-    profile_class.new(catalog: CtxParser::CommandCatalog.new(entries, multi_command: true), expansion: expansion)
+    profile_class.new(declarations: CtxParser::Commands.new(entries, multi_command: true), expansion: expansion)
   end
 
   def result(command, body = "sample")
@@ -72,7 +72,7 @@ RSpec.describe "CtxChecker bounded discovery collection" do
     end
   end
 
-  it "discovers once, executes a bounded catalog, and leaves an unrequested dependency out of health" do
+  it "discovers once, executes a bounded declarations, and leaves an unrequested dependency out of health" do
     session = double(:session, connected?: true)
     expect(session).to receive(:send_commands).with([ interface_command ]).once.ordered.and_return(result(interface_command))
     expect(session).to receive(:send_commands).with([ cpu_command ]).ordered.and_return(result(cpu_command))
@@ -101,7 +101,7 @@ RSpec.describe "CtxChecker bounded discovery collection" do
     static_entries[0][:dimensions] = %i[interfaces aggregation]
     shared_profile = build_profile(static_entries, expansion: ->(_observations, _dimensions) { expanded_profile })
     allow(CtxChecker::ParserRegistry).to receive(:fetch).with("cisco_ios", model: nil, software_version: nil).and_return(shared_profile)
-    allow(interface_parser).to receive(:parse).and_return(CtxParser::ResultSet.new(results: {
+    allow(interface_parser).to receive(:parse).and_return(CtxParser::Results.new(by_dimension: {
       interfaces: CtxParser::Result.new(status: :complete, records: [ { name: "port1" } ]),
       aggregation: CtxParser::Result.new(status: :complete, records: [])
     }))
