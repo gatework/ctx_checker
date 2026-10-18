@@ -91,4 +91,20 @@ RSpec.describe CtxChecker::Report, "command outcomes" do
     expect(result.commands.map { |entry| entry[:status] }).to eq(%i[partial partial])
     expect(report.commands).to be_empty
   end
+
+  it "preserves diagnostic order for one source and isolates unscoped diagnostics with multiple sources" do
+    issues = [ { code: :incomplete_command_output }, { code: :command_failed, command: "read one" },
+      { code: :incomplete_command_set }, { code: :parser_error, command: "read other" } ]
+    single = CtxChecker::Observation.new(name: :counters, status: :partial, issues: issues,
+      evidence: [ { command: "read one" }, { command: "read one", status: :failed }, { reference: "configuration" } ])
+    entry = report(single).commands.fetch(0)
+    expect(entry[:issues].map { |issue| issue[:code] }).to eq(%i[incomplete_command_output command_failed incomplete_command_set])
+    expect(entry[:status]).to eq(:partial)
+
+    multiple = CtxChecker::Observation.new(name: :counters, status: :partial, issues: issues,
+      evidence: [ { command: "read one" }, { command: "read two" } ])
+    entries = report(multiple).commands
+    expect(entries.first[:issues].map { |issue| issue[:code] }).to eq([ :command_failed ])
+    expect(entries.last[:issues]).to be_empty
+  end
 end

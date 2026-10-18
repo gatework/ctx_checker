@@ -14,7 +14,7 @@ module CtxChecker
         def parse_output(text, complete:)
           text = clean(text)
           rows, issues, group, header, groups = [], diagnostics, nil, false, {}
-          text.each_line do |raw|
+          text.each_line("\n") do |raw|
             line = raw.strip
             if (match = /\AAE group:\s*(ae\d+)\z/i.match(line))
               group = match[1].downcase

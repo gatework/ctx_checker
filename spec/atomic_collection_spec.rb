@@ -18,9 +18,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
   let(:session) { double(:session, connected?: true) }
 
   def successful(body)
-    step = Net::Connector::CommandResult.new(command: Net::Connector::Command.new("show example"),
-      output: "command\n#{body}device#", prompt: "device#", duration: 0.01)
-    Net::Connector::Result.new(steps: [ step ], config: body)
+    command_receipt(body, output: "command\n#{body}device#")
   end
 
   def expect_later_bgp
@@ -121,7 +119,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
   end
 
   it "classifies a zero-step success as an invalid response and continues" do
-    expect(session).to receive(:send_commands).with([ "show interfaces" ]).ordered.and_return(Net::Connector::Result.new(config: interfaces))
+    expect(session).to receive(:send_commands).with([ "show interfaces" ]).ordered.and_return(command_receipt(interfaces, steps: []))
     expect_later_bgp
 
     snapshot = collect

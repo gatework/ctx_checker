@@ -24,7 +24,7 @@ module CtxChecker
             next if block.strip.empty?
             match = /\A\s*Interface:\s*([^\n]+)\n/i.match(block)
             unless match
-              lines = block.lines.map(&:strip).reject { |line| line.empty? || line.match?(/\A-+\z/) }
+              lines = block.lines("\n").map(&:strip).reject { |line| line.empty? || line.match?(/\A-+\z/) }
               issues << { code: :unrecognized_counter_block } unless lines == [ "Hardware interface counters:" ]
               next
             end
@@ -33,7 +33,7 @@ module CtxChecker
             kind = CtxChecker::Parsers::InterfaceNames.kind(name)
             wanted = kind == :physical ? :hardware : :logical
             section, values = nil, []
-            block.lines.drop(1).each do |raw|
+            block.lines("\n").drop(1).each do |raw|
               line = raw.strip
               if (heading = /\A(Hardware|Logical) interface counters(?: read from CPU)?:\z/i.match(line))
                 section = heading[1].downcase.to_sym

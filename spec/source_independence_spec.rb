@@ -80,6 +80,33 @@ RSpec.describe CtxChecker::Evaluator, "source independence" do
     expect(report).not_to be_healthy
   end
 
+  it "does not prove aggregate capacity from explicitly incomplete member sources" do
+    policy = CtxChecker::Policy.new(minimum_active_members: { "Port-channel1" => 1 })
+    %i[active standby].each do |state|
+      rows = [ { group: "Port-channel1", member: "Ethernet1/1", member_status: state,
+        oper_status: :up, source_complete: false } ]
+      observation = CtxChecker::Observation.new(name: :aggregation, status: :complete, records: rows)
+      results = dimension_findings(described_class.new(policy: policy).call(snapshot({ aggregation: observation })), :aggregation)
+      expect(results).to include(have_attributes(status: :unknown, reason: :aggregation_capacity))
+      expect(results.map(&:status)).not_to include(:pass, :fail)
+    end
+  end
+
+  it "counts only proven active members while retaining known capacity success and failure" do
+    first = { group: "Port-channel1", member: "Ethernet1/1", member_status: :active, oper_status: :up, source_complete: true }
+    rows = [ first, first.merge(member: "Ethernet1/2", source_complete: false) ]
+    [ [ 1, :pass ], [ 2, :unknown ] ].each do |minimum, status|
+      policy = CtxChecker::Policy.new(minimum_active_members: { "Port-channel1" => minimum })
+      observation = CtxChecker::Observation.new(name: :aggregation, status: :complete, records: rows)
+      results = dimension_findings(described_class.new(policy: policy).call(snapshot({ aggregation: observation })), :aggregation)
+      expect(results).to include(have_attributes(status: status, reason: :aggregation_capacity, actual: 1))
+    end
+    policy = CtxChecker::Policy.new(minimum_active_members: { "Port-channel1" => 2 })
+    observation = CtxChecker::Observation.new(name: :aggregation, status: :complete, records: [ first ])
+    results = dimension_findings(described_class.new(policy: policy).call(snapshot({ aggregation: observation })), :aggregation)
+    expect(results).to include(have_attributes(status: :fail, reason: :aggregation_capacity, actual: 1))
+  end
+
   it "does not exempt an optical alarm using incomplete interface shutdown evidence" do
     interfaces = CtxChecker::Observation.new(name: :interfaces, status: :partial,
       records: [ { name: optical_record[:interface], admin_status: :down, source_complete: false } ])

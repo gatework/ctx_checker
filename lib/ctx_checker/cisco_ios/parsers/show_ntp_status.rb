@@ -16,7 +16,7 @@ module CtxChecker
         # 解析 show ntp status，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           records, issues = [], diagnostics
-          clean(text).each_line.with_index(1) do |source, number|
+          clean(text).each_line("\n").with_index(1) do |source, number|
             line = source.strip
             next if line.empty?
 

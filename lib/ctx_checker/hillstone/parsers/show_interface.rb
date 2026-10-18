@@ -18,7 +18,7 @@ module CtxChecker
         # 识别无地址链路时，仍保留 IP 协议 down 状态。
         def parse_output(text, complete:)
           rows, issues, header = [], diagnostics, false
-          clean(text).each_line do |raw|
+          clean(text).each_line("\n") do |raw|
             line = raw.strip
             next if line.empty? || /\A[-=]+\z/.match?(line) || LEGEND.match?(line)
 

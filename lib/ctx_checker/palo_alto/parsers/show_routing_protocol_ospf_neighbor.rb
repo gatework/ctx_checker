@@ -21,13 +21,13 @@ module CtxChecker
           text.split(/(?=^\s*virtual router:)/i).each do |block|
             unless block.match?(/\A\s*virtual router:/i)
               # 文档规定的图例位于首个邻居前，任意前导文本不构成证据。
-              lines = block.lines.map(&:strip).reject(&:empty?)
+              lines = block.lines("\n").map(&:strip).reject(&:empty?)
               unless lines.all? { |line| line.match?(/\A(?:=+|Options: 0x80:reserved,.*|N\/P:NSSA option,.*)\z/i) }
                 issues << { code: :unrecognized_ospf_block }
               end
               next
             end
-            issues << { code: :unrecognized_ospf_field } if block.lines.any? { |line| !line.strip.empty? && !FIELDS.match?(line.strip) }
+            issues << { code: :unrecognized_ospf_field } if block.lines("\n").any? { |line| !line.strip.empty? && !FIELDS.match?(line.strip) }
             if [ "neighbor address", "neighbor router ID", "status" ].any? { |field| block.scan(/^\s*#{Regexp.escape(field)}:/i).size > 1 }
               issues << { code: :duplicate_ospf_field }
               next

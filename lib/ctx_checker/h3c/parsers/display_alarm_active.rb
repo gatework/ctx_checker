@@ -16,7 +16,7 @@ module CtxChecker
         def parse_output(text, complete:)
           source = clean(text)
           rows, header, empty = [], false, false
-          source.each_line do |raw|
+          source.each_line("\n") do |raw|
             line = raw.strip
             if /\ASeq\s+Level\s+Time\s+Info\z/i.match?(line)
               header = true

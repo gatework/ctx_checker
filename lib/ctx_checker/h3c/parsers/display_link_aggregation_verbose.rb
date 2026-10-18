@@ -22,7 +22,7 @@ module CtxChecker
             return build_result([], complete: complete, recognized: true, issues: [ { code: :aggregation_not_configured } ])
           end
           rows, issues, group, remote, groups, columns, tables = [], diagnostics, nil, false, {}, nil, []
-          text.each_line do |raw|
+          text.each_line("\n") do |raw|
             line = raw.strip
             if (match = /\AAggregate Interface:\s*(.*)\z/i.match(line))
               group, remote, columns = nil, false, nil

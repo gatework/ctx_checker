@@ -17,9 +17,9 @@ module CtxChecker
         def parse_output(text, complete:)
           source = clean(text)
           cpus, memories, cpu_issues, memory_issues, shared_issues = [], [], diagnostics, diagnostics, diagnostics
-          swap_lines = source.lines.grep(/\A\s*(?:(?:KiB|MiB|GiB|TiB)\s+)?Swap\s*:/)
+          swap_lines = source.lines("\n").grep(/\A\s*(?:(?:KiB|MiB|GiB|TiB)\s+)?Swap\s*:/)
           process_table = false
-          source.each_line.with_index(1) do |raw, number|
+          source.each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if (match = /\A%?Cpu(?:\(s\)|(\d+))\s*:\s*(.*)\z/i.match(line))
               cpus << cpu(match, cpu_issues)

@@ -65,11 +65,16 @@ module CtxChecker
       grouped = {}
       snapshot.observations.each_value do |observation|
         sources = observation.evidence.filter_map { |entry| entry[:command] }.uniq
+        # 逐命令索引诊断，避免发现数百个端口时反复扫描整个列表。
+        issues_by_command = observation.issues.group_by { |issue| issue[:command] }
+        if sources.one?
+          issues_by_command[sources.first] = observation.issues.select { |issue| !issue[:command] || issue[:command] == sources.first }
+        end
         observation.evidence.each do |evidence|
           command = evidence[:command]
           next unless command
 
-          issues = observation.issues.select { |issue| issue[:command] == command || !issue[:command] && sources.one? }
+          issues = issues_by_command.fetch(command, [])
           state = issues.any? { |issue| issue[:skipped] } ? :skipped : evidence.fetch(:status, observation.status)
           entry = grouped[command] ||= { command: command, dimensions: {}, issues: [] }
           entry[:dimensions][observation.name] = command_status([ entry[:dimensions][observation.name], state ].compact)

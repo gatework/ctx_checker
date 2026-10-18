@@ -15,7 +15,7 @@ module CtxChecker
         # 将成员限定在其所属 trunk 中，明确保留不完整聚合组。
         def parse_output(text, complete:)
           rows, issues, groups, current = [], diagnostics, {}, nil
-          clean(text).each_line do |raw|
+          clean(text).each_line("\n") do |raw|
             line = raw.strip
             next if line.empty? || /\A-+\z/.match?(line)
 

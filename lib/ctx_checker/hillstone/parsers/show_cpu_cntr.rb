@@ -22,7 +22,7 @@ module CtxChecker
         def parse_output(text, complete:)
           records, contexts = [], []
           context, queue, summary = nil, nil, false
-          clean(text).each_line.with_index(1) do |raw, number|
+          clean(text).each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if /\Acpu Port Send\s+Rev Counter:\z/i.match?(line)
               summary = true

@@ -18,7 +18,7 @@ module CtxChecker
           text = clean(text)
           rows, issues, devices = [], diagnostics, []
           current, lane, header, lane_valid = nil, nil, false, true
-          text.each_line.with_index(1) do |source, number|
+          text.each_line("\n").with_index(1) do |source, number|
             line = source.strip
             next if line.empty? || line.match?(/\A[-= ]+\z/)
 

@@ -24,9 +24,7 @@ RSpec.describe CtxChecker::Collector do
   end
 
   def successful(body)
-    step = Net::Connector::CommandResult.new(command: Net::Connector::Command.new("show example"),
-      output: "command\n#{body}device#", prompt: "device#", duration: 0.01)
-    Net::Connector::Result.new(steps: [ step ], config: body)
+    command_receipt(body, output: "command\n#{body}device#")
   end
 
   it "collects shared interface and counter output once, using the clean body and raw-output digest" do
@@ -107,7 +105,7 @@ RSpec.describe CtxChecker::Collector do
 
   it "does not parse a zero-step success as completed evidence" do
     session = double(:session, connected?: true)
-    allow(session).to receive(:send_commands).and_return(Net::Connector::Result.new(config: bgp))
+    allow(session).to receive(:send_commands).and_return(command_receipt(bgp, steps: []))
     snapshot = collector.collect_session(target: target, session: session, dimensions: [ :bgp ])
     expect(snapshot.observation(:bgp).status).to eq(:failed)
     expect(snapshot.observation(:bgp).issues).to include(include(code: :invalid_command_result, stage: :response, error_type: "TypeError"))

@@ -13,7 +13,7 @@ module CtxChecker
         def parse_output(text, complete:)
           source = clean(text)
           rows, issues = [], diagnostics
-          source.each_line.with_index(1) do |raw, number|
+          source.each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             # 配置阈值和复制的 HA 对端状态不属于本地当前告警。
             next if line.empty? || line.match?(/\A(?:cfg\.|peer\.)/)

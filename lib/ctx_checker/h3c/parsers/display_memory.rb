@@ -20,7 +20,7 @@ module CtxChecker
 
           rows, contexts, sections = [], [], []
           context, scope, unit, columns, current, section = nil, "physical", nil, nil, nil, nil
-          source.each_line do |raw|
+          source.each_line("\n") do |raw|
             line = raw.strip
             if /\A(?:Container memory statistics|Memory statistics|The statistics about memory).*measured in (KB|bytes)(?:\(Available\))?:\z/i.match?(line)
               unit = line.match(/measured in (KB|bytes)/i)[1].casecmp?("KB") ? 1024 : 1
@@ -64,7 +64,7 @@ module CtxChecker
         # 旧交换机仅报告物理内存使用量，不能证明缓存调整后的应用使用量。
         def legacy_memory(source, complete:)
           values, seen = {}, {}
-          source.each_line do |raw|
+          source.each_line("\n") do |raw|
             line = raw.strip
             next if line.empty?
 

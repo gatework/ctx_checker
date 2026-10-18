@@ -16,7 +16,7 @@ module CtxChecker
         def parse_output(text, complete:)
           records, issues = [], diagnostics
           time_source = nil
-          clean(text).each_line.with_index(1) do |source, number|
+          clean(text).each_line("\n").with_index(1) do |source, number|
             line = source.strip
             next if line.empty?
 

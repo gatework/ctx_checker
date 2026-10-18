@@ -19,7 +19,7 @@ module CtxChecker
           caches, statuses = [], []
           kernel_cache = {}
           duplicate_cache = false
-          clean(text).each_line.with_index(1) do |source, number|
+          clean(text).each_line("\n").with_index(1) do |source, number|
             line = source.strip
             next if line.empty?
 

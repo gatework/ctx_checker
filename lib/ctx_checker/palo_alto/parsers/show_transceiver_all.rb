@@ -15,7 +15,7 @@ module CtxChecker
         def parse_output(text, complete:)
           text = clean(text)
           rows, issues, header = [], diagnostics, false
-          text.each_line do |raw|
+          text.each_line("\n") do |raw|
             line = raw.strip
             if /\APort\s+Temperature\s+Voltage\s+Current\s+Tx Power\s+Rx Power\z/i.match?(line)
               header = true

@@ -15,7 +15,7 @@ module CtxChecker
         # 活跃模式需要额外运行证据，不能由重复的 trunk 记录替代。
         def parse_output(text, complete:)
           issues, ports, header = diagnostics, {}, false
-          clean(text).each_line do |raw|
+          clean(text).each_line("\n") do |raw|
             line = raw.strip
             next if line.empty? || /\A-+\z/.match?(line)
 

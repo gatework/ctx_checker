@@ -15,7 +15,7 @@ module CtxChecker
           text = clean(text)
           rows, issues, section, totals, counts, duplicates = {}, diagnostics, nil, {}, Hash.new(0), []
           logical_names = {}
-          text.each_line do |raw|
+          text.each_line("\n") do |raw|
             line = raw.strip
             if (match = /\Atotal configured (hardware|logical) interfaces:\s*(\d+)\z/i.match(line))
               section = match[1].downcase.to_sym

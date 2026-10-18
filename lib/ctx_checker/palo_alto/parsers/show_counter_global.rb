@@ -18,7 +18,7 @@ module CtxChecker
           source = clean(text)
           rows, totals, issues = [], [], diagnostics
           title, header = false, false
-          source.each_line.with_index(1) do |raw, number|
+          source.each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if line == "Global counters:"
               title = true

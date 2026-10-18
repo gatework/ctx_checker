@@ -49,9 +49,7 @@ RSpec.describe "CtxChecker multi-command observations" do
   let(:outputs) { { interface_command => interfaces, inbound_command => inbound, outbound_command => outbound } }
 
   def successful(command, body)
-    step = Net::Connector::CommandResult.new(command: Net::Connector::Command.new(command),
-      output: "#{command}\n#{body}<device>", prompt: "<device>", duration: 0.01)
-    Net::Connector::Result.new(steps: [ step ], config: body)
+    command_receipt(body, output: "#{command}\n#{body}<device>")
   end
 
   def metric(observation, interface, name)

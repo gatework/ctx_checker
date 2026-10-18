@@ -8,8 +8,10 @@ module CtxChecker
   class ObservationMerger
     # 归并已声明的命令证据，不丢失来源失败或身份歧义。
     def self.call(name, observations, commands:, required_metrics: [])
-      unless observations.is_a?(Array) && observations.all? { |observation| observation.is_a?(Observation) && observation.name == name }
-        raise ArgumentError, "Command observations must share a dimension"
+      unless observations.is_a?(Array) && observations.all? do |observation|
+          observation.is_a?(Observation) && observation.name == name && observation.status != :not_requested
+        end
+        raise ArgumentError, "Command observations must share a requested dimension"
       end
       sources = observations.map do |observation|
         source = observation.evidence.map { |entry| entry[:command] }.compact.uniq

@@ -68,8 +68,7 @@ module CtxChecker
         raise ArgumentError, "Invalid evidence byte count" if entry.key?(:bytes) && !(entry[:bytes].is_a?(Integer) && entry[:bytes] >= 0)
         raise ArgumentError, "Invalid evidence reference" if entry.key?(:reference) && !text?(entry[:reference])
         if entry.key?(:observed_at)
-          raise ArgumentError, "Invalid evidence time" unless entry[:observed_at].is_a?(String)
-          Time.iso8601(entry[:observed_at])
+          raise ArgumentError, "Invalid evidence time" unless SystemFields.timestamp?(entry[:observed_at])
         end
       end
       @records, @issues, @evidence = [ normalized, issues, evidence ].map { |value| CtxParser::Immutable.copy(value) }

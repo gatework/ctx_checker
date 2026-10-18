@@ -13,7 +13,7 @@ module CtxChecker
 
         # 仅投影当前时钟，不使用启动、应用或保存时间戳。
         def parse_output(text, complete:)
-          lines = clean(text).lines.map(&:strip)
+          lines = clean(text).lines("\n").map(&:strip)
           clocks = lines.grep(/\ASystem Information at\b/)
           zones = lines.grep(/\ATime zone:/)
           @issues << { code: :ambiguous_clock_time, count: clocks.size } unless clocks.one?

@@ -16,7 +16,7 @@ module CtxChecker
         def parse_output(text, complete:)
           rows, issues, section = [], diagnostics, :preamble
           header, interfaces, ipv6, closed = false, false, false, false
-          clean(text).each_line do |raw|
+          clean(text).each_line("\n") do |raw|
             line = raw.strip
             next if line.empty? || /\A-+\z/.match?(line)
 

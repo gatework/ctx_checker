@@ -37,8 +37,14 @@ module CtxChecker
       private
 
       # 局部采集仍保留已知故障；判定成功则要求完整的支持证据。
-      def finding(status, reason, entity: nil, actual: nil, expected: nil, severity: :info, suffix: nil)
-        if status == :pass && !record_complete?(@current_record, @observation)
+      def finding(status, reason, entity: nil, actual: nil, expected: nil, severity: :info, suffix: nil, sources: nil)
+        # 跨记录结论必须由非空且全部完整的来源共同支持，不能只依赖维度状态。
+        complete = if sources
+          sources.any? && sources.all? { |record| record_complete?(record, @observation) }
+        else
+          record_complete?(@current_record, @observation)
+        end
+        if status == :pass && !complete
           status, reason = :unknown, :incomplete_evidence
         end
         Finding.new(id: [ @observation.name, suffix || reason ].join("."), dimension: @observation.name,

@@ -12,7 +12,7 @@ module CtxChecker
         # 解析 show memory statistics，保留不完整或不支持的证据。
         def parse_output(text, complete:)
           records, issues = [], diagnostics
-          clean(text).each_line.with_index(1) do |source, number|
+          clean(text).each_line("\n").with_index(1) do |source, number|
             line = source.strip
             next if line.empty? || /\AHead\s+Total\(b\)/.match?(line) || /\ATracekey\s*:\s*[\da-f#]+\z/i.match?(line)
 

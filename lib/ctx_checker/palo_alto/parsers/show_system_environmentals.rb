@@ -19,7 +19,7 @@ module CtxChecker
           rows = { temperature: [], environment: [], power: [] }
           issues = rows.transform_values { diagnostics }
           section, header, sections, section_rows = nil, nil, [], 0
-          source.each_line.with_index(1) do |raw, number|
+          source.each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             next if line.empty?
             if (match = /\A-+\s*([^-]+?)\s*-+\z/.match(line))

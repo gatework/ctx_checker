@@ -59,9 +59,13 @@ puts report.to_text
 
 观察完整性 `complete/partial/failed/unsupported/not_requested/not_applicable` 与业务结论 `pass/fail/unknown/not_applicable` 分开。空回显不能独自证明健康或功能未配置。可信配置可证明可选 BGP、OSPF 或聚合检查不适用，必检策略仍优先。
 
+快照字符串、命令证据和记录中的采样时间必须使用有效日期及明确的 `Z` 或 UTC 偏移；快照也接受 `Time` 对象。聚合容量仅计入有完整来源证据的成员，不完整成员不能证明容量充足，也不能证明容量不足。
+
 error、CRC、discard 保持独立，不相加；单次累计值不能当作当前错误速率。增量要求身份一致、时间递增及可靠连续性证据。光功率需要设备或策略阈值；已有格式支持不代表所有型号/版本都已验证。
 
 `Collector#collect` 接收负责会话生命周期的 connector；`collect_session` 借用已有会话。本 gem 不包含 Rails、库存数据库、调度或凭据。指标语义见[计数契约](COUNTER_CONTRACT.md)。
+
+采集会在调用时钟或连接器前固定已校验的目标与所选维度。生命周期连接器的 `open` 必须恰好提供一次会话；未提供或提供两次均抛出 `ArgumentError`，第二次回调不会重复执行查询。合并命令结果时不接受 `not_requested` 观察片段。
 
 详细厂商语义、历史验证记录和 Motor 专用集成说明保留在[架构参考](docs/architecture-zh.md)。其中宿主集成代码需要 Motor，不属于独立 gem API。适配层位于 [Motor 仓库](https://github.com/gatework/motor/tree/main/backend/lib) 的 `backend/lib/baseline`、`backend/lib/vxlan` 和 `backend/lib/wireless`。
 
@@ -75,6 +79,8 @@ error、CRC、discard 保持独立，不相加；单次累计值不能当作当�
 
 ## 开发与测试
 
+原生 net-connector 0.13 集成测试要求 ctx_driver 0.2.2 或更新版本。通用借用会话夹具直接实现回执协议，不依赖连接器的结果类。
+
 共享类按实际职责命名，平台信息放在命名空间中。直接对应设备命令的解析器保留文件名和类名。
 
 ```sh
@@ -86,7 +92,7 @@ bundle exec rake build
 
 `bundle exec rake` 执行 RSpec、RuboCop 及离线示例。测试放在 `spec/`，沿用项目 RSpec 约定；样例采用合成或脱敏证据。新增解析格式时补充成功、不完整、不支持及非法输入回归。离线测试不代表所有设备版本均通过实机验证。
 
-运行 `ruby script/verify_package.rb /path/to/ctx_checker.gem`，验证使用已发布依赖的隔离安装。联动开发时可追加明确构建的依赖包路径，例如 `/path/to/ctx_parser.gem`，先安装这些候选包；候选包验证通过不代表注册表中的依赖已兼容。`bundle exec ruby -Ilib benchmark/runtime.rb` 用合成输入测量本地命令查找和诊断开销。
+运行 `ruby script/verify_package.rb /path/to/ctx_checker.gem`，验证使用已发布依赖的隔离安装。联动开发时可追加明确构建的依赖包路径，例如 `/path/to/ctx_parser.gem`，先安装这些候选包；候选包验证通过不代表注册表中的依赖已兼容。`bundle exec ruby -Ilib benchmark/runtime.rb` 用合成输入测量本地命令查找和诊断开销。`bundle exec ruby benchmark/report.rb` 测量 64、256、512 条失败查询的报告构建开销，不含网络和解析时间。
 
 使用声明的最低 Ruby 版本检查兼容性。方法用途统一使用简明中文注释；复杂实现还需说明业务规则、实现思路及关键分支。保持公开返回值与错误契约。真实回显和凭据不可进入示例、fixture、日志或发布包。
 

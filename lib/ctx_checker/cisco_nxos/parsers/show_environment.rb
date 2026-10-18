@@ -22,7 +22,7 @@ module CtxChecker
           @section = nil
           @section_size = 0
           @power_columns = nil
-          clean(text).each_line.with_index(1) do |source, number|
+          clean(text).each_line("\n").with_index(1) do |source, number|
             line = source.strip
             next if line.empty?
             next if section_line(line) || header_line(line)

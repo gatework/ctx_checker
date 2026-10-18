@@ -52,7 +52,7 @@ module CtxChecker
             # Never 或相对时间都不能证明跨重启的计数连续性。
             discontinuity = nil
             section_counters = []
-            counter_source = section.lines.reject { |line| /\A\s*Description:/i.match?(line) }.join
+            counter_source = section.lines("\n").reject { |line| /\A\s*Description:/i.match?(line) }.join("")
             COUNTERS.each do |metric, pattern|
               values = counter_source.scan(pattern).flatten
               if DISCARD_LABELS.key?(metric) && values.size != counter_source.scan(DISCARD_LABELS.fetch(metric)).size
@@ -82,7 +82,7 @@ module CtxChecker
         # 换行 VLAN 列表仅在紧接前一列表时作为元数据处理。
         def known_details?(section)
           vlan_list = false
-          section.lines.drop(1).all? do |raw|
+          section.lines("\n").drop(1).all? do |raw|
             line = raw.strip
             if (match = /\A(?:VLAN (?:Passing|permitted)|(?:Tagged|Untagged)\s+VLAN ID)\s*:\s*(.+)\z/i.match(line))
               vlan_list = valid_vlan_list?(match[1])

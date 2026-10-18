@@ -23,7 +23,9 @@ module CtxChecker
       end
       @observed_at = case observed_at
       when Time then observed_at.getutc.freeze
-      when String then Time.iso8601(observed_at).getutc.freeze
+      when String
+        raise ArgumentError, "Observation time requires a valid date and explicit UTC offset" unless SystemFields.timestamp?(observed_at)
+        Time.iso8601(observed_at).getutc.freeze
       else raise ArgumentError, "Observation time must be Time or ISO8601"
       end
       @target = CtxParser::Immutable.copy(target)

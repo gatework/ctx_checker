@@ -15,7 +15,7 @@ module CtxChecker
         def parse_output(text, complete:)
           text = clean(text)
           rows, issues, total, header = [], diagnostics, nil, false
-          text.each_line do |raw|
+          text.each_line("\n") do |raw|
             line = raw.strip
             if (match = /\ATotal number of peers:\s*(\d+)\z/i.match(line))
               issues << { code: :duplicate_peer_count } unless total.nil?

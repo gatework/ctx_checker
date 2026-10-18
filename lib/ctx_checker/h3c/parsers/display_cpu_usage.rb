@@ -16,7 +16,7 @@ module CtxChecker
         def parse_output(text, complete:)
           source = clean(text)
           rows, components, current, table = [], [], nil, nil
-          source.each_line do |raw|
+          source.each_line("\n") do |raw|
             line = raw.strip
             if (match = /\A((?:Chassis \d+ )?Slot \d+(?: CPU \d+(?: Core \d+)?)?) CPU usage:\z/i.match(line))
               current = scope_name(match[1])

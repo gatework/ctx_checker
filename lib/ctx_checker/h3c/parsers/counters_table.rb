@@ -14,7 +14,7 @@ module CtxChecker
         def parse_counters(text, complete:, metric:)
           source = clean(text)
           rows, sections, section = [], [], nil
-          source.each_line do |raw|
+          source.each_line("\n") do |raw|
             line = raw.strip
             if /\AInterface\s+Total\s*\(pkts?\)\s+Broadcast\s*\(pkts?\)\s+Multicast\s*\(pkts?\)\s+Err\s*\(pkts?\)\z/i.match?(line)
               sections << (section = { count: 0 })

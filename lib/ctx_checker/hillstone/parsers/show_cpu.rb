@@ -14,7 +14,7 @@ module CtxChecker
         # 要求当前采样及回显声明的各标准采样时间窗均有证据。
         def parse_output(text, complete:)
           rows = []
-          clean(text).each_line.with_index(1) do |raw, number|
+          clean(text).each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if (match = /\A(Average|Current) cpu utilization\s*:\s*(\S+)\s*\z/i.match(line))
               rows << sample(match[2], scope: match[1].casecmp?("average") ? "system_average" : "system", seconds: nil)

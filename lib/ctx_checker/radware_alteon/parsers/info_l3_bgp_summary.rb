@@ -11,7 +11,7 @@ module CtxChecker
 
         # 协议明确禁用不代表策略要求的对等体健康。
         def parse_output(text, complete:)
-          lines = clean(text).lines.map(&:strip).reject(&:empty?)
+          lines = clean(text).lines("\n").map(&:strip).reject(&:empty?)
           disabled = lines == [ "BGP is disabled." ]
           issues = [ { code: disabled ? :protocol_disabled : :unrecognized_bgp_output } ]
           build_result([], complete: complete, recognized: disabled, issues: issues)

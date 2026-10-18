@@ -22,7 +22,7 @@ module CtxChecker
           rows = { temperature: [], environment: [], power: [] }
           issues = rows.transform_values { diagnostics }
           contexts, section, header = [], nil, false
-          clean(text).each_line.with_index(1) do |raw, number|
+          clean(text).each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if (match = /\A(.+ information(?:\(C\))?):\z/.match(line))
               section, header = SECTIONS[match[1]], false

@@ -2,6 +2,21 @@
 
 Changes to the public contract are recorded here. Versions follow Semantic Versioning.
 
+## 0.2.2 (2026-10-18)
+
+- Snapshot validated collection targets and dimensions before caller callbacks can alter them.
+- Require lifecycle connectors to provide exactly one session, preventing silent empty collections and repeated queries.
+- Reject unrequested observations as command fragments rather than upgrading them to complete evidence.
+
+- Exercise the current optional net-connector API and share protocol receipts across custom-session tests without tying generic fixtures to connector result internals.
+
+- Preserve proven aggregation capacity lower bounds in partial observations while retaining unknown overall coverage.
+- Parse vendor lines and reconstruct H3C counters independently of Ruby's global record and output separators.
+- Require valid dates and explicit UTC offsets in snapshot and command evidence timestamps, consistent with record timestamps.
+- Count only complete member sources when proving aggregation capacity; incomplete sources cannot prove a capacity shortage.
+- Index command diagnostics once per observation when constructing reports, avoiding repeated scans for expanded port queries.
+- Add a synthetic report construction benchmark for 64, 256, and 512 failed queries.
+
 ## 0.2.1 (2026-10-17)
 
 - Validate time-limit snapshot compatibility during policy construction; reject unsupported Numeric objects before evaluation while preserving exact Rational values.

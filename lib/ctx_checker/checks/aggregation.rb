@@ -38,8 +38,12 @@ module CtxChecker
         @policy.minimum_active_members.each do |group, minimum|
           group_rows = rows.fetch(group, [])
           members = group_rows.reject { |row| row[:member].nil? }
-          active = members.count { |row| row[:member_status] == :active && row[:oper_status] == :up && !member_down?(row) }
-          known = group_rows.none? { |row| row[:member].nil? } && members.all? { |row| row[:member_status] && row[:member_status] != :unknown && %i[up down].include?(row[:oper_status]) }
+          # 容量下界只计入完整来源；不完整成员也不能证明容量不足。
+          active_members = members.select { |row| record_complete?(row, @observation) && row[:member_status] == :active && row[:oper_status] == :up && !member_down?(row) }
+          active = active_members.size
+          known = group_rows.none? { |row| row[:member].nil? } && members.all? do |row|
+            record_complete?(row, @observation) && row[:member_status] && row[:member_status] != :unknown && %i[up down].include?(row[:oper_status])
+          end
           status = if active >= minimum
             :pass
           elsif @observation.complete? && known
@@ -47,7 +51,7 @@ module CtxChecker
           else
             :unknown
           end
-          results << finding(status, :aggregation_capacity, entity: group, actual: active, expected: minimum, severity: :critical)
+          results << finding(status, :aggregation_capacity, entity: group, actual: active, expected: minimum, severity: :critical, sources: active_members)
         end
         results
       end

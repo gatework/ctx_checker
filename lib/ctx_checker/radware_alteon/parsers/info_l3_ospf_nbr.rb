@@ -11,7 +11,7 @@ module CtxChecker
 
         # 在验证活跃 Alteon 邻居表前，保留明确禁用状态。
         def parse_output(text, complete:)
-          lines = clean(text).lines.map(&:strip).reject(&:empty?)
+          lines = clean(text).lines("\n").map(&:strip).reject(&:empty?)
           disabled = lines == [ "OSPF is disabled." ]
           issues = [ { code: disabled ? :protocol_disabled : :unrecognized_ospf_output } ]
           build_result([], complete: complete, recognized: disabled, issues: issues)

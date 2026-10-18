@@ -15,7 +15,7 @@ module CtxChecker
         def parse_output(text, complete:)
           percentages, totals, histories = [], [], []
           header_count, history = 0, nil
-          clean(text).each_line.with_index(1) do |raw, number|
+          clean(text).each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if (match = /\AThe percentage of memory utilization:\s*(\S+)\s*%\z/i.match(line))
               percentages << percentage(match[1])

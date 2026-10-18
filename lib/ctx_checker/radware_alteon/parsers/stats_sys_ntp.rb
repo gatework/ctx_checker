@@ -18,7 +18,7 @@ module CtxChecker
           source = clean(text)
           rows, headers, sections, time_fields = [], 0, [], []
           counter_issues, ntp_issues, section = diagnostics, diagnostics, nil
-          source.each_line.with_index(1) do |raw, number|
+          source.each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             next if line.empty? || /\A-+\z/.match?(line)
 

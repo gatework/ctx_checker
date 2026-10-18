@@ -48,9 +48,7 @@ RSpec.describe "CtxChecker bounded discovery collection" do
   end
 
   def result(command, body = "sample")
-    step = Net::Connector::CommandResult.new(command: Net::Connector::Command.new(command),
-      output: body, prompt: "device#", duration: 0.01)
-    Net::Connector::Result.new(steps: [ step ], config: body)
+    command_receipt(body, output: body)
   end
 
   def discovery(status: :complete, source_complete: true)

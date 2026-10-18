@@ -81,7 +81,7 @@ module CtxChecker
         # 仅拼接文档明确的续行；未完成的记录不能吞并新的作用域。
         def each_ntp_line(source, issues)
           pending = nil
-          source.each_line.with_index(1) do |raw, number|
+          source.each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             next if line.empty?
 

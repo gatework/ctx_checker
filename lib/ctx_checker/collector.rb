@@ -19,7 +19,7 @@ module CtxChecker
 
     # 连接的建立与清理由传入连接器的块生命周期管理。
     def collect(target:, connector:, dimensions: DEFAULT_DIMENSIONS, applicability: nil)
-      parser, identity = prepare(target, dimensions)
+      parser, identity, dimensions = prepare(target, dimensions)
       if connector.respond_to?(:platform) && ParserRegistry.canonical(connector.platform) != parser.platform
         raise ArgumentError, "Connector platform differs from the target"
       end
@@ -29,12 +29,17 @@ module CtxChecker
 
       issues = []
       stage = :connect
+      yielded = false
       begin
         connector.open do |session|
+          raise ArgumentError, "Connector must provide one session" if yielded
+
+          yielded = true
           stage = :collect
           collect_into(session, parser, dimensions, observations)
           stage = :close
         end
+        raise ArgumentError, "Connector must provide one session" unless yielded
       rescue StandardError => error
         raise unless CtxDriver::Failure.connection_error?(error, connector)
 
@@ -48,7 +53,7 @@ module CtxChecker
 
     # 借用已打开的 net-connector 会话，不负责建立或关闭连接。
     def collect_session(target:, session:, dimensions: DEFAULT_DIMENSIONS, applicability: nil)
-      parser, identity = prepare(target, dimensions)
+      parser, identity, dimensions = prepare(target, dimensions)
       observations = inapplicable_observations(parser, dimensions, applicability)
       dimensions = dimensions - observations.keys
       collect_into(session, parser, dimensions, observations) if dimensions.any?
@@ -87,13 +92,15 @@ module CtxChecker
     # 发送任何设备命令前，先校验维度选择与目标身份。
     def prepare(target, dimensions)
       RuntimeParser.validate_dimensions!(dimensions)
+      dimensions = dimensions.dup.freeze
       raise ArgumentError, "Target must be a hash" unless target.is_a?(Hash)
+      target = CtxParser::Immutable.copy(target)
 
       parser = RuntimeParser.new(platform: target.fetch(:platform), model: target[:model], software_version: target[:software_version])
       parser.discovery_dimensions(dimensions)
       # 打开连接器前校验身份，避免将输入错误误报为连接故障。
       snapshot = Snapshot.new(target: target.merge(platform: parser.platform), observed_at: @clock.call, observations: {})
-      [ parser, snapshot.target ]
+      [ parser, snapshot.target, dimensions ]
     end
 
     # 采集发现命令及其依赖命令，保留各自独立的失败结果。

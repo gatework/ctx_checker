@@ -20,7 +20,7 @@ module CtxChecker
         def parse_output(text, complete:)
           source = clean(text)
           row, seen, local_sync = { component: "system" }, {}, []
-          source.each_line do |raw|
+          source.each_line("\n") do |raw|
             line = raw.strip
             next if line.empty?
             key, value = line.split(/:\s*/, 2)

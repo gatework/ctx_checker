@@ -15,7 +15,7 @@ module CtxChecker
         def parse_output(text, complete:)
           source = clean(text)
           timestamps, zones, summer = [], [], false
-          source.each_line do |raw|
+          source.each_line("\n") do |raw|
             line = raw.strip
             if (match = /\A(\d{1,2}:\d{2}:\d{2}(?:\.\d+)?)\s+(\S+)\s+[A-Za-z]{3}\s+(\d{2})\/(\d{2})\/(\d{4})\z/.match(line))
               timestamps << match.captures

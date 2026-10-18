@@ -12,7 +12,7 @@ module CtxChecker
         # 校验每条风扇记录，并按厂商关键性定义确定故障严重级别。
         def parse_output(text, complete:)
           rows, tables, headers = [], 0, 0
-          clean(text).each_line.with_index(1) do |raw, number|
+          clean(text).each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if line == "Fans table:"
               tables += 1

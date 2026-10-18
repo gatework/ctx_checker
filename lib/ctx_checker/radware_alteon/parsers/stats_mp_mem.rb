@@ -16,7 +16,7 @@ module CtxChecker
         # 扣除明确报告的 Linux 缓存；原始进程数值仅作为来源证据保留。
         def parse_output(text, complete:)
           values, headers = Hash.new { |hash, key| hash[key] = [] }, 0
-          clean(text).each_line.with_index(1) do |raw, number|
+          clean(text).each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if line == "Memory stats:"
               headers += 1

@@ -57,7 +57,7 @@ module CtxChecker
           section = nil
           fragment_sections, acl_sections = 0, 0
           ipv4 = false
-          clean(text).each_line.with_index(1) do |source, number|
+          clean(text).each_line("\n").with_index(1) do |source, number|
             line = source.strip
             next if line.empty?
             if /\AIP Software Processed Traffic Statistics\z/i.match?(line)

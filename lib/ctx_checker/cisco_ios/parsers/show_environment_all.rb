@@ -21,7 +21,7 @@ module CtxChecker
           @temperature = nil
           @sensor_table = false
           @component_table = nil
-          clean(text).each_line.with_index(1) do |source, number|
+          clean(text).each_line("\n").with_index(1) do |source, number|
             line = source.strip
             next if line.empty? || /\A[- ]+\z/.match?(line)
             next if catalyst_line(line) || stack_component_line(line) || sensor_line(line)

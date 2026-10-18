@@ -26,7 +26,7 @@ module CtxChecker
           interfaces, counters, state_issues, counter_issues = [], [], diagnostics, diagnostics
           current = nil
           states = {}
-          text.each_line.with_index(1) do |source, number|
+          text.each_line("\n").with_index(1) do |source, number|
             line = source.strip
             next if line.empty?
 

@@ -14,7 +14,7 @@ module CtxChecker
         # 未识别的汇总状态保持不可用，不推定冗余供电正常。
         def parse_output(text, complete:)
           rows = []
-          clean(text).each_line.with_index(1) do |raw, number|
+          clean(text).each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if (match = /\A(Single|Dual) Power Supply Status:\s*(.+)\z/i.match(line))
               state = STATES.fetch(match[2].downcase, :unknown)

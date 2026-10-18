@@ -16,7 +16,7 @@ module CtxChecker
         def parse_output(text, complete:)
           source = clean(text)
           rows, location, columns, contexts, context = [], "system", nil, [], nil
-          source.each_line do |raw|
+          source.each_line("\n") do |raw|
             line = raw.strip
             if (match = /\A((?:Chassis \d+ )?Slot \d+|Chassis \d+)\s*:\z/i.match(line))
               location, columns = scope_name(match[1]), nil

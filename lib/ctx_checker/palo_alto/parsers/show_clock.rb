@@ -15,7 +15,7 @@ module CtxChecker
         def parse_output(text, complete:)
           source = clean(text)
           rows, issues = [], diagnostics
-          source.each_line.with_index(1) do |raw, number|
+          source.each_line("\n").with_index(1) do |raw, number|
             next if raw.strip.empty?
             match = /\A(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+([A-Z][a-z]{2})\s+(\d{1,2})\s+(\d{2}:\d{2}:\d{2})\s+(\S+)\s+(\d{4})\z/.match(raw.strip)
             unless match

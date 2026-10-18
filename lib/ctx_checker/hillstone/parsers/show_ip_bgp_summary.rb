@@ -11,7 +11,7 @@ module CtxChecker
 
         # 仅支持已观察到的 StoneOS 格式，不假设使用 Cisco 表格语法。
         def parse_output(text, complete:)
-          lines = clean(text).lines.map(&:strip).reject(&:empty?)
+          lines = clean(text).lines("\n").map(&:strip).reject(&:empty?)
           recognized = lines == [ "No IPv4 neighbor is configured" ]
           issues = [ { code: recognized ? :protocol_not_configured : :unrecognized_bgp_output } ]
           build_result([], complete: complete, recognized: recognized, issues: issues)

@@ -14,7 +14,7 @@ module CtxChecker
           source = clean(text)
           rows, globals, issues = [], [], diagnostics
           current, fields, header, peer_fields = nil, {}, false, {}
-          source.each_line.with_index(1) do |raw, number|
+          source.each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             next if line.empty?
             if line == "NTP state:"

@@ -17,7 +17,7 @@ module CtxChecker
         # 解释方向性测量前，要求存在带标签的累计计数列。
         def parse_output(text, complete:)
           blocks, issues, current, section = [], diagnostics, nil, nil
-          clean(text).each_line do |raw|
+          clean(text).each_line("\n") do |raw|
             line = raw.strip
             next if line.empty? || /\A-+\z/.match?(line)
 

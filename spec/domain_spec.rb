@@ -72,6 +72,14 @@ RSpec.describe "CtxChecker domain contracts" do
     expect { row(:interfaces, [ record ], evidence: [ { observed_at: Time.now } ]) }.to raise_error(ArgumentError)
   end
 
+  it "rejects ambiguous or normalized invalid dates at both sampling time boundaries" do
+    [ "2026-10-15T10:00:00", "2026-02-30T10:00:00Z", "2026-10-15T24:00:00Z",
+      "2026-10-15T10:00:00+24:00", "2026-10-15T10:00:00+08:60" ].each do |time|
+      expect { row(:interfaces, [ record ], evidence: [ { observed_at: time } ]) }.to raise_error(ArgumentError)
+      expect { CtxChecker::Snapshot.new(target: target, observed_at: time, observations: {}) }.to raise_error(ArgumentError)
+    end
+  end
+
   it "validates immutable policy expectations before any collection" do
     members = { "Port-channel1" => [ "Ethernet1/1" ] }
     policy = CtxChecker::Policy.new(required_members: members, minimum_active_members: { "Port-channel1" => 2 })

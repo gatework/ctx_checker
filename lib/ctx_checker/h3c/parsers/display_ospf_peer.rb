@@ -17,7 +17,7 @@ module CtxChecker
             return build_result([], complete: complete, recognized: true, issues: [ { code: :protocol_not_configured } ])
           end
           rows, issues, process, area, header = [], diagnostics, nil, nil, false
-          text.each_line do |raw|
+          text.each_line("\n") do |raw|
             line = raw.strip
             if (match = /\AOSPF Process (\d+) with Router ID ([\d.]+)\z/i.match(line))
               process, area = match[1], nil

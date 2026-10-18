@@ -14,7 +14,7 @@ module CtxChecker
         # 要求各文档规定的 MP 时间窗完整，无效读数保持未知。
         def parse_output(text, complete:)
           rows, headers = [], 0
-          clean(text).each_line.with_index(1) do |raw, number|
+          clean(text).each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if line == "CPU utilization:"
               headers += 1

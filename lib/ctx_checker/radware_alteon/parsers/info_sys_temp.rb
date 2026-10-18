@@ -15,7 +15,7 @@ module CtxChecker
         # 阈值缺失时保留未知，拒绝矛盾的汇总或范围证据。
         def parse_output(text, complete:)
           rows, highs, criticals, summaries = [], [], [], []
-          clean(text).each_line.with_index(1) do |raw, number|
+          clean(text).each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if (match = /\ASensor (\d+) has (\S+) degree Celsius\z/.match(line))
               value = /\A#{NUMBER}\z/.match?(match[2]) ? Float(match[2], exception: false) : nil

@@ -31,7 +31,7 @@ module CtxChecker
           records, issues = [], diagnostics
           active = false
           recognized = false
-          clean(text).each_line.with_index(1) do |source, number|
+          clean(text).each_line("\n").with_index(1) do |source, number|
             line = source.strip
             next if line.empty?
             if line == "IP statistics:"

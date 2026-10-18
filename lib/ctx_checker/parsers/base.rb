@@ -23,7 +23,7 @@ module CtxChecker
         @unsupported = false
         @command_failed = false
         source = CtxParser::Input.text(text, encoding: :transcode, newlines: :lf, max_bytes: MAX_BYTES)
-        source.each_line.with_index(1) do |line, number|
+        source.each_line("\n").with_index(1) do |line, number|
           if /\A\s*(?:(?:%\s*)?(?:Error:\s*)?(?:Invalid (?:input|command|syntax)|Unrecognized command|Unknown command|command not (?:found|supported)|not supported on this|syntax error)|\^-+\s*unrecognized keyword\b)/i.match?(line)
             @unsupported = true
             @issues << { code: :unsupported_command, line: number }

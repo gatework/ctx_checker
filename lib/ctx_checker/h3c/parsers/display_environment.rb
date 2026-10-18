@@ -18,7 +18,7 @@ module CtxChecker
         def parse_output(text, complete:)
           source = clean(text)
           rows, chassis, header, auxiliary, contexts, context = [], nil, nil, nil, [], nil
-          source.each_line do |raw|
+          source.each_line("\n") do |raw|
             line = raw.strip
             if (match = /\AChassis (\d+):\z/i.match(line))
               chassis = "chassis #{match[1]} "

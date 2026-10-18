@@ -15,9 +15,7 @@ RSpec.describe "Hillstone runtime integration" do
 
   # 传输成功的响应仍可能包含不支持的 CLI 语法。
   def response(body)
-    step = Net::Connector::CommandResult.new(command: Net::Connector::Command.new("show example"),
-      output: "command\n#{body}device#", prompt: "device#", duration: 0.01)
-    Net::Connector::Result.new(steps: [ step ], config: body)
+    command_receipt(body, output: "command\n#{body}device#")
   end
 
   it "resolves StoneOS and shares each query across its declared dimensions" do

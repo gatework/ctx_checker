@@ -15,7 +15,7 @@ module CtxChecker
         # 解释计数器前先校验列顺序；缺少采样时保留 nil。
         def parse_output(text, complete:)
           rows, issues, header, count = [], diagnostics, false, 0
-          clean(text).each_line do |raw|
+          clean(text).each_line("\n") do |raw|
             line = raw.strip
             next if line.empty? || /\A[-=]+\z/.match?(line)
 

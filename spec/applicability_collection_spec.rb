@@ -29,9 +29,7 @@ RSpec.describe "Configuration applicability through collection and reporting" do
 
   # 使用与实际顺序采集器一致的传输结果边界。
   def successful(body)
-    step = Net::Connector::CommandResult.new(command: Net::Connector::Command.new("show example"),
-      output: "command\n#{body}device#", prompt: "device#", duration: 0.01)
-    Net::Connector::Result.new(steps: [ step ], config: body)
+    command_receipt(body, output: "command\n#{body}device#")
   end
 
   # 通过真实配置解析器确定适用性，不使用预设的判断替身。

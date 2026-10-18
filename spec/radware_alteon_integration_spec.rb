@@ -23,9 +23,7 @@ RSpec.describe "Alteon runtime integration" do
 
   # 连接器可返回传输有效的结果，但其 CLI 正文仍可能明确报错。
   def response(command, body)
-    step = Net::Connector::CommandResult.new(command: Net::Connector::Command.new(command),
-      output: "#{command}\n#{body}>> Main#", prompt: ">> Main#", duration: 0.01)
-    Net::Connector::Result.new(steps: [ step ], config: body)
+    command_receipt(body, output: "#{command}\n#{body}>> Main#")
   end
 
   # 为目录边界回归构造类型化的发现证据。

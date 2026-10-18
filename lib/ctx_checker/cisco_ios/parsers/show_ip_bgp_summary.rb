@@ -25,7 +25,7 @@ module CtxChecker
           section = { header: false, empty: false, count: 0, scope_fields: [], scope: scope }
           sections << section
           pending = nil
-          text.each_line.with_index(1) do |source, number|
+          text.each_line("\n").with_index(1) do |source, number|
             line = source.strip
             next if line.empty? || line.match?(/\A[-= ]+\z/)
 

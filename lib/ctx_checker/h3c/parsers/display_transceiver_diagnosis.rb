@@ -27,7 +27,7 @@ module CtxChecker
               next
             end
             name = CtxChecker::Parsers::InterfaceNames.normalize(match[1], platform: :h3c)
-            lines = block.lines.drop(1).map(&:strip).reject(&:empty?)
+            lines = block.lines("\n").drop(1).map(&:strip).reject(&:empty?)
             if (state = availability(lines, name))
               rows.concat(measurements(name, nil, nil, nil, **state))
               next

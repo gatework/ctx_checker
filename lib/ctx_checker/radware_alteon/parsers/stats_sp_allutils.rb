@@ -15,7 +15,7 @@ module CtxChecker
           rows = { cpu: [], memory: [] }
           issues = rows.transform_values { diagnostics }
           sections, current = [], nil
-          clean(text).each_line.with_index(1) do |raw, number|
+          clean(text).each_line("\n").with_index(1) do |raw, number|
             line = raw.strip
             if (match = /\ASPs CPU utilization percentage for (\d+) sec sampling\s*:\z/.match(line))
               current = section(:cpu, match[1].to_i)

@@ -59,9 +59,13 @@ puts report.to_text
 
 Observation completeness (`complete`, `partial`, `failed`, `unsupported`, `not_requested`, `not_applicable`) is separate from findings (`pass`, `fail`, `unknown`, `not_applicable`). Empty output alone cannot prove a healthy or unconfigured feature. Confirmed configuration can establish that optional BGP, OSPF, or aggregation checks do not apply; required policy still takes precedence.
 
+Sampling timestamps in snapshot strings, command evidence, and records require a valid ISO8601 date with an explicit `Z` or UTC offset. Snapshots also accept `Time` objects. Aggregation capacity counts only members supported by complete source evidence; incomplete members cannot establish either sufficient capacity or a shortage.
+
 Errors, CRC, and discards are distinct counters and must not be summed. A single cumulative value is not a current error rate. Delta analysis needs matching identities, increasing timestamps, and reliable continuity evidence. Optics need device or policy thresholds; supported command formats do not guarantee every model/version is covered.
 
 `Collector#collect` accepts an injected connector that owns its session lifecycle; `collect_session` borrows an existing session. No Rails, inventory database, scheduler, or credentials are included. See the [counter contract](COUNTER_CONTRACT.md) for metric semantics.
+
+Collection snapshots the validated target and selected dimensions before calling the clock or connector. A lifecycle connector must yield exactly one session from `open`; yielding none or twice raises `ArgumentError`, and a second yield never repeats queries. Unrequested observations are not accepted as command fragments during combination.
 
 Detailed vendor behavior, historical validation notes, and Motor-only integration are preserved in [the architecture reference](docs/architecture-zh.md). Host integration examples in that reference require Motor; they are not standalone gem APIs. Motor adapters live under `backend/lib/baseline`, `backend/lib/vxlan`, and `backend/lib/wireless` in the [Motor repository](https://github.com/gatework/motor/tree/main/backend/lib).
 
@@ -75,6 +79,8 @@ Integer OSPF process IDs are normalized to strings in policies, observations, an
 
 ## Development and tests
 
+Native net-connector 0.13 integration tests require ctx_driver 0.2.2 or newer. Generic borrowed-session fixtures implement the response protocol directly and remain independent of connector result classes.
+
 Name shared classes by their responsibility and use the namespace for platform context. Preserve filenames and class names that directly match device commands.
 
 ```sh
@@ -86,7 +92,7 @@ bundle exec rake build
 
 `bundle exec rake` runs RSpec, RuboCop, and the offline examples. Tests live in `spec/`, following the existing project's RSpec convention; fixtures use synthetic or sanitized evidence. Add regression cases for successful, incomplete, unsupported, and malformed inputs when extending a parser. Offline tests do not certify all device versions or replace live integration checks.
 
-Run `ruby script/verify_package.rb /path/to/ctx_checker.gem` to verify an isolated installation with published dependencies. During coordinated development, append explicitly built dependency artifacts, such as `/path/to/ctx_parser.gem`, to install those candidates first. Candidate verification does not establish that the published dependencies are compatible. `bundle exec ruby -Ilib benchmark/runtime.rb` measures synthetic command lookup and diagnostic overhead locally.
+Run `ruby script/verify_package.rb /path/to/ctx_checker.gem` to verify an isolated installation with published dependencies. During coordinated development, append explicitly built dependency artifacts, such as `/path/to/ctx_parser.gem`, to install those candidates first. Candidate verification does not establish that the published dependencies are compatible. `bundle exec ruby -Ilib benchmark/runtime.rb` measures synthetic command lookup and diagnostic overhead locally. `bundle exec ruby benchmark/report.rb` measures report construction for 64, 256, and 512 failed queries, excluding network and parsing time.
 
 Use the declared minimum Ruby version for compatibility checks. Document source methods and non-obvious business logic in concise Chinese, preserve public return/error contracts, and never add raw device captures or credentials to examples, fixtures, logs, or release archives.
 

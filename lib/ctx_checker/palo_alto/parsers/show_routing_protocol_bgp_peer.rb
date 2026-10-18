@@ -22,7 +22,7 @@ module CtxChecker
               issues << { code: :unrecognized_bgp_block }
               next
             end
-            if block.lines.any? { |line| !line.strip.empty? && !FIELDS.match?(line.strip) }
+            if block.lines("\n").any? { |line| !line.strip.empty? && !FIELDS.match?(line.strip) }
               issues << { code: :unrecognized_bgp_field }
             end
             if [ "Remote Address", "Peer status", "Remote AS", "virtual router" ].any? { |field| block.scan(/^\s*#{Regexp.escape(field)}:/i).size > 1 }
