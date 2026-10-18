@@ -57,6 +57,7 @@ module CtxChecker
         identities = {}
         scopes = {}
         incomplete = Hash.new { |hash, keys| hash[keys] = {} }
+        covered = covered_scope_index
         @observation.records.each do |record|
           identities[record.values_at(*fields)] = true
           scopes[record.values_at(*scope)] = true
@@ -67,7 +68,7 @@ module CtxChecker
           next if identities.key?(identity.values_at(*fields))
 
           ambiguous = incomplete.any? { |keys, values| values.key?(identity.values_at(*keys)) }
-          enumerated = @observation.covered_scopes.any? { |entry| entry.all? { |key, value| identity[key] == value } }
+          enumerated = covered.any? { |keys, values| values.key?(identity.values_at(*keys)) }
           scope_observed = scopes.key?(identity.values_at(*scope))
           status = if ambiguous
             :unknown
@@ -79,6 +80,14 @@ module CtxChecker
             :unknown
           end
           finding(status, :expected_peer_missing, entity: identity, severity: :critical)
+        end
+      end
+
+      # 按字段组合索引覆盖范围；OSPF 的进程级与接口级证明分别匹配。
+      def covered_scope_index
+        @observation.covered_scopes.each_with_object({}) do |entry, index|
+          fields = entry.keys.sort
+          (index[fields] ||= {})[entry.values_at(*fields)] = true
         end
       end
     end

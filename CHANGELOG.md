@@ -2,6 +2,12 @@
 
 Changes to the public contract are recorded here. Versions follow Semantic Versioning.
 
+## 0.2.3 (2026-10-18)
+
+- Clear Bundler bootstrap variables when verifying packages in an isolated gem installation, including calls made through bundle exec.
+
+- Index protocol coverage and conflicting scopes by field sets, preserving wildcard identities and OSPF interface scopes without quadratic scans.
+
 ## 0.2.2 (2026-10-18)
 
 - Snapshot validated collection targets and dimensions before caller callbacks can alter them.

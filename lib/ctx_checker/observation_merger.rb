@@ -48,9 +48,9 @@ module CtxChecker
         issues << { code: :duplicate_identity, count: grouped.duplicate_identity_count }
         records = grouped.unambiguous.dup
         # 隔离的对等体实际已被观察到，因此移除后不能再据其作用域证明缺失。
-        ambiguous = grouped.first_occurrences - grouped.unambiguous
-        covered_scopes = covered_scopes.reject do |scope|
-          ambiguous.any? { |row| scope.all? { |key, value| row[key].nil? || row[key] == value } }
+        if covered_scopes.any?
+          ambiguous = grouped.first_occurrences - grouped.unambiguous
+          covered_scopes = unambiguous_scopes(covered_scopes, ambiguous)
         end
       end
       if name == :counters && required_metrics.any?
@@ -78,5 +78,24 @@ module CtxChecker
       Observation.new(name: name, status: status, records: records, issues: issues.uniq,
         covered_scopes: covered_scopes, evidence: observations.flat_map(&:evidence))
     end
+
+    # 各覆盖字段组合只建立一次冲突索引，保留原有范围顺序。
+    def self.unambiguous_scopes(scopes, records)
+      indexes = scopes.map { |scope| scope.keys.sort }.uniq.to_h do |fields|
+        [ fields, ambiguity_index(records, fields) ]
+      end
+      scopes.reject do |scope|
+        indexes.fetch(scope.keys.sort).any? { |fields, values| values.key?(scope.values_at(*fields)) }
+      end
+    end
+
+    # 冲突记录中缺失的字段仍匹配任意值，不能据此证明某个范围为空。
+    def self.ambiguity_index(records, fields)
+      records.each_with_object({}) do |record, index|
+        present = fields.reject { |field| record[field].nil? }
+        (index[present] ||= {})[record.values_at(*present)] = true
+      end
+    end
+    private_class_method :unambiguous_scopes, :ambiguity_index
   end
 end
