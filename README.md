@@ -21,7 +21,7 @@ gem "ctx_checker"
 
 Then run `bundle install`, or install directly with `gem install ctx_checker`. The require path is `ctx_checker` and the public namespace is `CtxChecker`; package names and Ruby namespaces are intentionally separate.
 
-Internal runtime dependencies: [`ctx_parser`](https://github.com/gatework/ctx_parser), [`ctx_driver`](https://github.com/gatework/ctx_driver). The gemspec declares runtime dependencies without version constraints. Applications should commit their own `Gemfile.lock` to make deployments reproducible. No Rails boot or sibling checkout paths are required.
+Internal runtime dependencies: [`ctx_parser`](https://github.com/gatework/ctx_parser), [`ctx_driver`](https://github.com/gatework/ctx_driver). The gemspec requires compatible 0.2.x versions of both gems. Applications should commit their own `Gemfile.lock` to make deployments reproducible. No Rails boot or sibling checkout paths are required.
 
 Release artifacts and checksums are available from [GitHub Releases](https://github.com/gatework/ctx_checker/releases). Check [RubyGems](https://rubygems.org/gems/ctx_checker) for published versions.
 
@@ -79,9 +79,11 @@ Integer OSPF process IDs are normalized to strings in policies, observations, an
 
 ## Development and tests
 
-Native net-connector 0.13 integration tests require ctx_driver 0.2.2 or newer. Generic borrowed-session fixtures implement the response protocol directly and remain independent of connector result classes.
+Native net-connector 0.13 integration tests require ctx_driver 0.2.2 or newer. Generic borrowed-session fixtures implement the response protocol directly and remain independent of connector result classes. `bundle exec ruby examples/connector.rb` exercises all five gems through a local PTY: shared command collection, raw evidence, parsed observations, health findings, and rejection without implicit reconnection. It uses synthetic device responses and requires no network endpoint or credentials.
 
 Name shared classes by their responsibility and use the namespace for platform context. Preserve filenames and class names that directly match device commands.
+
+CLI parsers specify field and line separators explicitly (`split(" ")`, `each_line("\n")`, and `join("\n")` as appropriate). Host applications may change Ruby's global separators; that must not change device facts or source evidence.
 
 ```sh
 bundle install
@@ -90,9 +92,9 @@ bundle exec ruby examples/offline.rb
 bundle exec rake build
 ```
 
-`bundle exec rake` runs RSpec, RuboCop, and the offline examples. Tests live in `spec/`, following the existing project's RSpec convention; fixtures use synthetic or sanitized evidence. Add regression cases for successful, incomplete, unsupported, and malformed inputs when extending a parser. Offline tests do not certify all device versions or replace live integration checks.
+`bundle exec rake` runs RSpec, RuboCop, and the offline and local PTY examples. Tests live in `spec/`, following the existing project's RSpec convention; fixtures use synthetic or sanitized evidence. Add regression cases for successful, incomplete, unsupported, and malformed inputs when extending a parser. Offline tests do not certify all device versions or replace live integration checks.
 
-Run `ruby script/verify_package.rb /path/to/ctx_checker.gem` to verify an isolated installation with published dependencies. During coordinated development, append explicitly built dependency artifacts, such as `/path/to/ctx_parser.gem`, to install those candidates first. Candidate verification does not establish that the published dependencies are compatible. `bundle exec ruby -Ilib benchmark/runtime.rb` measures synthetic command lookup and diagnostic overhead locally. `bundle exec ruby benchmark/report.rb` measures report construction for 64, 256, and 512 failed queries, excluding network and parsing time.
+Run `ruby script/verify_package.rb /path/to/ctx_checker.gem` to verify an isolated installation with published dependencies. During coordinated development, append explicitly built dependency artifacts, such as `/path/to/ctx_parser.gem`, to install and activate those exact candidate versions first; incompatible candidates fail verification. Candidate verification does not establish that the published dependencies are compatible. `bundle exec ruby -Ilib benchmark/runtime.rb` measures synthetic command lookup and diagnostic overhead locally. `bundle exec ruby benchmark/report.rb` measures report construction for 64, 256, and 512 failed queries, excluding network and parsing time.
 
 Use the declared minimum Ruby version for compatibility checks. Document source methods and non-obvious business logic in concise Chinese, preserve public return/error contracts, and never add raw device captures or credentials to examples, fixtures, logs, or release archives.
 

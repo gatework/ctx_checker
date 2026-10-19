@@ -68,7 +68,7 @@ module CtxChecker
 
         # 单个风扇故障优先于电源或托盘的整体正常状态。
         def stack_component_status(parent, fans)
-          values = fans.split
+          values = fans.split(" ")
           return unless values.all? { |value| /\A(?:good|bad|ok|fail|failed|N\/A)\z/i.match?(value) }
 
           states = [ component_status(parent), *values.reject { |value| value.casecmp?("N/A") }.map { |value| component_status(value) } ]

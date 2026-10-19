@@ -21,7 +21,7 @@ gem "ctx_checker"
 
 然后执行 `bundle install`；也可直接执行 `gem install ctx_checker`。Ruby 加载入口为 `ctx_checker`，公开命名空间为 `CtxChecker`；gem 包名与 Ruby 命名空间分别维护。
 
-模块运行依赖：[`ctx_parser`](https://github.com/gatework/ctx_parser), [`ctx_driver`](https://github.com/gatework/ctx_driver)。 gemspec 的运行依赖不添加版本约束；应用应提交自己的 `Gemfile.lock`，保持部署可复现。使用本库不需要启动 Rails 或配置兄弟模块的本地路径。
+模块运行依赖：[`ctx_parser`](https://github.com/gatework/ctx_parser), [`ctx_driver`](https://github.com/gatework/ctx_driver)。gemspec 要求两者使用兼容的 0.2.x 版本；应用应提交自己的 `Gemfile.lock`，保持部署可复现。使用本库不需要启动 Rails 或配置兄弟模块的本地路径。
 
 发布产物和校验值见 [GitHub Releases](https://github.com/gatework/ctx_checker/releases)，已发布版本以 [RubyGems](https://rubygems.org/gems/ctx_checker) 为准。
 
@@ -79,9 +79,11 @@ error、CRC、discard 保持独立，不相加；单次累计值不能当作当�
 
 ## 开发与测试
 
-原生 net-connector 0.13 集成测试要求 ctx_driver 0.2.2 或更新版本。通用借用会话夹具直接实现回执协议，不依赖连接器的结果类。
+原生 net-connector 0.13 集成测试要求 ctx_driver 0.2.2 或更新版本。通用借用会话夹具直接实现回执协议，不依赖连接器的结果类。`bundle exec ruby examples/connector.rb` 通过本地 PTY 贯通五个 gem，验证共享命令采集、原始证据、解析观测、健康判断和命令拒绝后不隐式重连；使用合成回显，无须网络设备或凭据。
 
 共享类按实际职责命名，平台信息放在命名空间中。直接对应设备命令的解析器保留文件名和类名。
+
+CLI 解析显式指定字段与行分隔符，按语义使用 `split(" ")`、`each_line("\n")` 和 `join("\n")`。宿主应用修改 Ruby 全局分隔符时，设备事实和来源证据必须保持一致。
 
 ```sh
 bundle install
@@ -90,9 +92,9 @@ bundle exec ruby examples/offline.rb
 bundle exec rake build
 ```
 
-`bundle exec rake` 执行 RSpec、RuboCop 及离线示例。测试放在 `spec/`，沿用项目 RSpec 约定；样例采用合成或脱敏证据。新增解析格式时补充成功、不完整、不支持及非法输入回归。离线测试不代表所有设备版本均通过实机验证。
+`bundle exec rake` 执行 RSpec、RuboCop、离线及本地 PTY 示例。测试放在 `spec/`，沿用项目 RSpec 约定；样例采用合成或脱敏证据。新增解析格式时补充成功、不完整、不支持及非法输入回归。离线测试不代表所有设备版本均通过实机验证。
 
-运行 `ruby script/verify_package.rb /path/to/ctx_checker.gem`，验证使用已发布依赖的隔离安装。联动开发时可追加明确构建的依赖包路径，例如 `/path/to/ctx_parser.gem`，先安装这些候选包；候选包验证通过不代表注册表中的依赖已兼容。`bundle exec ruby -Ilib benchmark/runtime.rb` 用合成输入测量本地命令查找和诊断开销。`bundle exec ruby benchmark/report.rb` 测量 64、256、512 条失败查询的报告构建开销，不含网络和解析时间。
+运行 `ruby script/verify_package.rb /path/to/ctx_checker.gem`，验证使用已发布依赖的隔离安装。联动开发时可追加明确构建的依赖包路径，例如 `/path/to/ctx_parser.gem`，先安装并精确激活这些候选版本，不兼容的候选会使验证失败；候选包验证通过不代表注册表中的依赖已兼容。`bundle exec ruby -Ilib benchmark/runtime.rb` 用合成输入测量本地命令查找和诊断开销。`bundle exec ruby benchmark/report.rb` 测量 64、256、512 条失败查询的报告构建开销，不含网络和解析时间。
 
 使用声明的最低 Ruby 版本检查兼容性。方法用途统一使用简明中文注释；复杂实现还需说明业务规则、实现思路及关键分支。保持公开返回值与错误契约。真实回显和凭据不可进入示例、fixture、日志或发布包。
 

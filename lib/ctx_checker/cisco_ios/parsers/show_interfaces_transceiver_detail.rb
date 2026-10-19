@@ -32,7 +32,7 @@ module CtxChecker
               header = true
               lane_column = line.match?(/\APort\s+Lane\s/i)
             elsif interface_row?(line)
-              name = CtxChecker::Parsers::InterfaceNames.normalize(line.split.first, platform: :cisco_ios)
+              name = CtxChecker::Parsers::InterfaceNames.normalize(line.split(" ").first, platform: :cisco_ios)
               ports << name
               if metric && header
                 next if metric == :other
@@ -65,7 +65,7 @@ module CtxChecker
         def measurement(line, metric, lane_column)
           # 括号内 A2D 读数属于独立校准证据，不作为阈值。
           normalized = line.gsub(/\(\s*#{NUMBER}\s*\)/i, "")
-          columns = normalized.split
+          columns = normalized.split(" ")
           name = CtxChecker::Parsers::InterfaceNames.normalize(columns.shift, platform: :cisco_ios)
           lane = lane_column ? columns.shift : nil
           lane = nil if lane && /\AN\/?A\z/i.match?(lane)
@@ -83,7 +83,7 @@ module CtxChecker
 
         # 区分接口数据行与表格标题。
         def interface_row?(line)
-          name = CtxChecker::Parsers::InterfaceNames.normalize(line.split.first, platform: :cisco_ios)
+          name = CtxChecker::Parsers::InterfaceNames.normalize(line.split(" ").first, platform: :cisco_ios)
           CtxChecker::Parsers::InterfaceNames.kind(name) == :physical
         end
 

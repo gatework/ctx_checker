@@ -37,7 +37,7 @@ module CtxChecker
                 component = "#{match[1]}/#{match[2].strip}"
                 alarm = match[3].casecmp?("true")
                 status = alarm ? :critical : :ok
-                values = match[4].split
+                values = match[4].split(" ")
                 case section
                 when "thermal"
                   measurements = values.map { |value| numeric(value) }

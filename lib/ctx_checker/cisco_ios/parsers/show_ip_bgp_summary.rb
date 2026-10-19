@@ -77,7 +77,7 @@ module CtxChecker
         end
 
         # 识别协议对等体记录，排除摘要和表头。
-        def peer_row?(line) = CtxParser::Values.ip_address?(line.split.first.to_s)
+        def peer_row?(line) = CtxParser::Values.ip_address?(line.split(" ").first.to_s)
 
         # 解析单个路由作用域，不合并无关的 VRF 证据。
         def parse_scope(line, scope, issues, number)
@@ -118,7 +118,7 @@ module CtxChecker
         # 仅归一化支持的地址族；未知作用域保留为 nil。
         def address_family(value)
           { "ipv4 unicast" => "ipv4_unicast", "ipv6 unicast" => "ipv6_unicast",
-            "l2vpn evpn" => "l2vpn_evpn" }[value.downcase.split.join(" ")]
+            "l2vpn evpn" => "l2vpn_evpn" }[value.downcase.split(" ").join(" ")]
         end
 
         # 归一化单个路由对等体及其协议状态。

@@ -31,10 +31,10 @@ module CtxChecker
               contexts << (context = { component: scope_name(match[1]), scope: scope, samples: 0 })
               columns, current = nil, nil
             elsif /\ATotal\s+Used\s+Free\b/.match?(line)
-              columns = line.split
+              columns = line.split(" ")
             elsif (match = /\AMem:\s+(\S+)\s+(\S+)\s+(\S+)(?:\s+.*)?\z/.match(line))
               if context && unit
-                values = line.delete_prefix("Mem:").split
+                values = line.delete_prefix("Mem:").split(" ")
                 if columns.nil? || values.size != columns.size
                   @issues << { code: :incomplete_memory_row, component: context[:component] }
                 end

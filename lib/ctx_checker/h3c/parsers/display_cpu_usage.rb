@@ -24,7 +24,7 @@ module CtxChecker
             elsif /\A(?:Chassis\s+)?Slot\s+CPU\s+Last 5 sec\s+Last 1 min\s+Last 5 min\z/i.match?(line)
               table = line.start_with?("Chassis") ? 3 : 2
             elsif table && (match = /\A(\d+(?:\s+\d+){1,2})\s+(#{NUMBER})%?\s+(#{NUMBER})%?\s+(#{NUMBER})%?\z/i.match(line))
-              identifiers = match[1].split
+              identifiers = match[1].split(" ")
               if identifiers.size == table
                 current = identifiers.zip(table == 3 ? %w[chassis slot cpu] : %w[slot cpu]).map { |id, kind| "#{kind} #{id}" }.join(" ")
                 components << current

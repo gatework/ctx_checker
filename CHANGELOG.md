@@ -2,6 +2,15 @@
 
 Changes to the public contract are recorded here. Versions follow Semantic Versioning.
 
+## Unreleased
+
+## 0.2.4 (2026-10-19)
+
+- Parse whitespace-delimited IOS, NX-OS, H3C and PAN-OS facts independently of Ruby's global field separator, preserving native whitespace splitting semantics.
+- Exercise the five-gem collection-to-report chain with a local PTY in default checks and isolated package validation, including shared queries, source digests and command rejection without reconnecting.
+- Activate explicitly supplied candidate package versions exactly during isolated verification; incompatible candidates fail instead of silently testing a newer dependency.
+- Correct dependency documentation to match the existing compatible 0.2.x constraints.
+
 ## 0.2.3 (2026-10-18)
 
 - Clear Bundler bootstrap variables when verifying packages in an isolated gem installation, including calls made through bundle exec.
