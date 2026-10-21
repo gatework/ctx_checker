@@ -2,6 +2,8 @@
 
 require "time"
 require "ctx_driver"
+require "ctx_runner/collection"
+require "ctx_runner/query"
 require_relative "runtime_parser"
 require_relative "snapshot"
 require_relative "failure"
@@ -28,24 +30,12 @@ module CtxChecker
       return Snapshot.new(target: identity, observed_at: @clock.call, observations: observations) if dimensions.empty?
 
       issues = []
-      stage = :connect
-      yielded = false
-      begin
-        connector.open do |session|
-          raise ArgumentError, "Connector must provide one session" if yielded
-
-          yielded = true
-          stage = :collect
-          collect_into(session, parser, dimensions, observations)
-          stage = :close
-        end
-        raise ArgumentError, "Connector must provide one session" unless yielded
-      rescue StandardError => error
-        raise unless CtxDriver::Failure.connection_error?(error, connector)
-
-        code = stage == :close ? :session_close_failed : CtxDriver::Failure.code(error, :connection_failed)
-        issues << { code: code, stage: stage }
-        mark_unavailable(parser, dimensions, observations, code: code, stage: stage, error: error)
+      collection = CtxRunner::Collection.new(strict: true)
+      collection.open(connector) { |session| collect_into(session, parser, dimensions, observations) }
+      if collection.failure
+        details = collection.failure
+        issues << details.slice(:code, :stage)
+        mark_unavailable(parser, dimensions, observations, **details)
       end
       reconcile_applicability(observations, applicability)
       Snapshot.new(target: identity, observed_at: @clock.call, observations: observations, issues: issues)
@@ -137,29 +127,20 @@ module CtxChecker
 
     # 每条命令独立承担失败；单个脚本失败不能丢弃此前事实。
     def read(reader, parser, command, names)
-      capture = reader.read(command)
-      evidence = capture.evidence
-      unless capture.success?
-        return names.to_h do |name|
-          [ name, Failure.observation(name, **capture.failure, command: command, evidence: evidence, skipped: capture.skipped?) ]
-        end
+      unavailable = ->(name, capture, details) do
+        Failure.observation(name, **details, command: command, evidence: capture.evidence, skipped: capture.skipped?)
       end
-
-      begin
-        parser.parse_many(names, capture.body, complete: true, command: command).transform_values do |observation|
-          records = if %i[counters device_counters].include?(observation.name)
-            observation.records.map { |record| record.merge(sampled_at: evidence.first[:observed_at]) }
-          else
-            observation.records
-          end
-          source_status = observation.evidence.first&.fetch(:status, nil) || observation.status
-          Observation.new(name: observation.name, status: observation.status, records: records,
-            covered_scopes: observation.covered_scopes,
-            issues: observation.issues, evidence: evidence.map { |entry| entry.merge(status: source_status) })
+      CtxRunner::Query.new(reader: reader, parser: parser).read(command, names: names, unavailable: unavailable) do |_name, observation, capture|
+        evidence = capture.evidence
+        records = if %i[counters device_counters].include?(observation.name)
+          observation.records.map { |record| record.merge(sampled_at: evidence.first[:observed_at]) }
+        else
+          observation.records
         end
-      rescue StandardError => error
-        failure = CtxDriver::Failure.details(error, fallback: :command_processing_failed, stage: :parse)
-        names.to_h { |name| [ name, Failure.observation(name, **failure, command: command, evidence: evidence) ] }
+        source_status = observation.evidence.first&.fetch(:status, nil) || observation.status
+        Observation.new(name: observation.name, status: observation.status, records: records,
+          covered_scopes: observation.covered_scopes,
+          issues: observation.issues, evidence: evidence.map { |entry| entry.merge(status: source_status) })
       end
     end
 
@@ -174,7 +155,7 @@ module CtxChecker
           end
           parser.combine(name, sources)
         else
-          parser.unavailable_observation(name, error: failure[:error], code: failure[:code], stage: failure[:stage])
+          parser.unavailable_observation(name, error: failure[:error], error_type: failure[:error_type], code: failure[:code], stage: failure[:stage])
         end
       end
     end

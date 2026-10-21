@@ -10,3 +10,6 @@ gem "rspec-mocks"
 gem "rubocop-rails-omakase", require: false
 gem "net-connector", ">= 0.13.0", require: false
 gem "ctx_driver", ">= 0.2.2"
+
+# 公共业务层候选源码联调。
+gem "ctx_runner", path: ENV.fetch("CTX_RUNNER_PATH") if ENV["CTX_RUNNER_PATH"]

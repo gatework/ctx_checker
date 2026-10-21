@@ -56,7 +56,7 @@ bundle exec rake build
 - 性能改动使用 `benchmark/` 中的脚本，记录输入规模、Ruby 版本、代码来源、耗时和分配量；比较前后语义。合成结果不能证明网络吞吐或实机兼容性。
 - 公共行为变化记录在 `CHANGELOG.md` 的 Unreleased。当前代码、README 和验证脚本是依据；`docs/architecture-zh.md` 含历史 Motor 宿主记录，不能当成当前 gem 的运行能力。
 - 跨仓库联调与锁定依赖测试分别运行并报告。`RUBYLIB` 联调通过不证明已发布依赖兼容；使用 `script/verify_package.rb` 在隔离安装中验证候选包。
-- 只有明确要求发布时才执行交付流程，顺序为 ctx_parser → ctx_driver → ctx_checker；核对精确提交的 CI、制品、校验和及安装读回结果。仓库可见性仅按当前授权调整。
+- 只有明确要求发布时才执行交付流程，顺序为 ctx_parser → ctx_driver → ctx_runner → ctx_checker；核对精确提交的 CI、制品、校验和及安装读回结果。仓库可见性仅按当前授权调整。
 
 独立安装验证：`ruby script/verify_package.rb pkg/ctx_checker-*.gem`；脚本可接收显式依赖候选包，并按依赖顺序精确激活。修改共享基础类后运行整个厂商测试集，不能只验证一个厂商或维度。离线夹具通过不代表所有型号实机认证。基准入口：`bundle exec ruby -Ilib benchmark/runtime.rb`、`benchmark/report.rb`、`benchmark/protocol_scopes.rb`。
 
@@ -75,3 +75,9 @@ RUBYLIB=../ctx_parser/lib:../ctx_driver/lib bundle exec ruby -Ilib benchmark/pip
 ```
 
 该基准使用合成会话；分别报告配置、采集解析与评估阶段的耗时和对象分配，并校验共享查询次数及报告结果。
+
+## 公共业务流程
+
+采集会话约束、共享查询与事实外壳由 `ctx_runner` 提供；VXLAN/Wireless 的批量交付、报告检查点和变更执行也由 Runner 统一维护。领域规则、厂商命令、健康评估及操作租约留在当前模块，不复制公共状态机。
+
+源码联调使用 `CTX_RUNNER_PATH=../ctx_runner bundle exec rake`；普通安装验证不设置该变量。首次发布依赖顺序为 ctx_parser → ctx_driver → ctx_runner → 消费模块。未发布 Runner 时先构建安装候选包，隔离包验证显式传入候选，不能依靠相邻源码路径。

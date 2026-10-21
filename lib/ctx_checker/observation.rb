@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "ctx_parser/immutable"
+require "ctx_runner/observation"
 require "time"
 require_relative "system_fields"
 
@@ -41,11 +42,7 @@ module CtxChecker
     # 冻结单个维度的记录、状态及诊断元数据。
     def initialize(name:, status:, records: [], issues: [], evidence: [], covered_scopes: [])
       raise ArgumentError, "Unknown observation dimension" unless NAMES.include?(name)
-      raise ArgumentError, "Invalid observation status" unless STATUSES.include?(status)
-      raise ArgumentError, "Records must be an array" unless records.is_a?(Array)
-      if %i[failed unsupported not_requested not_applicable].include?(status) && records.any?
-        raise ArgumentError, "Unavailable observations cannot contain records"
-      end
+      CtxRunner::Observation.validate(name: name, status: status, records: records, issues: issues, evidence: evidence, statuses: STATUSES)
       @name, @status = name, status
       validate_scopes!(covered_scopes)
       covered_scopes = covered_scopes.map do |scope|

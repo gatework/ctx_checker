@@ -140,13 +140,14 @@ module CtxChecker
     end
 
     # 发现不可用时保留实际来源错误及证据，不据此声称硬件不受支持。
-    def unavailable_observation(name, discoveries: @discovery_observations, error: nil, code: nil, stage: :discovery)
+    def unavailable_observation(name, discoveries: @discovery_observations, error: nil, error_type: nil, code: nil, stage: :discovery)
       dependencies = discovery_dimensions([ name ])
       if dependencies.empty?
         return Observation.new(name: name, status: :unsupported, issues: [ { code: :unsupported_dimension } ])
       end
       sources = discoveries.values_at(*dependencies).compact
       issue = { code: code || (error ? :discovery_expansion_failed : :discovery_unavailable), stage: stage }
+      issue[:error_type] = error_type if error_type
       if error
         type = error.class.name
         issue[:error_type] = type.is_a?(String) && Observation::ERROR_TYPE_PATTERN.match?(type) ? type : "StandardError"
