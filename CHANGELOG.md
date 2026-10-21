@@ -4,6 +4,14 @@ Changes to the public contract are recorded here. Versions follow Semantic Versi
 
 ## Unreleased
 
+## 0.2.5 (2026-10-21)
+
+- Snapshot entire offline command/body batches before parser callbacks and reject non-text bodies before invoking any parser.
+- Reduce temporary field-pair allocations when normalizing observations; add a configuration-to-report benchmark with semantic assertions.
+
+- Add repository-specific AGENTS.md guidance for responsibilities, Ruby conventions, evidence boundaries and validation.
+- Snapshot offline runtime view selections and explicit commands before parser callbacks, preserving result projections and evidence attribution.
+
 ## 0.2.4 (2026-10-19)
 
 - Parse whitespace-delimited IOS, NX-OS, H3C and PAN-OS facts independently of Ruby's global field separator, preserving native whitespace splitting semantics.

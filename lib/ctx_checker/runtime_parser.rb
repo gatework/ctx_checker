@@ -30,6 +30,7 @@ module CtxChecker
     # 共享命令仅解析一次，再投影各请求维度。
     def parse_many(names, text, complete: false, command: nil)
       self.class.validate_dimensions!(names)
+      names = names.dup.freeze
       raise ArgumentError, "CLI output must be text" unless text.is_a?(String)
       raise ArgumentError, "Completeness must be boolean" unless [ true, false ].include?(complete)
 
@@ -46,6 +47,8 @@ module CtxChecker
       unless command && names.all? { |name| @implementations.fetch(name).key?(command) }
         raise ArgumentError, "Select one declared command or use parse_outputs for multiple sources"
       end
+      # 固定已校验的命令，避免解析回调改写调用方选择后污染证据。
+      command = command.dup.freeze unless command.frozen?
       implementation = @implementations.fetch(names.first).fetch(command)
       command_counts = names.to_h { |name| [ name, @implementations.fetch(name).size ] }
       evidence = [ { command: command, sha256: Digest::SHA256.hexdigest(text), bytes: text.bytesize } ]
@@ -84,7 +87,13 @@ module CtxChecker
       unless outputs.is_a?(Hash) && (outputs.keys - profile.commands_for(name)).empty?
         raise ArgumentError, "Outputs must map declared commands to their bodies"
       end
-      combine(name, outputs.map { |command, body| parse(name, body, complete: complete, command: command) })
+      # 整批固定后再调用扩展解析器，避免前一来源回调改变后续命令或正文。
+      sources = outputs.map do |command, body|
+        raise ArgumentError, "CLI output must be text" unless body.is_a?(String)
+
+        [ command.frozen? ? command : command.dup.freeze, body.frozen? ? body : body.dup.freeze ]
+      end
+      combine(name, sources.map { |command, body| parse(name, body, complete: complete, command: command) })
     end
 
     # 实时采集与离线组装遵循相同的来源及指标覆盖契约。

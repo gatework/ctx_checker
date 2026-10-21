@@ -125,7 +125,7 @@ module CtxChecker
       unless record.is_a?(Hash) && (record.keys - FIELDS.fetch(name)).empty?
         raise ArgumentError, "Unsupported observation record fields"
       end
-      row = FIELDS.fetch(name).to_h { |key| [ key, record[key] ] }
+      row = FIELDS.fetch(name).each_with_object({}) { |key, values| values[key] = record[key] }
       raise ArgumentError, "Missing observation identity" unless REQUIRED.fetch(name).all? { |key| !row[key].nil? }
       row.each do |key, value|
         next if value.nil?

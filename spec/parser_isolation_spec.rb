@@ -16,6 +16,30 @@ RSpec.describe CtxChecker::RuntimeParser, "failure isolation" do
     parser.parse_many(%i[cpu memory], "synthetic private output", complete: true)
   end
 
+  it "keeps the requested views when a parser callback changes the caller selection" do
+    names = %i[cpu memory]
+    result = CtxParser::Results.new(by_dimension: { cpu: cpu_result, memory: memory_result })
+    allow(implementation).to receive(:parse) { names.clear; result }
+
+    observations = parser.parse_many(names, "synthetic", complete: true)
+
+    expect(observations.keys).to eq(%i[cpu memory])
+    expect(observations.values).to all(be_complete)
+    expect(names).to be_empty
+  end
+
+  it "binds evidence to the selected command before invoking a parser callback" do
+    selected = +"show system resources"
+    result = CtxParser::Results.new(by_dimension: { cpu: cpu_result, memory: memory_result })
+    allow(implementation).to receive(:parse) { selected.replace("invented command"); result }
+
+    observations = parser.parse_many(%i[cpu memory], "synthetic", complete: true, command: selected)
+
+    expect(observations.values).to all(be_complete)
+    expect(observations[:cpu].evidence.first[:command]).to eq("show system resources")
+    expect(selected).to eq("invented command")
+  end
+
   it "contains parser exceptions at one command and omits exception details from evidence" do
     expect(implementation).to receive(:parse).once.and_raise(ArgumentError, "private token from unsupported syntax")
     results = parse_resources

@@ -76,6 +76,49 @@ RSpec.describe "CtxChecker multi-command observations" do
     expect(result.issues).to include(include(code: :missing_counter_metrics))
   end
 
+  it "keeps all selected sources when a parser callback clears the caller mapping" do
+    implementation = parser.profile.parser_for(:counters, command: interface_command)
+    allow(implementation).to receive(:parse).and_wrap_original do |original, *args, **options|
+      outputs.clear
+      original.call(*args, **options)
+    end
+
+    result = parser.parse_outputs(:counters, outputs, complete: true)
+
+    expect(result.evidence.map { |entry| entry[:command] }).to eq([ interface_command, inbound_command, outbound_command ])
+    expect(metric(result, "Ten-GigabitEthernet1/0/2", :out_errors)).to include(value: 7)
+    expect(outputs).to be_empty
+  end
+
+  it "snapshots later bodies before a parser callback can reuse their buffers" do
+    sources = outputs.transform_values(&:dup)
+    original_digest = Digest::SHA256.hexdigest(sources.fetch(outbound_command))
+    implementation = parser.profile.parser_for(:counters, command: interface_command)
+    allow(implementation).to receive(:parse).and_wrap_original do |original, *args, **options|
+      sources.fetch(outbound_command).replace("Error: permission denied")
+      original.call(*args, **options)
+    end
+
+    result = parser.parse_outputs(:counters, sources, complete: true)
+
+    expect(metric(result, "Ten-GigabitEthernet1/0/2", :out_errors)).to include(value: 7)
+    expect(result.evidence.find { |entry| entry[:command] == outbound_command }[:sha256]).to eq(original_digest)
+    expect(sources.fetch(outbound_command)).to eq("Error: permission denied")
+  end
+
+  it "validates every body before invoking any command parser" do
+    sources = outputs.merge(outbound_command => nil)
+    implementation = parser.profile.parser_for(:counters, command: interface_command)
+    calls = 0
+    allow(implementation).to receive(:parse).and_wrap_original do |original, *args, **options|
+      calls += 1
+      original.call(*args, **options)
+    end
+
+    expect { parser.parse_outputs(:counters, sources, complete: true) }.to raise_error(ArgumentError, /text/)
+    expect(calls).to eq(0)
+  end
+
   it "requires an explicit source for a multi-command dimension and never treats one source as complete" do
     expect { parser.parse(:counters, inbound, complete: true) }.to raise_error(ArgumentError, /command|sources/)
     result = parser.parse_many([ :counters ], inbound, complete: true, command: inbound_command).fetch(:counters)
