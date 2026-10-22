@@ -29,15 +29,6 @@ module CtxChecker
     end
 
     # 选择解析器与检查策略前，先归一化平台别名。
-    def self.canonical(platform)
-      unless platform.is_a?(String) || platform.is_a?(Symbol)
-        raise ArgumentError, "Platform must be text"
-      end
-      key = platform.to_s.strip.downcase.to_sym
-      key = ALIASES.fetch(key, key)
-      raise ArgumentError, "Unsupported checker platform" unless PROFILES.key?(key)
-
-      key.to_s
-    end
+    def self.canonical(platform) = REGISTRY.canonical(platform).to_s
   end
 end

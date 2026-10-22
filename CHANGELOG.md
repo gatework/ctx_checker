@@ -2,12 +2,17 @@
 
 Changes to the public contract are recorded here. Versions follow Semantic Versioning.
 
+## Unreleased
+
+## 0.3.1 (2026-10-23)
+
+- Require the parser version providing canonical platform lookup.
+- Preserve conflicting PAN-OS interface total declarations as partial evidence.
+
 ## 0.3.0 (2026-10-22)
 
 - Delegate shared collection, evidence and execution contracts to ctx_runner.
 - Preserve domain parsing, change policies, CLI layouts and connection ownership.
-
-## Unreleased
 
 ## 0.2.5 (2026-10-21)
 

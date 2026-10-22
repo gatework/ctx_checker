@@ -19,10 +19,10 @@ module CtxChecker
             line = raw.strip
             if (match = /\Atotal configured (hardware|logical) interfaces:\s*(\d+)\z/i.match(line))
               section = match[1].downcase.to_sym
-              totals[section] = match[2].to_i
+              declare_total(totals, section, match[2].to_i, issues)
             elsif (match = /\Aaggregation groups:\s*(\d+)\z/i.match(line))
               section = :aggregation
-              totals[section] = match[1].to_i
+              declare_total(totals, section, match[1].to_i, issues)
             elsif line.empty? || line.match?(/\A[- ]+\z/) || line.match?(/\Aname\s+id\s+/i)
               next
             elsif section == :hardware && (match = /\A(\S+)\s+\d+\s+\S+\/\S+\/(up|down)(?:\([^\s]*\))?\s+[\da-f:]+\z/i.match(line))
@@ -57,6 +57,15 @@ module CtxChecker
           end
           duplicates.each { |name| rows.delete(name) }
           build_result(rows.values, complete: complete, recognized: totals.key?(:hardware), issues: issues, identity: [ :name ])
+        end
+
+        # 同一作用域的矛盾声明不能被末次总数覆盖。
+        def declare_total(totals, section, total, issues)
+          if totals.key?(section) && totals[section] != total
+            issues << { code: :conflicting_count, section: section }
+          else
+            totals[section] = total
+          end
         end
 
         # 先创建状态未知的接口身份，再由所属表补充明确证据。
