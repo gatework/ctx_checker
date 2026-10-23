@@ -4,6 +4,11 @@ Changes to the public contract are recorded here. Versions follow Semantic Versi
 
 ## Unreleased
 
+## 0.3.2 (2026-10-23)
+
+- Allow Runner 0.2 while retaining the Collection, Query and Observation contracts.
+- Require the driver that skips subsequent queries after malformed command receipts.
+
 ## 0.3.1 (2026-10-23)
 
 - Require the parser version providing canonical platform lookup.

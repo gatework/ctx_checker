@@ -80,7 +80,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
     end
   end
 
-  it "supports older adapters whose send_commands method does not accept keyword options" do
+  it "accepts the explicit positional single-command session protocol" do
     commands = []
     responses = { "show interfaces" => successful(interfaces), "show ip bgp summary" => successful(bgp) }
     adapter = Object.new
@@ -96,36 +96,39 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
     expect(commands).to eq([ [ "show interfaces" ], [ "show ip bgp summary" ] ])
   end
 
-  it "isolates a missing result as a response failure and continues later commands" do
+  it "stops later commands when a missing receipt leaves completion unconfirmed" do
     expect(session).to receive(:send_commands).with([ "show interfaces" ]).ordered.and_return(nil)
-    expect_later_bgp
+    expect(session).not_to receive(:send_commands).with([ "show ip bgp summary" ])
 
     snapshot = collect
     expect(snapshot.observation(:interfaces).status).to eq(:failed)
     expect(snapshot.observation(:interfaces).issues).to include(include(stage: :response))
-    expect(snapshot.observation(:bgp).records.first[:state]).to eq(:established)
+    expect(snapshot.observation(:bgp).status).to eq(:failed)
+    expect(snapshot.observation(:bgp).issues).to include(include(code: :invalid_command_result, skipped: true))
   end
 
   it "isolates a nontext result output without leaking its body" do
     malformed = double(:result, output: { password: "secret result body" }, success?: true, steps: successful(interfaces).steps)
     expect(session).to receive(:send_commands).with([ "show interfaces" ]).ordered.and_return(malformed)
-    expect_later_bgp
+    expect(session).not_to receive(:send_commands).with([ "show ip bgp summary" ])
 
     snapshot = collect
     expect(snapshot.observation(:interfaces).status).to eq(:failed)
     expect(snapshot.observation(:interfaces).issues).to include(include(stage: :response))
-    expect(snapshot.observation(:bgp).status).to eq(:complete)
+    expect(snapshot.observation(:bgp).status).to eq(:failed)
+    expect(snapshot.observation(:bgp).issues).to include(include(code: :invalid_command_result, skipped: true))
     expect(snapshot.to_h.to_s).not_to include("secret result body")
   end
 
-  it "classifies a zero-step success as an invalid response and continues" do
+  it "stops later commands when a zero-step success leaves completion unconfirmed" do
     expect(session).to receive(:send_commands).with([ "show interfaces" ]).ordered.and_return(command_receipt(interfaces, steps: []))
-    expect_later_bgp
+    expect(session).not_to receive(:send_commands).with([ "show ip bgp summary" ])
 
     snapshot = collect
     expect(snapshot.observation(:interfaces).status).to eq(:failed)
     expect(snapshot.observation(:interfaces).issues).to include(include(stage: :response))
-    expect(snapshot.observation(:bgp).status).to eq(:complete)
+    expect(snapshot.observation(:bgp).status).to eq(:failed)
+    expect(snapshot.observation(:bgp).issues).to include(include(code: :invalid_command_result, skipped: true))
   end
 
   it "classifies an exception reading a successful result body as a response failure" do
