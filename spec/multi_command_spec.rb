@@ -262,7 +262,8 @@ RSpec.describe "CtxChecker multi-command observations" do
   end
 
   it "uses matching per-metric sample times for deltas even when evidence ended later" do
-    row = { interface: "GigabitEthernet1/0/1", metric: :in_errors, value: 2, discontinuity: "verified-epoch", sampled_at: (sample_time + 10).iso8601(6) }
+    row = { interface: "GigabitEthernet1/0/1", metric: :in_errors, value: 2, unit: :packets, scope: :interface,
+      discontinuity: "verified-epoch", sampled_at: (sample_time + 10).iso8601(6) }
     previous_observation = CtxChecker::Observation.new(name: :counters, status: :complete, records: [ row ],
       evidence: [ { command: inbound_command, observed_at: (sample_time + 20).iso8601(6) } ])
     current_observation = CtxChecker::Observation.new(name: :counters, status: :complete,
@@ -279,7 +280,8 @@ RSpec.describe "CtxChecker multi-command observations" do
       sources = [ interface_command, inbound_command, outbound_command ].zip(%i[crc_errors in_errors out_errors]).map do |command, name|
         seconds = name == :in_errors ? inbound_seconds : other_seconds
         CtxChecker::Observation.new(name: :counters, status: :complete,
-          records: [ { interface: "GigabitEthernet1/0/1", metric: name, value: name == :in_errors ? value : 0, discontinuity: "verified-epoch" } ],
+          records: [ { interface: "GigabitEthernet1/0/1", metric: name, value: name == :in_errors ? value : 0,
+            unit: :packets, scope: :interface, discontinuity: "verified-epoch" } ],
           evidence: [ { command: command, observed_at: (sample_time + seconds).iso8601(6) } ])
       end
       parser.combine(:counters, sources)

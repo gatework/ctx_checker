@@ -82,7 +82,8 @@ RSpec.describe CtxChecker::Evaluator do
   end
 
   it "keeps CRC and error totals distinct and describes positive single samples as historical" do
-    rows = [ { interface: "Ethernet1/1", metric: :in_errors, value: 12 }, { interface: "Ethernet1/1", metric: :crc_errors, value: 7 } ]
+    rows = [ { interface: "Ethernet1/1", metric: :in_errors, value: 12, unit: :packets, scope: :interface },
+      { interface: "Ethernet1/1", metric: :crc_errors, value: 7, unit: :packets, scope: :interface } ]
     report = evaluate(observation(:counters, rows))
     expect(findings(report, :counters).map(&:actual)).to eq([ 12, 7 ])
     expect(findings(report, :counters).map(&:reason)).to eq([ :cumulative_errors, :cumulative_errors ])
@@ -92,7 +93,7 @@ RSpec.describe CtxChecker::Evaluator do
   end
 
   it "calculates deltas only with matching counter epochs and earlier samples" do
-    row = { interface: "Ethernet1/1", metric: :crc_errors, value: 10, discontinuity: "boot-1/clear-1" }
+    row = { interface: "Ethernet1/1", metric: :crc_errors, value: 10, unit: :packets, scope: :interface, discontinuity: "boot-1/clear-1" }
     earlier = snapshot(observation(:counters, [ row ]), time: Time.utc(2026, 10, 15, 1, 59))
     report = evaluate(observation(:counters, [ row.merge(value: 13) ]), previous: earlier, policy: CtxChecker::Policy.new(counter_limits: { crc_errors: 2 }))
     expect(findings(report, :counters).first.to_h).to include(status: :fail, reason: :counter_delta, actual: { delta: 3, seconds: 60.0 })
@@ -104,7 +105,7 @@ RSpec.describe CtxChecker::Evaluator do
   end
 
   it "uses command sample times and retains proven deltas from partial evidence" do
-    row = { interface: "Ethernet1/1", metric: :crc_errors, value: 10, discontinuity: "boot-1/clear-1" }
+    row = { interface: "Ethernet1/1", metric: :crc_errors, value: 10, unit: :packets, scope: :interface, discontinuity: "boot-1/clear-1" }
     prior = observation(:counters, [ row ], status: :partial, evidence: [ { observed_at: "2026-10-15T01:59:45Z" } ])
     earlier = snapshot(prior, time: Time.utc(2026, 10, 15, 1, 59))
     current = observation(:counters, [ row.merge(value: 13) ], status: :partial, evidence: [ { observed_at: "2026-10-15T01:59:50Z" } ])

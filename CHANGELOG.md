@@ -4,6 +4,11 @@ Changes to the public contract are recorded here. Versions follow Semantic Versi
 
 ## Unreleased
 
+## 0.3.3 (2026-10-24)
+
+- Keep counters unknown when unit or scope evidence is missing, including zero values and matching previous samples; never assume packets or an implicit scope.
+- Document explicit counter semantics and leave shared gem dependency selection to the host lockfile.
+
 ## 0.3.2 (2026-10-23)
 
 - Allow Runner 0.2 while retaining the Collection, Query and Observation contracts.

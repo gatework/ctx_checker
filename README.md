@@ -21,7 +21,7 @@ gem "ctx_checker"
 
 Then run `bundle install`, or install directly with `gem install ctx_checker`. The require path is `ctx_checker` and the public namespace is `CtxChecker`; package names and Ruby namespaces are intentionally separate.
 
-Internal runtime dependencies: [`ctx_parser`](https://github.com/gatework/ctx_parser), [`ctx_driver`](https://github.com/gatework/ctx_driver). The gemspec requires compatible 0.2.x versions of both gems. Applications should commit their own `Gemfile.lock` to make deployments reproducible. No Rails boot or sibling checkout paths are required.
+Internal runtime dependencies: [`ctx_parser`](https://github.com/gatework/ctx_parser), [`ctx_driver`](https://github.com/gatework/ctx_driver), [`ctx_runner`](https://github.com/gatework/ctx_runner). The gemspec leaves their versions unconstrained; applications should commit a verified `Gemfile.lock` for reproducible deployments. No Rails boot or sibling checkout paths are required.
 
 Release artifacts and checksums are available from [GitHub Releases](https://github.com/gatework/ctx_checker/releases). Check [RubyGems](https://rubygems.org/gems/ctx_checker) for published versions.
 

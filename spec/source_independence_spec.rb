@@ -7,7 +7,10 @@ require "ctx_checker/observation_merger"
 RSpec.describe CtxChecker::Evaluator, "source independence" do
   let(:target) { { host: "192.0.2.42", platform: "h3c" } }
   let(:sample_time) { Time.utc(2026, 10, 16, 12) }
-  let(:counter_record) { { interface: "GigabitEthernet1/0/1", metric: :out_errors, value: 3, discontinuity: "verified-epoch" } }
+  let(:counter_record) do
+    { interface: "GigabitEthernet1/0/1", metric: :out_errors, value: 3,
+      unit: :packets, scope: :interface, discontinuity: "verified-epoch" }
+  end
   let(:optical_record) do
     { interface: "GigabitEthernet1/0/1", metric: :rx_power, value: 2, unit: :dbm,
       low_alarm: -20, high_alarm: 0, alarm: :high_alarm, source_complete: true }

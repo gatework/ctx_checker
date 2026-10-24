@@ -29,7 +29,7 @@ RSpec.describe "CtxChecker interface counter measurement semantics" do
       .findings.find { |finding| finding.dimension == dimension }
   end
 
-  it "validates explicit interface measurement units and scopes without changing legacy records" do
+  it "validates explicit measurement semantics and preserves absent evidence" do
     expect(observation(counter.except(:unit, :scope)).records.first).to include(unit: nil, scope: nil)
     CtxChecker::Observation::COUNTER_UNITS.each do |unit|
       expect(observation(counter.merge(unit: unit)).records.first[:unit]).to eq(unit)
@@ -90,7 +90,7 @@ RSpec.describe "CtxChecker interface counter measurement semantics" do
     expect(assess(current.merge(value: 2), prior: current)).to have_attributes(status: :unknown, reason: :counter_scope_unknown)
   end
 
-  it "requires unchanged units and scope across samples including the legacy transition" do
+  it "requires matching known units and scope in the previous sample" do
     [ nil, :bytes, :events, :unknown ].each do |old_unit|
       result = assess(counter.merge(value: 2), prior: counter.merge(unit: old_unit))
       expect(result).to have_attributes(status: :unknown, reason: :counter_unit_changed)
@@ -100,19 +100,32 @@ RSpec.describe "CtxChecker interface counter measurement semantics" do
       result = assess(counter.merge(value: 2), prior: counter.merge(scope: old_scope))
       expect(result).to have_attributes(status: :unknown, reason: :counter_scope_changed)
     end
-    legacy = counter.except(:unit, :scope)
-    expect(assess(legacy, prior: counter)).to have_attributes(status: :unknown, reason: :counter_unit_changed)
   end
 
-  it "retains packet deltas within a known unchanged scope and the existing legacy API" do
-    [ nil, :interface, :mac, :cpu, :logical, :queue ].each do |scope|
+  it "does not infer packet semantics from missing fields even across matching samples" do
+    [
+      [ counter.except(:unit), :counter_unit_unknown ],
+      [ counter.merge(unit: nil), :counter_unit_unknown ],
+      [ counter.except(:scope), :counter_scope_unknown ],
+      [ counter.merge(scope: nil), :counter_scope_unknown ],
+      [ counter.except(:unit, :scope), :counter_unit_unknown ]
+    ].each do |record, reason|
+      [ 0, 2 ].each do |value|
+        [ nil, record, counter ].each do |prior|
+          result = assess(record.merge(value: value), prior: prior)
+          expect(result).to have_attributes(status: :unknown, reason: reason)
+          expect(result.actual).not_to have_key(:delta)
+        end
+      end
+    end
+  end
+
+  it "retains packet deltas within a known unchanged scope" do
+    %i[interface mac cpu logical queue].each do |scope|
       previous = counter.merge(scope: scope)
       result = assess(previous.merge(value: 2), prior: previous)
       expect(result).to have_attributes(status: :fail, reason: :counter_delta, actual: { delta: 2, seconds: 60.0 })
     end
-    legacy = counter.except(:unit, :scope)
-    expect(assess(legacy)).to have_attributes(status: :pass, reason: :zero_cumulative_counter)
-    expect(assess(legacy.merge(value: 2), prior: legacy)).to have_attributes(status: :fail, reason: :counter_delta)
   end
 
   it "keeps the separate device counter policy and continuity contract" do

@@ -65,9 +65,9 @@ module CtxChecker
       # 包数阈值不能比较字节、事件计数，也不能比较测量语义已变化的采样。
       def packet_semantics_reason(record, prior)
         return unless dimension == :counters
-        return :counter_unit_unknown if record[:unit] == :unknown
-        return :counter_unit_not_packets unless record[:unit].nil? || record[:unit] == :packets
-        return :counter_scope_unknown if record[:scope] == :unknown
+        return :counter_unit_unknown if record[:unit].nil? || record[:unit] == :unknown
+        return :counter_unit_not_packets unless record[:unit] == :packets
+        return :counter_scope_unknown if record[:scope].nil? || record[:scope] == :unknown
         return unless prior
         return :counter_unit_changed if record[:unit] != prior[:unit]
         :counter_scope_changed if record[:scope] != prior[:scope]
