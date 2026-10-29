@@ -14,8 +14,8 @@ RSpec.describe "Hillstone runtime integration" do
   end
 
   # 传输成功的响应仍可能包含不支持的 CLI 语法。
-  def response(body)
-    command_receipt(body, output: "command\n#{body}device#")
+  def response(body, command: "show interfaces")
+    command_receipt(body, command: command, output: "command\n#{body}device#")
   end
 
   it "resolves StoneOS and shares each query across its declared dimensions" do
@@ -58,9 +58,9 @@ RSpec.describe "Hillstone runtime integration" do
 
   it "continues after a rejected script and collects a shared hardware query only once" do
     session = double(:session, connected?: true)
-    expect(session).to receive(:send_commands).with([ "show cpu" ]).ordered.and_return(response(" ^-----unrecognized keyword cpu\n"))
-    expect(session).to receive(:send_commands).with([ "show memory" ]).ordered.and_return(response(fixture("memory_a3700_55r10p14")))
-    expect(session).to receive(:send_commands).with([ "show environment" ]).once.ordered.and_return(response(fixture("environment_a3700_55r10p14")))
+    expect(session).to receive(:send_commands).with([ "show cpu" ]).ordered.and_return(response(" ^-----unrecognized keyword cpu\n", command: "show cpu"))
+    expect(session).to receive(:send_commands).with([ "show memory" ]).ordered.and_return(response(fixture("memory_a3700_55r10p14"), command: "show memory"))
+    expect(session).to receive(:send_commands).with([ "show environment" ]).once.ordered.and_return(response(fixture("environment_a3700_55r10p14"), command: "show environment"))
     snapshot = CtxChecker::Collector.new.collect_session(target: target, session: session,
       dimensions: %i[cpu memory temperature environment power alarms])
     expect(snapshot.observation(:cpu).status).to eq(:unsupported)

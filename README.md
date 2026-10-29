@@ -109,3 +109,6 @@ Publish dependency gems first. A Git tag, a successful build, or a workflow file
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+
+Snapshot access uses `observations` and `observation(name)`: known missing dimensions are `not_requested`; unknown names raise `ArgumentError`. Collection provider failures remain structured issues, including `session_not_opened` and `session_reentered`, without replaying queries.

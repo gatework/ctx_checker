@@ -12,7 +12,7 @@ module CommandReceipts
   end
 
   # 原始证据与清理后正文分别提供，空步骤用于保留非法成功回归。
-  def command_receipt(body, output: body, steps: [ Object.new.freeze ])
+  def command_receipt(body, command: "show interfaces", output: body, steps: [ { command: command }.freeze ])
     Receipt.new(output: output, steps: steps, body: body)
   end
 end

@@ -49,7 +49,7 @@ RSpec.describe "CtxChecker multi-command observations" do
   let(:outputs) { { interface_command => interfaces, inbound_command => inbound, outbound_command => outbound } }
 
   def successful(command, body)
-    command_receipt(body, output: "#{command}\n#{body}<device>")
+    command_receipt(body, command: command, output: "#{command}\n#{body}<device>")
   end
 
   def metric(observation, interface, name)

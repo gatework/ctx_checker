@@ -52,7 +52,7 @@ puts JSON.generate(sources: [ CtxParser::Input.method(:text), CtxDriver::Reader.
   body = names.map do |name|
     "#{name} is up, line protocol is up\n  0 input errors, 0 CRC\n  0 output errors\n"
   end.join("").freeze
-  receipt = PipelineReceipt.new(output: "show interfaces\n#{body}device#".freeze, body: body, steps: [ 1 ].freeze)
+  receipt = PipelineReceipt.new(output: "show interfaces\n#{body}device#".freeze, body: body, steps: [ { command: "show interfaces" } ].freeze)
   time = Time.utc(2026, 10, 21).freeze
   session = PipelineSession.new(receipt)
   collector = CtxChecker::Collector.new(clock: -> { time })

@@ -4,6 +4,10 @@ Changes to the public contract are recorded here. Versions follow Semantic Versi
 
 ## Unreleased
 
+## 0.4.0 (2026-10-29)
+
+- Use the shared Collection failure protocol; unknown snapshot dimensions raise ArgumentError while known missing observations remain not_requested.
+
 ## 0.3.3 (2026-10-24)
 
 - Keep counters unknown when unit or scope evidence is missing, including zero values and matching previous samples; never assume packets or an implicit scope.

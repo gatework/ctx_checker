@@ -48,7 +48,7 @@ RSpec.describe "CtxChecker bounded discovery collection" do
   end
 
   def result(command, body = "sample")
-    command_receipt(body, output: body)
+    command_receipt(body, command: command, output: body)
   end
 
   def discovery(status: :complete, source_complete: true)

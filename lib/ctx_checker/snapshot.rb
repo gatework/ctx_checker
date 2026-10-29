@@ -35,7 +35,10 @@ module CtxChecker
     end
 
     # 返回请求的观测，不虚构不可用记录。
-    def observation(name) = observations.fetch(name)
+    def observation(name)
+      raise ArgumentError, "Unknown checker dimension" unless Observation::NAMES.include?(name)
+      observations.fetch(name)
+    end
     # 检查两次采样是否指向同一设备与平台。
     def same_target?(other) = other.is_a?(Snapshot) && %i[host platform id].all? { |key| target[key] == other.target[key] }
     # 返回公开的数据结构，并保留状态与诊断信息。

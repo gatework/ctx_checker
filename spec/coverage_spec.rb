@@ -83,7 +83,7 @@ RSpec.describe "Runtime query coverage and explicit measurement requirements" do
 
   it "carries scope proof through collection and source merging without upgrading failed sibling commands" do
     command = CtxChecker::RuntimeParser.new(platform: :h3c).profile.command(:bgp)
-    response = command_receipt(h3c_empty)
+    response = command_receipt(h3c_empty, command: command)
     session = double(:session, connected?: true)
     expect(session).to receive(:send_commands).with([ command ]).and_return(response)
     sample = CtxChecker::Collector.new.collect_session(target: { host: "192.0.2.1", platform: "h3c" }, session: session, dimensions: [ :bgp ])

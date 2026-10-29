@@ -17,12 +17,12 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
   end
   let(:session) { double(:session, connected?: true) }
 
-  def successful(body)
-    command_receipt(body, output: "command\n#{body}device#")
+  def successful(body, command: "show interfaces")
+    command_receipt(body, command: command, output: "command\n#{body}device#")
   end
 
   def expect_later_bgp
-    expect(session).to receive(:send_commands).with([ "show ip bgp summary" ]).ordered.and_return(successful(bgp))
+    expect(session).to receive(:send_commands).with([ "show ip bgp summary" ]).ordered.and_return(successful(bgp, command: "show ip bgp summary"))
   end
 
   def collect(dimensions = %i[interfaces bgp], platform: "cisco_ios")
@@ -82,7 +82,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
 
   it "accepts the explicit positional single-command session protocol" do
     commands = []
-    responses = { "show interfaces" => successful(interfaces), "show ip bgp summary" => successful(bgp) }
+    responses = { "show interfaces" => successful(interfaces), "show ip bgp summary" => successful(bgp, command: "show ip bgp summary") }
     adapter = Object.new
     adapter.define_singleton_method(:connected?) { true }
     adapter.define_singleton_method(:send_commands) do |queries|
@@ -157,7 +157,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
   end
 
   it "preserves earlier successful observations when a later command raises" do
-    expect(session).to receive(:send_commands).with([ "show interfaces" ]).ordered.and_return(successful(interfaces))
+    expect(session).to receive(:send_commands).with([ "show interfaces" ]).ordered.and_return(successful(interfaces, command: "show interfaces"))
     expect(session).to receive(:send_commands).with([ "show etherchannel summary" ]).ordered.and_raise(RuntimeError, "secret aggregation failure")
     expect_later_bgp
 
@@ -190,7 +190,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
       raise IOError, "secret session state" if reads > 1
       true
     end
-    expect(session).to receive(:send_commands).with([ "show interfaces" ]).and_return(successful(interfaces))
+    expect(session).to receive(:send_commands).with([ "show interfaces" ]).and_return(successful(interfaces, command: "show interfaces"))
     expect(session).not_to receive(:send_commands).with([ "show ip bgp summary" ])
     expect(session).not_to receive(:connect)
 
@@ -202,7 +202,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
 
   it "isolates a parser exception and still executes later commands" do
     allow(CtxChecker::CiscoIos::Parsers::ShowInterfaces).to receive(:parse).and_raise(RuntimeError, "secret parser body")
-    expect(session).to receive(:send_commands).with([ "show interfaces" ]).ordered.and_return(successful(interfaces))
+    expect(session).to receive(:send_commands).with([ "show interfaces" ]).ordered.and_return(successful(interfaces, command: "show interfaces"))
     expect_later_bgp
 
     snapshot = collect
@@ -217,7 +217,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
     memory = CtxParser::Result.new(status: :complete, records: [ { component: "memory", scope: "system", utilization: 101 } ])
     allow(CtxChecker::CiscoNxos::Parsers::ShowSystemResources).to receive(:parse).and_return(
       CtxParser::Results.new(by_dimension: { cpu: cpu, memory: memory }))
-    expect(session).to receive(:send_commands).with([ "show system resources" ]).once.and_return(successful("resources\n"))
+    expect(session).to receive(:send_commands).with([ "show system resources" ]).once.and_return(successful("resources\n", command: "show system resources"))
 
     snapshot = collect(%i[cpu memory], platform: "cisco_nxos")
     expect(snapshot.observation(:cpu).status).to eq(:complete)
@@ -229,7 +229,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
   it "retains a valid shared-command view when its sibling projection is missing" do
     cpu = CtxParser::Result.new(status: :complete, records: [ { component: "cpu", scope: "system", utilization: 10 } ])
     allow(CtxChecker::CiscoNxos::Parsers::ShowSystemResources).to receive(:parse).and_return(CtxParser::Results.new(by_dimension: { cpu: cpu }))
-    expect(session).to receive(:send_commands).with([ "show system resources" ]).once.and_return(successful("resources\n"))
+    expect(session).to receive(:send_commands).with([ "show system resources" ]).once.and_return(successful("resources\n", command: "show system resources"))
 
     snapshot = collect(%i[cpu memory], platform: "cisco_nxos")
     expect(snapshot.observation(:cpu).status).to eq(:complete)
@@ -240,9 +240,9 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
   it "preserves outbound counter health when the independent inbound command fails" do
     detail = File.read(File.expand_path("fixtures/ctx_checker/h3c/interfaces.txt", __dir__))
     outbound = File.read(File.expand_path("fixtures/ctx_checker/h3c/counters_outbound.txt", __dir__))
-    expect(session).to receive(:send_commands).with([ "display interface" ]).ordered.and_return(successful(detail))
+    expect(session).to receive(:send_commands).with([ "display interface" ]).ordered.and_return(successful(detail, command: "display interface"))
     expect(session).to receive(:send_commands).with([ "display counters inbound interface" ]).ordered.and_raise(RuntimeError, "secret inbound failure")
-    expect(session).to receive(:send_commands).with([ "display counters outbound interface" ]).ordered.and_return(successful(outbound))
+    expect(session).to receive(:send_commands).with([ "display counters outbound interface" ]).ordered.and_return(successful(outbound, command: "display counters outbound interface"))
 
     snapshot = collect(%i[interfaces counters], platform: "h3c")
     counters = snapshot.observation(:counters)

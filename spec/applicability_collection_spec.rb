@@ -28,8 +28,8 @@ RSpec.describe "Configuration applicability through collection and reporting" do
   end
 
   # 使用与实际顺序采集器一致的传输结果边界。
-  def successful(body)
-    command_receipt(body, output: "command\n#{body}device#")
+  def successful(body, command: "show interfaces")
+    command_receipt(body, command: command, output: "command\n#{body}device#")
   end
 
   # 通过真实配置解析器确定适用性，不使用预设的判断替身。
@@ -40,7 +40,7 @@ RSpec.describe "Configuration applicability through collection and reporting" do
   it "skips absent optional features while collecting a shared interface query exactly once" do
     context = applicability
     session = double(:session, connected?: true)
-    expect(session).to receive(:send_commands).with([ "show interfaces" ]).once.and_return(successful(interfaces))
+    expect(session).to receive(:send_commands).with([ "show interfaces" ]).once.and_return(successful(interfaces, command: "show interfaces"))
     snapshot = collector.collect_session(target: target, session: session,
       dimensions: [ :interfaces, :counters, *optional_dimensions ], applicability: context)
 
@@ -91,7 +91,7 @@ RSpec.describe "Configuration applicability through collection and reporting" do
       context = applicability(configuration.sub("end\n", "#{feature}end\n"))
       expect(context.not_applicable?(name)).to be(false)
       session = double(:session, connected?: true)
-      expect(session).to receive(:send_commands).with([ command ]).and_return(successful(""))
+      expect(session).to receive(:send_commands).with([ command ]).and_return(successful("", command: command))
       snapshot = collector.collect_session(target: target, session: session, dimensions: [ name ], applicability: context)
       expect(snapshot.observation(name).status).not_to eq(:not_applicable)
       report = CtxChecker::Evaluator.new.call(snapshot)
@@ -103,7 +103,7 @@ RSpec.describe "Configuration applicability through collection and reporting" do
   it "does not skip queries when configuration completeness has not been established" do
     session = double(:session, connected?: true)
     [ "show etherchannel summary", "show ip bgp summary", "show ip ospf neighbor" ].each do |command|
-      expect(session).to receive(:send_commands).with([ command ]).once.and_return(successful(""))
+      expect(session).to receive(:send_commands).with([ command ]).once.and_return(successful("", command: command))
     end
     snapshot = collector.collect_session(target: target, session: session,
       dimensions: optional_dimensions, applicability: applicability(complete: false))
@@ -150,7 +150,7 @@ RSpec.describe "Configuration applicability through collection and reporting" do
 
   it "excludes optional absences from coverage without diluting applicable measurements" do
     session = double(:session, connected?: true)
-    expect(session).to receive(:send_commands).with([ "show interfaces" ]).and_return(successful(interfaces))
+    expect(session).to receive(:send_commands).with([ "show interfaces" ]).and_return(successful(interfaces, command: "show interfaces"))
     snapshot = collector.collect_session(target: target, session: session,
       dimensions: [ :interfaces, *optional_dimensions ], applicability: applicability)
     report = CtxChecker::Evaluator.new.call(snapshot)
@@ -205,7 +205,7 @@ RSpec.describe "Configuration applicability through collection and reporting" do
   it "collects explicit H3C absence as inapplicable while preserving the completed command evidence" do
     session = double(:session, connected?: true)
     expect(session).to receive(:send_commands).with([ "display link-aggregation verbose" ])
-      .and_return(successful("Info: No link aggregation group defined at present.\n"))
+      .and_return(successful("Info: No link aggregation group defined at present.\n", command: "display link-aggregation verbose"))
     snapshot = collector.collect_session(target: target.merge(platform: "h3c"), session: session, dimensions: [ :aggregation ])
     expect(snapshot.observation(:aggregation).status).to eq(:not_applicable)
     report = CtxChecker::Evaluator.new.call(snapshot)
@@ -236,7 +236,7 @@ RSpec.describe "Configuration applicability through collection and reporting" do
     expect(context.state(:aggregation)).to eq(:configured)
     session = double(:session, connected?: true)
     expect(session).to receive(:send_commands).with([ "display link-aggregation verbose" ])
-      .and_return(successful("Info: No link aggregation group defined at present.\n"))
+      .and_return(successful("Info: No link aggregation group defined at present.\n", command: "display link-aggregation verbose"))
     snapshot = collector.collect_session(target: target.merge(platform: "h3c"), session: session,
       dimensions: [ :aggregation ], applicability: context)
     observation = snapshot.observation(:aggregation)

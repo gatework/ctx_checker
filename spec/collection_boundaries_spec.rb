@@ -33,9 +33,9 @@ RSpec.describe "Collection input and connector boundaries" do
 
   it "rejects an open protocol that never provides a session" do
     connector = double(:connector, open: nil)
-    expect do
-      CtxChecker::Collector.new(clock: -> { time }).collect(target: target, connector: connector, dimensions: [ :interfaces ])
-    end.to raise_error(ArgumentError, /session/)
+    snapshot = CtxChecker::Collector.new(clock: -> { time }).collect(target: target, connector: connector, dimensions: [ :interfaces ])
+    expect(snapshot.issues).to include(include(code: :session_not_opened))
+    expect(CtxChecker::Evaluator.new.call(snapshot).status).to eq(:unknown)
   end
 
   it "never executes a second collection when open yields twice" do
@@ -44,9 +44,9 @@ RSpec.describe "Collection input and connector boundaries" do
     connector.define_singleton_method(:open) { |&block| 2.times { block.call(borrowed) } }
     expect(session).to receive(:send_commands).with([ "show interfaces" ]).once.and_return(command_receipt(body))
 
-    expect do
-      CtxChecker::Collector.new(clock: -> { time }).collect(target: target, connector: connector, dimensions: [ :interfaces ])
-    end.to raise_error(ArgumentError, /session/)
+    snapshot = CtxChecker::Collector.new(clock: -> { time }).collect(target: target, connector: connector, dimensions: [ :interfaces ])
+    expect(snapshot.issues).to include(include(code: :session_reentered))
+    expect(CtxChecker::Evaluator.new.call(snapshot).status).to eq(:unknown)
   end
 end
 

@@ -30,7 +30,7 @@ module CtxChecker
       return Snapshot.new(target: identity, observed_at: @clock.call, observations: observations) if dimensions.empty?
 
       issues = []
-      collection = CtxRunner::Collection.new(strict: true)
+      collection = CtxRunner::Collection.new
       collection.open(connector) { |session| collect_into(session, parser, dimensions, observations) }
       if collection.failure
         details = collection.failure
