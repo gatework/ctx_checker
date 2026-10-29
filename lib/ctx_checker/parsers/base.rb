@@ -3,7 +3,6 @@
 require "ctx_parser"
 require "ctx_parser/input"
 require_relative "interface_names"
-require_relative "scoped_result"
 require_relative "diagnostics"
 
 module CtxChecker
@@ -63,12 +62,8 @@ module CtxChecker
         else
           :complete
         end
-        if covered_scopes.any?
-          ScopedResult.new(status: status, records: records, issues: problems.uniq,
-            covered_scopes: status == :complete ? covered_scopes.uniq : [])
-        else
-          CtxParser::Result.new(status: status, records: records, issues: problems.uniq)
-        end
+        CtxParser::Result.new(status: status, records: records, issues: problems.uniq,
+          covered_scopes: status == :complete ? covered_scopes.uniq : [])
       end
     end
   end

@@ -35,11 +35,11 @@ class CheckerExampleTransport < Net::Connector::Transports::Pty
       end
     RUBY
     output = @reject ? "% Invalid input detected at '^' marker.\n" : INTERFACES
-    [ RbConfig.ruby, "-e", program, output, BGP ]
+    [ RbConfig.ruby, "--disable-gems", "-e", program, output, BGP ]
   end
 end
 
-target = { host: "192.0.2.10", platform: :cisco_ios }
+target = { host: "192.0.2.10", platform: "cisco_ios" }
 configuration = Net::Connector::Configuration.new(host: target[:host], username: "example", command_timeout: 2, login_timeout: 2)
 collector = CtxChecker::Collector.new
 

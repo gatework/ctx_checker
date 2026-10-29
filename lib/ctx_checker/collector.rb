@@ -84,7 +84,7 @@ module CtxChecker
       RuntimeParser.validate_dimensions!(dimensions)
       dimensions = dimensions.dup.freeze
       raise ArgumentError, "Target must be a hash" unless target.is_a?(Hash)
-      target = CtxParser::Immutable.copy(target)
+      target = CtxRunner::Target.snapshot(target)
 
       parser = RuntimeParser.new(platform: target.fetch(:platform), model: target[:model], software_version: target[:software_version])
       parser.discovery_dimensions(dimensions)
@@ -140,7 +140,8 @@ module CtxChecker
         source_status = observation.evidence.first&.fetch(:status, nil) || observation.status
         Observation.new(name: observation.name, status: observation.status, records: records,
           covered_scopes: observation.covered_scopes,
-          issues: observation.issues, evidence: evidence.map { |entry| entry.merge(status: source_status) })
+          issues: observation.issues, evidence: evidence.map { |entry| entry.merge(status: source_status) },
+          started_at: capture.started_at, completed_at: capture.completed_at)
       end
     end
 

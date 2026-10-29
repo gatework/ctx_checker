@@ -98,7 +98,7 @@ RSpec.describe "NX-OS interface command variants" do
   it "reports unavailable OLT measurements as unknown health even after a complete parse" do
     observation = parse(:optics, fixture(:optics_olt_106))
     snapshot = CtxChecker::Snapshot.new(target: { host: "192.0.2.1", platform: "cisco_nxos" },
-      observed_at: "2026-10-16T01:00:00Z", observations: { optics: observation })
+      observed_at: Time.iso8601("2026-10-16T01:00:00Z"), observations: { optics: observation })
     report = CtxChecker::Evaluator.new.call(snapshot)
     expect(report).not_to be_healthy
     expect(report.findings.select { |finding| finding.dimension == :optics }.map(&:status)).to all(eq(:unknown))

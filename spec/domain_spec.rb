@@ -54,14 +54,22 @@ RSpec.describe "CtxChecker domain contracts" do
   end
 
   it "normalizes sample time and retains unrequested dimensions" do
-    snapshot = CtxChecker::Snapshot.new(target: target, observed_at: "2026-10-15T10:00:00+08:00", observations: { interfaces: row(:interfaces, [ record ]) })
+    snapshot = CtxChecker::Snapshot.new(target: target, observed_at: Time.iso8601("2026-10-15T10:00:00+08:00"), observations: { interfaces: row(:interfaces, [ record ]) })
     expect(snapshot.observed_at).to eq(Time.utc(2026, 10, 15, 2))
     expect(snapshot.observation(:bgp).status).to eq(:not_requested)
-    expect(JSON.parse(JSON.generate(snapshot.to_h))["observed_at"]).to eq("2026-10-15T02:00:00.000000Z")
+    expect(CtxRunner::Document.call(snapshot)["observed_at"]).to eq("2026-10-15T02:00:00.000000Z")
     expect { CtxChecker::Snapshot.new(target: target.merge(password: "secret"), observed_at: Time.now, observations: {}) }.to raise_error(ArgumentError)
     expect { CtxChecker::Snapshot.new(target: target.merge(host: "host\nforged"), observed_at: Time.now, observations: {}) }.to raise_error(ArgumentError)
     expect { CtxChecker::Snapshot.new(target: target, observed_at: "not-a-date", observations: {}) }.to raise_error(ArgumentError)
     expect { CtxChecker::Snapshot.new(target: target, observed_at: Time.now, observations: { bgp: row(:interfaces) }) }.to raise_error(ArgumentError)
+  end
+
+  it "does not report complete coverage for an empty request and serializes through the common document boundary" do
+    snapshot = CtxChecker::Snapshot.new(target: target, observed_at: Time.utc(2026, 10, 29), observations: {})
+    report = CtxChecker::Evaluator.new.call(snapshot)
+    expect(report).not_to be_complete
+    document = CtxRunner::Document.call(report)
+    expect(document.fetch("snapshot")).to include("collection_status" => "not_requested", "observed_at" => "2026-10-29T00:00:00.000000Z")
   end
 
   it "captures immutable command acquisition times once and rejects untyped timestamps" do

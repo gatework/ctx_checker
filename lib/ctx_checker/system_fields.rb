@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "time"
-require "date"
+require "ctx_parser/values"
 require "ctx_parser/immutable"
 
 module CtxChecker
@@ -66,13 +66,7 @@ module CtxChecker
 
     # 没有时区的本地时间不能安全地与采集器时间比较。
     def self.timestamp?(value)
-      return false unless value.is_a?(String) && /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})\z/.match?(value)
-      Date.iso8601(value[0, 10])
-      return false unless value[11, 2].to_i < 24 && value[14, 2].to_i < 60 && value[17, 2].to_i < 60
-      if (offset = /[+-](\d{2}):(\d{2})\z/.match(value))
-        return false unless offset[1].to_i < 24 && offset[2].to_i < 60
-      end
-      Time.iso8601(value)
+      CtxParser::Values.timestamp(value)
       true
     rescue ArgumentError
       false

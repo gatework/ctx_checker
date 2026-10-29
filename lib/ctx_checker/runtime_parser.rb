@@ -241,7 +241,7 @@ module CtxChecker
       defaults = name == :counters ? { unit: :packets, scope: :interface } : {}
       records = result.records.map { |record| defaults.merge(record).merge(metadata) }
       Observation.new(name: name, status: status, records: records, issues: issues,
-        covered_scopes: result.is_a?(Parsers::ScopedResult) ? result.covered_scopes : [],
+        covered_scopes: result.covered_scopes,
         evidence: evidence.map { |entry| entry.merge(status: result.status) })
     rescue StandardError => error
       Failure.observation(name, code: :invalid_observation, stage: :validate, command: command, error: error, evidence: evidence)

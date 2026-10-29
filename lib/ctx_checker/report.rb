@@ -7,6 +7,7 @@ require "json"
 module CtxChecker
   # 提供紧凑、可序列化的结果，独立保留采集覆盖率与故障信息。
   class Report
+    include CtxRunner::Document::Value
     attr_reader :snapshot, :findings, :counts, :commands
 
     # 冻结报告证据与检查结果，便于复现评估。
@@ -20,7 +21,7 @@ module CtxChecker
     end
 
     # 判断所有已选事实是否都有完整证据支持。
-    def complete? = counts[:unknown].zero? && snapshot.issues.empty? && snapshot.observations.values.all? { |row| %i[complete not_requested not_applicable].include?(row.status) }
+    def complete? = counts[:unknown].zero? && snapshot.complete?
     # 仅在覆盖充分且无失败检查时声明健康。
     def healthy? = complete? && counts[:pass].positive? && counts[:fail].zero?
     # 推导汇总状态，避免将证据缺失当作成功。

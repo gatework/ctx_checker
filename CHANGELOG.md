@@ -4,6 +4,11 @@ Changes to the public contract are recorded here. Versions follow Semantic Versi
 
 ## Unreleased
 
+## 0.5.0 (2026-10-29)
+
+- Compose the shared Observation and Snapshot contracts while retaining strict field, identity and scope validation. Remove the bespoke ScopedResult subtype.
+- Expose collection_status independently of observations; require Time snapshot timestamps and serialize through CtxRunner::Document.
+
 ## 0.4.0 (2026-10-29)
 
 - Use the shared Collection failure protocol; unknown snapshot dimensions raise ArgumentError while known missing observations remain not_requested.

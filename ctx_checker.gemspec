@@ -22,10 +22,11 @@ Gem::Specification.new do |spec|
   # 显式限定打包文件，排除设备回显、凭据、测试夹具和构建产物。
   spec.files = Dir.chdir(__dir__) { Dir["lib/**/*.rb", "examples/**/*.rb", "docs/**/*.md", "README*.md", "CHANGELOG.md", "LICENSE", "COUNTER_CONTRACT.md"].sort }
   spec.require_paths = [ "lib" ]
+  spec.add_dependency "forwardable"
 
-  spec.add_dependency "ctx_runner", ">= 0.3.0", "< 0.4"
-  spec.add_dependency "ctx_parser", ">= 0.3.0", "< 0.4"
-  spec.add_dependency "ctx_driver", ">= 0.3.0", "< 0.4"
+  spec.add_dependency "ctx_runner", ">= 0.4.0", "< 0.5"
+  spec.add_dependency "ctx_parser", ">= 0.4.0", "< 0.5"
+  spec.add_dependency "ctx_driver", ">= 0.4.0", "< 0.5"
   spec.add_dependency "date"
   spec.add_dependency "digest"
   spec.add_dependency "ipaddr"

@@ -99,7 +99,7 @@ RSpec.describe "Runtime query coverage and explicit measurement requirements" do
     expect(CtxChecker::Observation.new(**merged.to_h).covered_scopes).to eq([ bgp_scope ])
   end
 
-  it "validates and isolates immutable scope identities while preserving legacy observations" do
+  it "validates and isolates immutable scope identities while preserving the common observation fields" do
     scopes = [ { vrf: "default".dup, afi_safi: "ipv4_unicast" } ]
     observed = CtxChecker::Observation.new(name: :bgp, status: :complete, covered_scopes: scopes)
     scopes.first[:vrf].replace("changed")
@@ -113,7 +113,7 @@ RSpec.describe "Runtime query coverage and explicit measurement requirements" do
     expect { CtxChecker::Observation.new(name: :interfaces, status: :complete, covered_scopes: [ bgp_scope ]) }.to raise_error(ArgumentError)
     expect(absent_peer(CtxChecker::Observation.new(name: :bgp, status: :complete)).status).to eq(:unknown)
     legacy = CtxChecker::Observation.new(name: :counters, status: :complete)
-    expect(legacy.to_h.keys).to eq(%i[name status records issues evidence])
+    expect(legacy.to_h.keys).to eq(%i[name status records issues evidence started_at completed_at covered_scopes])
   end
 
   it "does not mistake conflicting peer records for a confirmed absence while retaining other scopes" do
@@ -130,7 +130,7 @@ RSpec.describe "Runtime query coverage and explicit measurement requirements" do
   end
 
   it "retains scoped parser result value semantics and profile compatibility" do
-    result = CtxChecker::Parsers::ScopedResult.new(status: :complete, covered_scopes: [ bgp_scope ])
+    result = CtxParser::Result.new(status: :complete, covered_scopes: [ bgp_scope ])
     other = result.with(covered_scopes: [ bgp_scope.merge(vrf: "blue") ])
     expect(result).to be_a(CtxParser::Result)
     expect(result).not_to eq(other)

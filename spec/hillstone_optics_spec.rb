@@ -41,7 +41,7 @@ RSpec.describe CtxChecker::Hillstone::Parsers::ShowTransceiver do
     expect(result).to be_complete
     observation = CtxChecker::Observation.new(name: :optics, status: result.status, records: result.records)
     snapshot = CtxChecker::Snapshot.new(target: { host: "192.0.2.203", platform: "hillstone" },
-      observed_at: "2026-10-16T03:50:00Z", observations: { optics: observation })
+      observed_at: Time.iso8601("2026-10-16T03:50:00Z"), observations: { optics: observation })
     report = CtxChecker::Evaluator.new.call(snapshot)
     findings = report.findings.select { |finding| finding.dimension == :optics }
     expect(findings.map(&:reason)).to all(eq(:optical_thresholds_unavailable))

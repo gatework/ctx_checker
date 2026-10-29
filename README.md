@@ -43,7 +43,7 @@ output = "GigabitEthernet1/0/1 is up, line protocol is up\n"
 parser = CtxChecker::RuntimeParser.new(platform: :cisco_ios)
 observation = parser.parse(:interfaces, output, complete: true)
 snapshot = CtxChecker::Snapshot.new(
-  target: { host: "192.0.2.10", platform: parser.platform },
+  target: { host: "192.0.2.10", platform: parser.platform.to_s },
   observed_at: Time.utc(2026, 1, 1),
   observations: { interfaces: observation }
 )
@@ -65,7 +65,7 @@ Errors, CRC, and discards are distinct counters and must not be summed. A single
 
 `Collector#collect` accepts an injected connector that owns its session lifecycle; `collect_session` borrows an existing session. No Rails, inventory database, scheduler, or credentials are included. See the [counter contract](COUNTER_CONTRACT.md) for metric semantics.
 
-Collection snapshots the validated target and selected dimensions before calling the clock or connector. A lifecycle connector must yield exactly one session from `open`; yielding none or twice raises `ArgumentError`, and a second yield never repeats queries. Unrequested observations are not accepted as command fragments during combination.
+Collection snapshots the validated target and selected dimensions before calling the clock or connector. A lifecycle connector must yield exactly one session from `open`; yielding none or twice records `session_not_opened` / `session_reentered`, and a second yield never repeats queries. Unrequested observations are not accepted as command fragments during combination.
 
 Detailed vendor behavior, historical validation notes, and Motor-only integration are preserved in [the architecture reference](docs/architecture-zh.md). Host integration examples in that reference require Motor; they are not standalone gem APIs. Motor adapters live under `backend/lib/baseline`, `backend/lib/vxlan`, and `backend/lib/wireless` in the [Motor repository](https://github.com/gatework/motor/tree/main/backend/lib).
 
@@ -112,3 +112,5 @@ MIT. See [LICENSE](LICENSE).
 
 
 Snapshot access uses `observations` and `observation(name)`: known missing dimensions are `not_requested`; unknown names raise `ArgumentError`. Collection provider failures remain structured issues, including `session_not_opened` and `session_reentered`, without replaying queries.
+
+本次契约升级要求重新生成旧报告和计划；Ruby 快照使用 `observations`、`collection_status` 和 `Time`，JSON 通过 `CtxRunner::Document` 输出 UTC ISO8601（解析基础库仅提供 `Result`）。跨模块约定见 [ctx_runner 契约迁移](https://github.com/gatework/ctx_runner/blob/main/docs/contracts-2026-10-29.md)。

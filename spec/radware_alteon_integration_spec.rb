@@ -244,10 +244,10 @@ RSpec.describe "Alteon runtime integration" do
     [ 32, true, [ "32.4.15.0" ], "32.4.15.0\nforged" ].each do |version|
       expect do
         CtxChecker::Collector.new.collect(target: target.merge(software_version: version), connector: connector, dimensions: [ :optics ])
-      end.to raise_error(ArgumentError, /Software version/)
+      end.to raise_error(ArgumentError, /target identity/)
       expect do
         CtxChecker::Snapshot.new(target: target.merge(software_version: version), observed_at: Time.now, observations: {})
-      end.to raise_error(ArgumentError, /Target/)
+      end.to raise_error(ArgumentError, /target/i)
     end
   end
 

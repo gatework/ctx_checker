@@ -2,12 +2,15 @@
 
 require "ctx_parser/immutable"
 require "ctx_runner/observation"
+require "ctx_runner/document"
 require "time"
+require "forwardable"
 require_relative "system_fields"
 
 module CtxChecker
   # 提供经过校验的不可变运行事实，与后续健康评估相互独立。
   class Observation
+    include CtxRunner::Document::Value
     NAMES = (%i[interfaces counters aggregation optics bgp ospf] + SystemFields::FIELDS.keys).freeze
     STATUSES = %i[complete partial failed unsupported not_requested not_applicable].freeze
     METRICS = %i[in_errors out_errors in_discards out_discards crc_errors stomped_crc_errors out_carrier_errors].freeze
@@ -37,20 +40,21 @@ module CtxChecker
       network_type: %i[broadcast nbma point_to_point point_to_multipoint virtual_link unknown],
       local_role: %i[dr bdr drother unknown], neighbor_role: %i[dr bdr drother unknown])
     SCOPE_FIELDS = CtxParser::Immutable.copy(bgp: %i[vrf afi_safi], ospf: %i[vrf process_id interface])
-    attr_reader :name, :status, :records, :issues, :evidence, :covered_scopes
+    extend Forwardable
+    def_delegators :@observation, :name, :status, :records, :issues, :evidence, :covered_scopes,
+      :started_at, :completed_at, :observed_at, :complete?, :partial?, :available?, :to_h
 
     # 冻结单个维度的记录、状态及诊断元数据。
-    def initialize(name:, status:, records: [], issues: [], evidence: [], covered_scopes: [])
+    def initialize(name:, status:, records: [], issues: [], evidence: [], covered_scopes: [], started_at: nil, completed_at: nil)
       raise ArgumentError, "Unknown observation dimension" unless NAMES.include?(name)
       CtxRunner::Observation.validate(name: name, status: status, records: records, issues: issues, evidence: evidence, statuses: STATUSES)
-      @name, @status = name, status
-      validate_scopes!(covered_scopes)
+      validate_scopes!(covered_scopes, name: name, status: status)
       covered_scopes = covered_scopes.map do |scope|
         scope[:process_id].is_a?(Integer) ? scope.merge(process_id: scope[:process_id].to_s) : scope
       end
-      validate_scopes!(covered_scopes)
-      normalized = records.map { |record| validate_record(record) }
-      identities = normalized.map { |record| identity(record) }
+      validate_scopes!(covered_scopes, name: name, status: status)
+      normalized = records.map { |record| validate_record(record, name) }
+      identities = normalized.map { |record| record.values_at(*IDENTITIES.fetch(name)) }
       raise ArgumentError, "Duplicate observation identity" unless identities.uniq.size == identities.size
       unless issues.is_a?(Array) && issues.all? { |issue| self.class.valid_issue?(issue) }
         raise ArgumentError, "Observation issues require safe codes"
@@ -68,23 +72,13 @@ module CtxChecker
           raise ArgumentError, "Invalid evidence time" unless SystemFields.timestamp?(entry[:observed_at])
         end
       end
-      @records, @issues, @evidence = [ normalized, issues, evidence ].map { |value| CtxParser::Immutable.copy(value) }
-      @covered_scopes = CtxParser::Immutable.copy(covered_scopes)
-      @observed_at = evidence.filter_map { |entry| Time.iso8601(entry[:observed_at]).getutc if entry[:observed_at] }.max&.freeze
+      @observation = CtxRunner::Observation.new(name: name, status: status, records: normalized, issues: issues,
+        evidence: evidence, covered_scopes: covered_scopes, started_at: started_at, completed_at: completed_at)
       freeze
     end
 
-    # 判断所有已选事实是否都有完整证据支持。
-    def complete? = status == :complete
-    # 返回当前观测关联的归一化时间戳。
-    def observed_at = @observed_at
     # 返回用于关联同一资源多次采样的稳定字段。
     def identity(record) = record.values_at(*IDENTITIES.fetch(name))
-    # 未增加作用域证明时，保持旧快照和计数器指纹稳定。
-    def to_h
-      value = { name: name, status: status, records: records, issues: issues, evidence: evidence }
-      covered_scopes.empty? ? value : value.merge(covered_scopes: covered_scopes)
-    end
     # 展示对象身份与状态，避免泄露原始回显或凭据。
     def inspect = "#<#{self.class} name=#{name} status=#{status} records=#{records.size}>"
 
@@ -101,7 +95,7 @@ module CtxChecker
     private
 
     # 完整协议表仅覆盖其明确的 VRF、地址族或 OSPF 进程。
-    def validate_scopes!(scopes)
+    def validate_scopes!(scopes, name:, status:)
       unless scopes.is_a?(Array) && scopes.uniq == scopes
         raise ArgumentError, "Covered scopes must be a unique array"
       end
@@ -118,7 +112,7 @@ module CtxChecker
     end
 
     # 测量缺失保留 nil；身份字段不能静默消失。
-    def validate_record(record)
+    def validate_record(record, name)
       unless record.is_a?(Hash) && (record.keys - FIELDS.fetch(name)).empty?
         raise ArgumentError, "Unsupported observation record fields"
       end

@@ -7,7 +7,7 @@ output = "GigabitEthernet1/0/1 is up, line protocol is up\n"
 parser = CtxChecker::RuntimeParser.new(platform: :cisco_ios)
 observation = parser.parse(:interfaces, output, complete: true)
 snapshot = CtxChecker::Snapshot.new(
-  target: { host: "192.0.2.10", platform: parser.platform },
+  target: { host: "192.0.2.10", platform: parser.platform.to_s },
   observed_at: Time.utc(2026, 1, 1),
   observations: { interfaces: observation }
 )
