@@ -159,7 +159,7 @@ RSpec.describe "H3C Comware switch output variants" do
     OUTPUT
     result = parse(:ntp, text)
     expect(result).to be_complete
-    expect(result.records.first).to include(synchronized: true, offset_ms: -0.7559, peer: nil)
+    expect(result.records.first).to include(synchronized: true, offset_ms: -0.7559, peer_address: nil)
     expect(parse(:ntp, text + "Clock status: unsynchronized\n").records.first[:synchronized]).to be_nil
   end
 

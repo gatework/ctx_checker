@@ -32,8 +32,8 @@ RSpec.describe "CtxChecker system observation contracts" do
       [ :clock, { component: "system", time: "2026-02-30T11:00:00Z" } ],
       [ :clock, { component: "system", time: "2026-10-16T11:00:00+00:99" } ],
       [ :ntp, { component: "system", stratum: 17 } ],
-      [ :ntp, { component: "peer", last_sync_status: :healthy } ],
-      [ :ntp, { component: "peer", last_sync_at: "2026-10-16T11:00:00" } ],
+      [ :ntp, { component: "peer_address", last_sync_status: :healthy } ],
+      [ :ntp, { component: "peer_address", last_sync_at: "2026-10-16T11:00:00" } ],
       [ :device_counters, { component: "system", metric: "drops", value: 1.5 } ],
       [ :power, { component: "PS1", kind: :fan } ],
       [ :alarms, { component: "system", alarm_id: "summary", active: "false" } ] ]

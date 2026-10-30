@@ -14,7 +14,7 @@ module CtxChecker
       environment: %i[component kind status],
       power: %i[component kind status present watts capacity_watts],
       clock: %i[component time source synchronized],
-      ntp: %i[component synchronized stratum reference peer offset_ms leap last_sync_status last_sync_at],
+      ntp: %i[component synchronized stratum reference peer_address offset_ms leap last_sync_status last_sync_at],
       alarms: %i[component alarm_id severity active count],
       device_counters: %i[component metric category value discontinuity sampled_at])
     IDENTITIES = CtxParser::Immutable.copy(cpu: %i[component scope window_seconds], memory: %i[component scope],

@@ -90,7 +90,7 @@ RSpec.describe "H3C S5130S R6343 system captures" do
   it "does not replace the missing NTP offset with root delay, dispersion or jitter" do
     result = parse(:ntp)
     expect(result.status).to eq(:complete)
-    expect(result.records.first).to include(synchronized: true, stratum: 3, peer: "192.0.2.123", reference: "192.0.2.123",
+    expect(result.records.first).to include(synchronized: true, stratum: 3, peer_address: "192.0.2.123", reference: "192.0.2.123",
       leap: 0, offset_ms: nil)
   end
 

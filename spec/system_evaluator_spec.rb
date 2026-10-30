@@ -103,7 +103,7 @@ RSpec.describe "CtxChecker system health assessment" do
     row = { component: "system", time: "2026-10-16T11:00:00+08:00" }
     expect(assess(:clock, [ row ]).first.status).to eq(:pass)
     policy = CtxChecker::Policy.new(max_clock_skew_seconds: 30)
-    results = assess(:clock, [ row ], policy: policy, evidence: [ { observed_at: "2026-10-16T03:01:00Z" } ])
+    results = assess(:clock, [ row ], policy: policy, evidence: [ { reference: "test sample", observed_at: "2026-10-16T03:01:00Z" } ])
     expect(results.first.to_h).to include(status: :fail, actual: { time: row[:time], skew_seconds: 60.0 })
     expect(assess(:clock, [ row.merge(time: nil, synchronized: false) ]).map(&:status)).to eq(%i[fail unknown])
   end
@@ -134,7 +134,7 @@ RSpec.describe "CtxChecker system health assessment" do
   end
 
   it "separates a failed NTP peer attempt from current system synchronization" do
-    peer = { component: "peer/unspecified/192.0.2.2", peer: "192.0.2.2", last_sync_status: :failed }
+    peer = { component: "peer/unspecified/192.0.2.2", peer_address: "192.0.2.2", last_sync_status: :failed }
     results = assess(:ntp, [ { component: "system", synchronized: nil }, peer ], status: :partial)
     expect(results.map(&:reason)).to eq(%i[ntp_synchronization ntp_last_sync_failed])
     expect(results.map(&:status)).to eq(%i[unknown fail])

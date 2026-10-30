@@ -48,12 +48,12 @@ RSpec.describe "Configuration applicability through collection and reporting" do
       observation = snapshot.observation(name)
       expect(observation.status).to eq(:not_applicable)
       expect(observation.issues).to include(include(code: :feature_not_configured))
-      expect(observation.evidence).to eq(context.evidence)
+      expect(observation.evidence.map(&:to_h)).to eq(context.evidence)
       expect(observation.records).to be_empty
     end
     expect(snapshot.observation(:interfaces)).to be_complete
     expect(snapshot.observation(:counters)).to be_complete
-    expect(snapshot.observation(:interfaces).evidence).to eq(snapshot.observation(:counters).evidence)
+    expect(snapshot.observation(:interfaces).evidence.map(&:to_h)).to eq(snapshot.observation(:counters).evidence.map(&:to_h))
   end
 
   it "does not open a connection when every requested dimension is inapplicable" do
@@ -125,7 +125,7 @@ RSpec.describe "Configuration applicability through collection and reporting" do
     snapshot = collector.collect_session(target: target, session: double(:unused_session),
       dimensions: optional_dimensions, applicability: applicability)
     policy = CtxChecker::Policy.new(required_members: { "Port-channel1" => [ "GigabitEthernet1/0/1" ] },
-      expected_bgp: [ { vrf: "default", afi_safi: "ipv4_unicast", peer: "192.0.2.2" } ],
+      expected_bgp: [ { vrf: "default", afi_safi: "ipv4_unicast", peer_address: "192.0.2.2" } ],
       expected_ospf: [ { vrf: "default", process_id: "1", interface: "GigabitEthernet1/0/1", router_id: "192.0.2.2" } ])
     report = CtxChecker::Evaluator.new(policy: policy).call(snapshot)
     expect(report.findings.select { |finding| optional_dimensions.include?(finding.dimension) })
@@ -196,7 +196,7 @@ RSpec.describe "Configuration applicability through collection and reporting" do
 
     commands = [ "show static groups", "show dynamic groups" ]
     sources = commands.map do |command|
-      CtxChecker::Observation.new(name: :aggregation, status: :complete, evidence: [ { command: command, status: :complete } ])
+      CtxChecker::Observation.new(name: :aggregation, status: :complete, evidence: [ { command: command, status: :complete, sha256: "a" * 64, bytes: 0 } ])
     end
     expect(CtxChecker::ObservationMerger.call(:aggregation, sources, commands: commands).status).to eq(:not_applicable)
     expect(CtxChecker::ObservationMerger.call(:aggregation, sources.first(1), commands: commands).status).not_to eq(:not_applicable)
@@ -219,7 +219,7 @@ RSpec.describe "Configuration applicability through collection and reporting" do
 
   it "does not extend one absent source to an unavailable sibling command" do
     source = CtxChecker::Observation.new(name: :bgp, status: :not_applicable,
-      issues: [ { code: :protocol_disabled } ], evidence: [ { command: "show protocol one", status: :complete } ])
+      issues: [ { code: :protocol_disabled } ], evidence: [ { command: "show protocol one", status: :complete, sha256: "a" * 64, bytes: 0 } ])
     failure = CtxChecker::Observation.new(name: :bgp, status: :failed,
       issues: [ { code: :command_failed } ], evidence: [ { command: "show protocol two", status: :failed } ])
     commands = [ "show protocol one", "show protocol two" ]
@@ -242,7 +242,7 @@ RSpec.describe "Configuration applicability through collection and reporting" do
     observation = snapshot.observation(:aggregation)
     expect(observation.status).to eq(:partial)
     expect(observation.issues).to include(include(code: :configuration_runtime_conflict))
-    expect(observation.evidence).to include(*context.evidence)
+    expect(observation.evidence.map(&:to_h)).to include(*context.evidence)
     report = CtxChecker::Evaluator.new.call(snapshot)
     expect(report.findings.select { |finding| finding.dimension == :aggregation }).to all(have_attributes(status: :unknown))
     expect(report).not_to be_complete

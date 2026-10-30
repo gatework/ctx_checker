@@ -60,7 +60,7 @@ module CtxChecker
             end
           end
           peer = CtxParser::Values.ip_address?(host) ? CtxParser::Values.ip_address(host) : host.downcase
-          { component: "peer/#{fields[:vrouter] || 'unspecified'}/#{peer}", peer: peer, synchronized: nil,
+          { component: "peer/#{fields[:vrouter] || 'unspecified'}/#{peer}", peer_address: peer, synchronized: nil,
             last_sync_status: fields[:last_sync_status] || :unknown, last_sync_at: nil }
         end
 

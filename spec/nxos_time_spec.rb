@@ -14,7 +14,7 @@ RSpec.describe "NX-OS time command variants" do
   it "accepts empty local-clock VRFs and a VRF immediately following the delay value" do
     result = parse(text)
     expect(result).to be_complete
-    expect(result.records.first).to include(synchronized: true, stratum: 3, peer: "192.0.2.20")
+    expect(result.records.first).to include(synchronized: true, stratum: 3, peer_address: "192.0.2.20")
   end
 
   it "accepts older tables without the optional VRF column" do
@@ -43,7 +43,7 @@ RSpec.describe "NX-OS time command variants" do
     expect(parse(truncated).issues).to include(include(code: :truncated_ntp_peer))
     expect(parse(truncated).records.first[:synchronized]).to be_nil
     interrupted = truncated + "Total peers : 1\n2 64 377 0.00107default\n"
-    expect(parse(interrupted).records.first[:peer]).to be_nil
+    expect(parse(interrupted).records.first[:peer_address]).to be_nil
     expect(parse("Total peers : 1\nremote local\n").issues).to include(include(code: :truncated_ntp_header))
   end
 
@@ -81,7 +81,7 @@ RSpec.describe "NX-OS time command variants" do
     mapped = parse(body.sub("127.127.1.0", "::ffff:127.127.1.0"))
     expect(mapped.issues).to include(include(code: :local_ntp_reference))
     expect(mapped.records.first[:synchronized]).to be_nil
-    expect(parse(text.sub("192.0.2.20", "::ffff:192.0.2.20")).records.first[:peer]).to eq("192.0.2.20")
+    expect(parse(text.sub("192.0.2.20", "::ffff:192.0.2.20")).records.first[:peer_address]).to eq("192.0.2.20")
   end
 
   it "retains strict reachability, peer count and completeness boundaries" do

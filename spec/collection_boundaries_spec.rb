@@ -26,7 +26,7 @@ RSpec.describe "Collection input and connector boundaries" do
 
     snapshot = CtxChecker::Collector.new(clock: clock).collect_session(target: target, session: session, dimensions: [ :interfaces ])
 
-    expect(snapshot.target[:host]).to eq("192.0.2.10")
+    expect(snapshot.target.host).to eq("192.0.2.10")
     expect(target[:host]).to eq("192.0.2.99")
     expect(target[:host]).not_to be_frozen
   end

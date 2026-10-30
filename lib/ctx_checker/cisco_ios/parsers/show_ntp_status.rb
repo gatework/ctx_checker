@@ -24,12 +24,12 @@ module CtxChecker
               stratum = Integer(match[2], 10)
               issues << { code: :invalid_ntp_stratum, line: number } unless stratum.between?(0, 16)
               records << { component: "system", synchronized: match[1].casecmp?("synchronized"),
-                stratum: stratum.between?(0, 16) ? stratum : nil, reference: match[3], peer: nil, offset_ms: nil, leap: nil }
+                stratum: stratum.between?(0, 16) ? stratum : nil, reference: match[3], peer_address: nil, offset_ms: nil, leap: nil }
             elsif (match = /\Aclock offset is (#{NUMBER}) msec(?:,|\z)/i.match(line)) && records.one?
               issues << { code: :duplicate_ntp_offset, line: number } if records.first[:offset_ms]
               records.first[:offset_ms] = checked_number(match[1], issues: issues, component: "system")
             elsif /\A%?NTP is not enabled\.?\z/i.match?(line)
-              records << { component: "system", synchronized: false, stratum: nil, reference: nil, peer: nil, offset_ms: nil, leap: nil }
+              records << { component: "system", synchronized: false, stratum: nil, reference: nil, peer_address: nil, offset_ms: nil, leap: nil }
             elsif AUXILIARY.match?(line)
               next
             else

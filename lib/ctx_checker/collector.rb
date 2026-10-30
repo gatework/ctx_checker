@@ -83,8 +83,7 @@ module CtxChecker
     def prepare(target, dimensions)
       RuntimeParser.validate_dimensions!(dimensions)
       dimensions = dimensions.dup.freeze
-      raise ArgumentError, "Target must be a hash" unless target.is_a?(Hash)
-      target = CtxRunner::Target.snapshot(target)
+      target = CtxRunner::Target.coerce(target).to_h
 
       parser = RuntimeParser.new(platform: target.fetch(:platform), model: target[:model], software_version: target[:software_version])
       parser.discovery_dimensions(dimensions)

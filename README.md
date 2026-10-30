@@ -114,3 +114,7 @@ MIT. See [LICENSE](LICENSE).
 Snapshot access uses `observations` and `observation(name)`: known missing dimensions are `not_requested`; unknown names raise `ArgumentError`. Collection provider failures remain structured issues, including `session_not_opened` and `session_reentered`, without replaying queries.
 
 本次契约升级要求重新生成旧报告和计划；Ruby 快照使用 `observations`、`collection_status` 和 `Time`，JSON 通过 `CtxRunner::Document` 输出 UTC ISO8601（解析基础库仅提供 `Result`）。跨模块约定见 [ctx_runner 契约迁移](https://github.com/gatework/ctx_runner/blob/main/docs/contracts-2026-10-29.md)。
+
+## Domain contract migration (2026-10-30)
+
+Inherit shared Observation value semantics with domain validation on construction and replacement. Use `peer_address` for BGP/NTP endpoints and public Target values in snapshots; expose `records(name)`. Require Runner/Driver 0.5. See the [schema 4 migration and module contracts](https://github.com/gatework/ctx_runner/blob/main/docs/contracts-2026-10-30.md). Regenerate old collection reports and change plans; changing only their version number is not supported.

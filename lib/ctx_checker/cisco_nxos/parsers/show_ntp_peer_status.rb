@@ -30,17 +30,17 @@ module CtxChecker
             end
           end
           issues << { code: :ntp_peer_count_mismatch } unless totals.one? && totals.first == peers.size
-          issues << { code: :duplicate_identity } unless peers.map { |peer| peer.values_at(:peer, :vrf) }.uniq.size == peers.size
+          issues << { code: :duplicate_identity } unless peers.map { |peer| peer.values_at(:peer_address, :vrf) }.uniq.size == peers.size
           selected = peers.select { |peer| peer[:selected] }
           issues << { code: :conflicting_ntp_selection } if selected.size > 1
           peer = selected.one? ? selected.first : nil
           issues << { code: :invalid_ntp_selection } if peer && (!peer[:reachable] || !peer[:stratum].between?(1, 14))
-          issues << { code: :local_ntp_reference } if peer && peer[:peer] == "127.127.1.0"
+          issues << { code: :local_ntp_reference } if peer && peer[:peer_address] == "127.127.1.0"
           recognized = totals.any? || peers.any?
           synchronized = issues.empty? && (complete || peer) ? !!peer : nil
           records = recognized ? [ { component: "system", synchronized: synchronized,
-            stratum: peer && peer[:stratum] < 16 ? peer[:stratum] + 1 : nil, reference: peer&.fetch(:peer),
-            peer: peer&.fetch(:peer), offset_ms: nil, leap: nil } ] : []
+            stratum: peer && peer[:stratum] < 16 ? peer[:stratum] + 1 : nil, reference: peer&.fetch(:peer_address),
+            peer_address: peer&.fetch(:peer_address), offset_ms: nil, leap: nil } ] : []
           build_result(records, complete: complete, recognized: recognized, issues: issues, identity: [ :component ])
         end
 
@@ -72,7 +72,7 @@ module CtxChecker
           vrf = vrf_column ? delay[2] || delay[3] : nil
           raise ArgumentError if vrf_column && delay[3] && /\A[eE][+-]?\d+\z/.match?(delay[3])
 
-          { peer: remote, vrf: vrf, selected: match[1] == "*", stratum: stratum, reachable: reach.positive? }
+          { peer_address: remote, vrf: vrf, selected: match[1] == "*", stratum: stratum, reachable: reach.positive? }
         rescue ArgumentError, IPAddr::InvalidAddressError
           issues << { code: :invalid_ntp_peer, line: number }
           nil
@@ -98,7 +98,7 @@ module CtxChecker
             kind = if /\Aremote\s+local\z/i.match?(line)
               :header
             elsif /\A(?:[*+\-=]\s*)?[0-9a-f:.]+\s+[0-9a-f:.]+\z/i.match?(line)
-              :peer
+              :peer_address
             end
             if kind
               pending = [ kind, line, number ]

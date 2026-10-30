@@ -183,11 +183,11 @@ RSpec.describe "H3C system runtime parsers" do
   it "keeps NTP status, server, reference, leap and signed offset separate" do
     row = parse(:ntp).records.first
     expect(row).to include(component: "system", synchronized: true, stratum: 3,
-      peer: "192.0.2.123", reference: "192.0.2.123", offset_ms: -0.125, leap: 0)
+      peer_address: "192.0.2.123", reference: "192.0.2.123", offset_ms: -0.125, leap: 0)
     text = "Clock status: unsynchronized\n\nClock stratum: 16\nReference clock ID: none\n"
-    expect(parse(:ntp, text).records.first).to include(synchronized: false, stratum: 16, peer: nil, reference: nil, offset_ms: nil)
+    expect(parse(:ntp, text).records.first).to include(synchronized: false, stratum: 16, peer_address: nil, reference: nil, offset_ms: nil)
     text = "Clock status: synchronized\nClock jitter: 9.000 s\nSystem peer: LOCAL(0)\n"
-    expect(parse(:ntp, text).records.first).to include(peer: "LOCAL(0)", offset_ms: nil, synchronized: false)
+    expect(parse(:ntp, text).records.first).to include(peer_address: "LOCAL(0)", offset_ms: nil, synchronized: false)
     expect(parse(:ntp, "Clock status: synchronized\nReference clock ID: 127.127.1.0\n").records.first[:synchronized]).to be(false)
     expect(parse(:ntp, "Clock status: synchronized\nSystem peer: 192.0.2.123\nReference clock ID: 127.127.1.0\n").records.first[:synchronized]).to be(true)
     expect(parse(:ntp, "Clock status: synchronized\nClock stratum: 1\nReference clock ID: GPS\n").records.first[:synchronized]).to be(true)

@@ -25,7 +25,7 @@ module CtxChecker
             elsif (match = /\A\*?\s*([\d.]+)\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+)\s+\S+\s+(.+)\z/.match(line))
               state = match[4].downcase.delete(" ")
               if CtxParser::Values.ip_address?(match[1]) && STATES.include?(state) && (1..4_294_967_295).cover?(match[2].to_i)
-                rows << { vrf: "default", afi_safi: "ipv4_unicast", peer: match[1], state: state == "idle(admin)" ? :shutdown : state.to_sym,
+                rows << { vrf: "default", afi_safi: "ipv4_unicast", peer_address: match[1], state: state == "idle(admin)" ? :shutdown : state.to_sym,
                   received_prefixes: match[3].to_i, remote_as: match[2].to_i }
               else
                 issues << { code: :invalid_bgp_peer }
@@ -36,7 +36,7 @@ module CtxChecker
           end
           issues << { code: :count_mismatch, expected: total, observed: rows.size } if total && total != rows.size
           build_result(rows, complete: complete, recognized: header && (rows.any? || total == 0), issues: issues,
-            identity: %i[vrf afi_safi peer], covered_scopes: [ { vrf: "default", afi_safi: "ipv4_unicast" } ])
+            identity: %i[vrf afi_safi peer_address], covered_scopes: [ { vrf: "default", afi_safi: "ipv4_unicast" } ])
         end
       end
     end

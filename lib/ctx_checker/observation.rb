@@ -9,7 +9,7 @@ require_relative "system_fields"
 
 module CtxChecker
   # 提供经过校验的不可变运行事实，与后续健康评估相互独立。
-  class Observation
+  class Observation < CtxRunner::Observation
     include CtxRunner::Document::Value
     NAMES = (%i[interfaces counters aggregation optics bgp ospf] + SystemFields::FIELDS.keys).freeze
     STATUSES = %i[complete partial failed unsupported not_requested not_applicable].freeze
@@ -22,14 +22,14 @@ module CtxChecker
       counters: %i[interface metric value unit scope discontinuity sampled_at source_command],
       aggregation: %i[group member member_status oper_status],
       optics: %i[interface lane metric value unit low_alarm low_warning high_warning high_alarm alarm present dom_supported applicable],
-      bgp: %i[vrf afi_safi peer state received_prefixes remote_as],
+      bgp: %i[vrf afi_safi peer_address state received_prefixes remote_as],
       ospf: %i[vrf process_id area interface router_id neighbor_address state network_type local_role neighbor_role], **SystemFields::FIELDS
     }.transform_values { |fields| fields + [ :source_complete ] })
     IDENTITIES = CtxParser::Immutable.copy(interfaces: %i[name], counters: %i[interface metric],
-      aggregation: %i[group member], optics: %i[interface lane metric], bgp: %i[vrf afi_safi peer],
+      aggregation: %i[group member], optics: %i[interface lane metric], bgp: %i[vrf afi_safi peer_address],
       ospf: %i[vrf process_id interface router_id neighbor_address], **SystemFields::IDENTITIES)
     REQUIRED = CtxParser::Immutable.copy(interfaces: %i[name], counters: %i[interface metric],
-      aggregation: %i[group], optics: %i[interface metric], bgp: %i[peer], ospf: %i[router_id], **SystemFields::REQUIRED)
+      aggregation: %i[group], optics: %i[interface metric], bgp: %i[peer_address], ospf: %i[router_id], **SystemFields::REQUIRED)
     ISSUE_FIELDS = %i[code line lines field count skipped interface metric metrics lane section expected observed group stage component scope window_seconds command error_type].freeze
     ERROR_TYPE_PATTERN = /\A(?:[A-Z][A-Za-z0-9_]*::)*[A-Z][A-Za-z0-9_]*\z/
     ENUMS = CtxParser::Immutable.copy(
@@ -40,10 +40,6 @@ module CtxChecker
       network_type: %i[broadcast nbma point_to_point point_to_multipoint virtual_link unknown],
       local_role: %i[dr bdr drother unknown], neighbor_role: %i[dr bdr drother unknown])
     SCOPE_FIELDS = CtxParser::Immutable.copy(bgp: %i[vrf afi_safi], ospf: %i[vrf process_id interface])
-    extend Forwardable
-    def_delegators :@observation, :name, :status, :records, :issues, :evidence, :covered_scopes,
-      :started_at, :completed_at, :observed_at, :complete?, :partial?, :available?, :to_h
-
     # 冻结单个维度的记录、状态及诊断元数据。
     def initialize(name:, status:, records: [], issues: [], evidence: [], covered_scopes: [], started_at: nil, completed_at: nil)
       raise ArgumentError, "Unknown observation dimension" unless NAMES.include?(name)
@@ -59,20 +55,7 @@ module CtxChecker
       unless issues.is_a?(Array) && issues.all? { |issue| self.class.valid_issue?(issue) }
         raise ArgumentError, "Observation issues require safe codes"
       end
-      unless evidence.is_a?(Array) && evidence.all? { |entry| entry.is_a?(Hash) && (entry.keys - %i[command sha256 bytes reference observed_at status]).empty? }
-        raise ArgumentError, "Invalid observation evidence"
-      end
-      evidence.each do |entry|
-        raise ArgumentError, "Invalid command evidence status" if entry.key?(:status) && !%i[complete partial failed unsupported].include?(entry[:status])
-        raise ArgumentError, "Invalid evidence command" if entry.key?(:command) && !text?(entry[:command])
-        raise ArgumentError, "Invalid evidence digest" if entry.key?(:sha256) && !/\A[0-9a-f]{64}\z/.match?(entry[:sha256].to_s)
-        raise ArgumentError, "Invalid evidence byte count" if entry.key?(:bytes) && !(entry[:bytes].is_a?(Integer) && entry[:bytes] >= 0)
-        raise ArgumentError, "Invalid evidence reference" if entry.key?(:reference) && !text?(entry[:reference])
-        if entry.key?(:observed_at)
-          raise ArgumentError, "Invalid evidence time" unless SystemFields.timestamp?(entry[:observed_at])
-        end
-      end
-      @observation = CtxRunner::Observation.new(name: name, status: status, records: normalized, issues: issues,
+      super(name: name, status: status, records: normalized, issues: issues,
         evidence: evidence, covered_scopes: covered_scopes, started_at: started_at, completed_at: completed_at)
       freeze
     end

@@ -26,12 +26,12 @@ module CtxChecker
               globals << { component: "system", synchronized: false, reference: "LOCAL" }
               current = nil
             elsif (match = /\ANTP server (\S+) connected: (True|False)\z/i.match(line))
-              row = { component: "peer/#{match[1]}", peer: match[1], synchronized: nil }
+              row = { component: "peer/#{match[1]}", peer_address: match[1], synchronized: nil }
               rows << row
               peer_fields[row.object_id] = { "reachable" => match[2].casecmp?("true") ? "yes" : "no" }
               current = nil
             elsif (match = /\ANTP server:\s*(\S+)\z/.match(line))
-              current = { component: "peer/#{match[1]}", peer: match[1], synchronized: nil }
+              current = { component: "peer/#{match[1]}", peer_address: match[1], synchronized: nil }
               rows << current
               fields = {}
               peer_fields[current.object_id] = fields
@@ -60,7 +60,7 @@ module CtxChecker
           end
           globals.each do |global|
             next unless global[:synchronized] == true
-            peers = rows.select { |row| row[:peer] == global[:reference] }
+            peers = rows.select { |row| row[:peer_address] == global[:reference] }
             if peers.any? { |row| row[:synchronized] == false || peer_fields.fetch(row.object_id, {})["reachable"] == "no" }
               global[:synchronized] = nil
               issues << { code: :conflicting_ntp_state, component: "system" }

@@ -20,7 +20,7 @@ RSpec.describe "Protocol scope matching" do
   end
 
   it "matches BGP coverage by field identity regardless of hash order" do
-    peer = { vrf: "blue", afi_safi: "ipv4_unicast", peer: "192.0.2.9" }
+    peer = { vrf: "blue", afi_safi: "ipv4_unicast", peer_address: "192.0.2.9" }
     findings = missing_peers(:bgp, scopes: [ { afi_safi: "ipv4_unicast", vrf: "blue" } ],
       expected: [ peer, peer.merge(vrf: "red"), peer.merge(afi_safi: "ipv6_unicast") ])
 
@@ -38,14 +38,14 @@ RSpec.describe "Protocol scope matching" do
   end
 
   it "keeps missing peers unknown when no source established coverage" do
-    peer = { vrf: "blue", afi_safi: "ipv4_unicast", peer: "192.0.2.9" }
+    peer = { vrf: "blue", afi_safi: "ipv4_unicast", peer_address: "192.0.2.9" }
     expect(missing_peers(:bgp, scopes: [], expected: [ peer ]).map(&:status)).to eq([ :unknown ])
   end
 
   it "does not turn an incompletely scoped BGP record into confirmed absence" do
-    peer = { vrf: "blue", afi_safi: "ipv4_unicast", peer: "192.0.2.9" }
-    findings = missing_peers(:bgp, scopes: [ peer.slice(:afi_safi, :vrf) ], expected: [ peer, peer.merge(peer: "192.0.2.10") ],
-      records: [ { peer: "192.0.2.9", afi_safi: "ipv4_unicast", state: :established } ])
+    peer = { vrf: "blue", afi_safi: "ipv4_unicast", peer_address: "192.0.2.9" }
+    findings = missing_peers(:bgp, scopes: [ peer.slice(:afi_safi, :vrf) ], expected: [ peer, peer.merge(peer_address: "192.0.2.10") ],
+      records: [ { peer_address: "192.0.2.9", afi_safi: "ipv4_unicast", state: :established } ])
 
     expect(findings.map(&:status)).to eq(%i[unknown fail])
   end
@@ -53,7 +53,7 @@ RSpec.describe "Protocol scope matching" do
   it "invalidates BGP scopes matched by a conflicting record with an unknown VRF" do
     scopes = [ { afi_safi: "ipv4_unicast", vrf: "blue" }, { vrf: "red", afi_safi: "ipv4_unicast" },
       { vrf: "blue", afi_safi: "ipv6_unicast" } ]
-    merged = merge_peers(:bgp, records: [ { peer: "192.0.2.9", afi_safi: "ipv4_unicast", state: :established } ],
+    merged = merge_peers(:bgp, records: [ { peer_address: "192.0.2.9", afi_safi: "ipv4_unicast", state: :established } ],
       scopes: scopes, first_scopes: [])
 
     expect(merged.status).to eq(:partial)
@@ -82,7 +82,7 @@ RSpec.describe "Protocol scope matching" do
   end
 
   it "does not invent coverage when conflicting sources supplied none" do
-    merged = merge_peers(:bgp, scopes: [], records: [ { peer: "192.0.2.9", state: :established } ])
+    merged = merge_peers(:bgp, scopes: [], records: [ { peer_address: "192.0.2.9", state: :established } ])
 
     expect(merged.status).to eq(:partial)
     expect(merged.records).to be_empty

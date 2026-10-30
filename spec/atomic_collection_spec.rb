@@ -65,7 +65,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
       failed = snapshot.observation(:interfaces)
       expect(failed.status).to eq(:failed)
       expect(failed.issues).to include(include(stage: :execute, error_type: error_class.name))
-      expect(failed.evidence).to include(include(command: "show interfaces", status: :failed))
+      expect(failed.evidence.map(&:to_h)).to include(include(command: "show interfaces", status: :failed))
       expect(snapshot.observation(:bgp).status).to eq(:complete)
       expect(snapshot.to_h.to_s).not_to include("secret runtime body")
     end
@@ -250,7 +250,7 @@ RSpec.describe CtxChecker::Collector, "atomic command collection" do
     expect(counters.status).to eq(:partial)
     expect(counters.records).to include(include(interface: "GigabitEthernet1/0/1", metric: :out_errors, value: 0, source_complete: true))
     expect(counters.records).to include(include(interface: "GigabitEthernet1/0/1", metric: :in_errors, value: nil))
-    expect(counters.evidence).to include(include(command: "display counters inbound interface", status: :failed))
+    expect(counters.evidence.map(&:to_h)).to include(include(command: "display counters inbound interface", status: :failed))
 
     report = CtxChecker::Evaluator.new.call(snapshot)
     expect(report.findings).to include(have_attributes(dimension: :counters, status: :pass,

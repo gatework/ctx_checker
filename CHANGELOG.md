@@ -4,6 +4,10 @@ Changes to the public contract are recorded here. Versions follow Semantic Versi
 
 ## Unreleased
 
+## 0.6.0 (2026-10-30)
+
+- Inherit shared Observation value semantics with domain validation on construction and replacement. Use `peer_address` for BGP/NTP endpoints and public Target values in snapshots; expose `records(name)`. Require Runner/Driver 0.5.
+
 ## 0.5.0 (2026-10-29)
 
 - Compose the shared Observation and Snapshot contracts while retaining strict field, identity and scope validation. Remove the bespoke ScopedResult subtype.

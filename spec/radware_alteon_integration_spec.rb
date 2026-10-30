@@ -219,8 +219,8 @@ RSpec.describe "Alteon runtime integration" do
     session = double(:session, connected?: true)
     expect(session).to receive(:send_commands).with([ "/info/transceiver" ]).once.and_return(response("/info/transceiver", fixture("transceiver_5424_32415")))
     snapshot = CtxChecker::Collector.new.collect_session(target: configured_target, session: session, dimensions: [ :optics ])
-    expect(snapshot.target[:software_version]).to eq(version)
-    expect(snapshot.target[:software_version]).to be_frozen
+    expect(snapshot.target.software_version).to eq(version)
+    expect(snapshot.target.software_version).to be_frozen
     expect(snapshot.observation(:optics).evidence.first[:command]).to eq("/info/transceiver")
     expect(snapshot.observation(:optics).records.size).to eq(56)
     expect(CtxChecker::RuntimeParser.new(platform: :h3c, software_version: "unrelated syntax").platform).to eq("h3c")
@@ -255,7 +255,7 @@ RSpec.describe "Alteon runtime integration" do
     version = String.new("32.4.15.0")
     snapshot = CtxChecker::Snapshot.new(target: target.merge(software_version: version), observed_at: Time.now, observations: {})
     version.replace("32.4.20.0")
-    expect(snapshot.target[:software_version]).to eq("32.4.15.0")
+    expect(snapshot.target.software_version).to eq("32.4.15.0")
     expect(snapshot.to_h.fetch(:target).fetch(:software_version)).to eq("32.4.15.0")
     expect(snapshot.observation(:counters).records).to be_empty
   end

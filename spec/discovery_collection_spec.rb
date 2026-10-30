@@ -124,7 +124,7 @@ RSpec.describe "CtxChecker bounded discovery collection" do
     counters = snapshot.observation(:counters)
     expect(counters.status).to eq(:failed)
     expect(counters.issues).to include(include(code: :discovery_unavailable), include(code: :truncated_port_table, command: interface_command))
-    expect(counters.evidence).to include(include(command: interface_command, status: :partial))
+    expect(counters.evidence.map(&:to_h)).to include(include(command: interface_command, status: :partial))
     expect(snapshot.observation(:cpu)).to be_complete
   end
 
@@ -135,7 +135,7 @@ RSpec.describe "CtxChecker bounded discovery collection" do
     expect(session).to receive(:send_commands).with([ cpu_command ]).and_return(result(cpu_command))
     snapshot = collector.collect_session(target: target, session: session, dimensions: %i[counters cpu])
     expect(snapshot.observation(:counters).issues).to include(include(code: :discovery_expansion_failed, error_type: "ArgumentError"))
-    expect(snapshot.observation(:counters).evidence).to include(include(command: interface_command, status: :complete))
+    expect(snapshot.observation(:counters).evidence.map(&:to_h)).to include(include(command: interface_command, status: :complete))
     expect(snapshot.observation(:cpu)).to be_complete
     expect(snapshot.to_h.to_s).not_to include("private port output")
   end

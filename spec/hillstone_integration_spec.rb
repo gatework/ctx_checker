@@ -67,7 +67,7 @@ RSpec.describe "Hillstone runtime integration" do
     %i[memory temperature environment power].each do |name|
       expect(snapshot.observation(name).status).to eq(:complete)
     end
-    expect(snapshot.observation(:temperature).evidence).to eq(snapshot.observation(:power).evidence)
+    expect(snapshot.observation(:temperature).evidence.map(&:to_h)).to eq(snapshot.observation(:power).evidence.map(&:to_h))
     expect(snapshot.observation(:alarms).status).to eq(:unsupported)
   end
 end

@@ -300,12 +300,12 @@ RSpec.describe "Cisco runtime parsers" do
     TEXT
     result = profile(:cisco_nxos).parse(:bgp, text, complete: true)
     expect(observation(:bgp, result)).to be_complete
-    expect(result.records.first).to include(vrf: "blue", afi_safi: "ipv6_unicast", peer: "2001:db8::1", received_prefixes: 0)
+    expect(result.records.first).to include(vrf: "blue", afi_safi: "ipv6_unicast", peer_address: "2001:db8::1", received_prefixes: 0)
 
     truncated = text + "2001:db8::2\nBGP summary information for VRF red, address family IPv6 Unicast\n4 65002 0 0 0 0 0 never Idle\n"
     result = profile(:cisco_nxos).parse(:bgp, truncated, complete: true)
     expect(result.status).to eq(:partial)
-    expect(result.records).not_to include(include(peer: "2001:db8::2"))
+    expect(result.records).not_to include(include(peer_address: "2001:db8::2"))
     expect(result.issues).to include(include(code: :truncated_peer))
   end
 

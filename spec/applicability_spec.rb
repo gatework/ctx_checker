@@ -111,7 +111,7 @@ RSpec.describe CtxChecker::Applicability do
     reference = +"private/backup/configuration.txt"
     result = parse(text, platform: :h3c_wireless, reference: reference)
     expect(result.platform).to eq("h3c")
-    expect(result.evidence).to eq([ { sha256: Digest::SHA256.hexdigest(text), bytes: text.bytesize, reference: reference } ])
+    expect(result.evidence.map(&:to_h)).to eq([ { sha256: Digest::SHA256.hexdigest(text), bytes: text.bytesize, reference: reference } ])
     expect(result.inspect).not_to include("PRIVATE-CREDENTIAL", "private/backup")
     text.replace("changed")
     reference.replace("changed")

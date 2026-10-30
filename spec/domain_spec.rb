@@ -12,6 +12,17 @@ RSpec.describe "CtxChecker domain contracts" do
     CtxChecker::Observation.new(name: name, status: status, records: records, **options)
   end
 
+  it "shares immutable value semantics while validating every replacement" do
+    observation = row(:interfaces, [ record ])
+    equivalent = row(:interfaces, [ record.dup ])
+    expect(equivalent).to eq(observation)
+    expect({ observation => :found }.fetch(equivalent)).to eq(:found)
+    expect(observation.deconstruct_keys([ :name, :status ])).to eq(name: :interfaces, status: :complete)
+    expect(observation.with(status: :partial)).to be_a(CtxChecker::Observation)
+    expect(observation.with(status: :partial)).to be_partial
+    expect { observation.with(records: [ { name: "Eth1", password: "private" } ]) }.to raise_error(ArgumentError)
+  end
+
   it "deep copies records, identities and diagnostics without freezing caller data" do
     issues = [ { code: :unsupported_field, lines: [ 3 ] } ]
     record[:name] = record[:name].dup
@@ -36,7 +47,7 @@ RSpec.describe "CtxChecker domain contracts" do
   end
 
   it "keeps repeated peer addresses separate by context and OSPF neighbor address" do
-    peer = { vrf: "default", afi_safi: "ipv4_unicast", peer: "192.0.2.2", state: :established }
+    peer = { vrf: "default", afi_safi: "ipv4_unicast", peer_address: "192.0.2.2", state: :established }
     expect(row(:bgp, [ peer, peer.merge(vrf: "blue") ]).records.size).to eq(2)
     ospf = { vrf: "default", process_id: nil, interface: nil, router_id: "192.0.2.2", neighbor_address: "192.0.2.3" }
     expect(row(:ospf, [ ospf, ospf.merge(neighbor_address: "192.0.2.4") ]).records.size).to eq(2)
@@ -73,17 +84,17 @@ RSpec.describe "CtxChecker domain contracts" do
   end
 
   it "captures immutable command acquisition times once and rejects untyped timestamps" do
-    observation = row(:interfaces, [ record ], evidence: [ { observed_at: "2026-10-15T10:00:00+08:00" } ])
+    observation = row(:interfaces, [ record ], evidence: [ { reference: "test sample", observed_at: "2026-10-15T10:00:00+08:00" } ])
     expect(observation.observed_at).to eq(Time.utc(2026, 10, 15, 2))
     expect(observation.observed_at).to equal(observation.observed_at)
     expect(observation.observed_at).to be_frozen
-    expect { row(:interfaces, [ record ], evidence: [ { observed_at: Time.now } ]) }.to raise_error(ArgumentError)
+    expect { row(:interfaces, [ record ], evidence: [ { reference: "test sample", observed_at: Object.new } ]) }.to raise_error(ArgumentError)
   end
 
   it "rejects ambiguous or normalized invalid dates at both sampling time boundaries" do
     [ "2026-10-15T10:00:00", "2026-02-30T10:00:00Z", "2026-10-15T24:00:00Z",
       "2026-10-15T10:00:00+24:00", "2026-10-15T10:00:00+08:60" ].each do |time|
-      expect { row(:interfaces, [ record ], evidence: [ { observed_at: time } ]) }.to raise_error(ArgumentError)
+      expect { row(:interfaces, [ record ], evidence: [ { reference: "test sample", observed_at: time } ]) }.to raise_error(ArgumentError)
       expect { CtxChecker::Snapshot.new(target: target, observed_at: time, observations: {}) }.to raise_error(ArgumentError)
     end
   end
@@ -94,7 +105,7 @@ RSpec.describe "CtxChecker domain contracts" do
     members["Port-channel1"] << "Ethernet1/2"
     expect(policy.required_members["Port-channel1"]).to eq([ "Ethernet1/1" ])
     [ { required_interfaces: [ "" ] }, { minimum_active_members: { "Po1" => 0 } }, { counter_limits: { crc_errors: -1 } },
-      { expected_bgp: [ { peer: "192.0.2.2" } ] }, { expected_ospf: [ { vrf: "default", process_id: nil, interface: "Eth1/1", router_id: "192.0.2.2" } ] } ].each do |invalid|
+      { expected_bgp: [ { peer_address: "192.0.2.2" } ] }, { expected_ospf: [ { vrf: "default", process_id: nil, interface: "Eth1/1", router_id: "192.0.2.2" } ] } ].each do |invalid|
       expect { CtxChecker::Policy.new(**invalid) }.to raise_error(ArgumentError)
     end
   end

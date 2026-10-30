@@ -6,7 +6,7 @@ require "ctx_checker"
 
 RSpec.describe "Runtime query coverage and explicit measurement requirements" do
   let(:bgp_scope) { { vrf: "default", afi_safi: "ipv4_unicast" } }
-  let(:bgp_peer) { bgp_scope.merge(peer: "192.0.2.9") }
+  let(:bgp_peer) { bgp_scope.merge(peer_address: "192.0.2.9") }
   let(:h3c_empty) { "Total number of peers: 0\nPeer AS MsgRcvd MsgSent OutQ PrefRcv Up/Down State\n" }
   let(:optic) do
     { interface: "Ethernet1/1", lane: 0, metric: :rx_power, value: -3.0, unit: :dbm,

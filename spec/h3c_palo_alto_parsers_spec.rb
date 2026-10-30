@@ -198,8 +198,8 @@ RSpec.describe "H3C and PAN-OS runtime parsers" do
     result = parse(:palo_alto, :bgp)
     expect(result).to be_complete
     expect(result.records.size).to eq(3)
-    expect(result.records.first).to include(vrf: "default", afi_safi: "ipv4_unicast", peer: "192.0.2.1", received_prefixes: 0)
-    expect(result.records.last).to include(vrf: "blue", afi_safi: "ipv6_unicast", peer: "2001:db8::2", state: :active)
+    expect(result.records.first).to include(vrf: "default", afi_safi: "ipv4_unicast", peer_address: "192.0.2.1", received_prefixes: 0)
+    expect(result.records.last).to include(vrf: "blue", afi_safi: "ipv6_unicast", peer_address: "2001:db8::2", state: :active)
   end
 
   it "keeps malformed PAN BGP fields or unfamiliar AFs partial" do
@@ -221,11 +221,11 @@ RSpec.describe "H3C and PAN-OS runtime parsers" do
 
   it "canonicalizes PAN IPv6 peers before detecting duplicate scoped identities" do
     text = fixture(:palo_alto, :bgp).sub("[2001:db8::2]", "[2001:0db8:0:0:0:0:0:2]")
-    expect(parse(:palo_alto, :bgp, text).records.last[:peer]).to eq("2001:db8::2")
+    expect(parse(:palo_alto, :bgp, text).records.last[:peer_address]).to eq("2001:db8::2")
     duplicate = fixture(:palo_alto, :bgp).split("Peer: backup").last
     result = parse(:palo_alto, :bgp, text + "\nPeer: duplicate#{duplicate}")
     expect(result.status).to eq(:partial)
-    expect(result.records).not_to include(include(vrf: "blue", peer: "2001:db8::2"))
+    expect(result.records).not_to include(include(vrf: "blue", peer_address: "2001:db8::2"))
   end
 
   it "retains PAN OSPF neighbor identity without inventing local interface and network type" do

@@ -48,7 +48,7 @@ RSpec.describe CtxChecker::RuntimeParser, "failure isolation" do
       expect(observation.status).to eq(:failed)
       expect(observation.records).to be_empty
       expect(observation.issues).to include(include(code: :parser_error, stage: :parse, command: command, error_type: "ArgumentError"))
-      expect(observation.evidence).to include(include(command: command, status: :failed, bytes: 24))
+      expect(observation.evidence.map(&:to_h)).to include(include(command: command, status: :failed, bytes: 24))
       expect(observation.to_h.to_s).not_to include("private", "token", "unsupported syntax", "backtrace")
     end
   end
@@ -118,7 +118,7 @@ RSpec.describe CtxChecker::RuntimeParser, "failure isolation" do
     expect(observation.status).to eq(:partial)
     expect(observation.records).to include(include(metric: :out_errors, value: 0, source_complete: true))
     expect(observation.issues).to include(include(code: :parser_error, command: inbound))
-    expect(observation.evidence).to include(include(command: inbound, status: :failed), include(command: outbound, status: :complete))
+    expect(observation.evidence.map(&:to_h)).to include(include(command: inbound, status: :failed), include(command: outbound, status: :complete))
     expect(observation.to_h.to_s).not_to include("private data")
   end
 

@@ -43,7 +43,7 @@ Dir.mktmpdir("gem-install-") do |home|
     CLI
     observation = CtxChecker::RuntimeParser.new(platform: :cisco_ios).parse(:bgp, bgp, complete: true)
     abort "Installed BGP parser did not produce complete evidence" unless observation.complete? && observation.issues.empty?
-    expected = { vrf: "blue", afi_safi: "ipv4_unicast", peer: "192.0.2.1", state: :established,
+    expected = { vrf: "blue", afi_safi: "ipv4_unicast", peer_address: "192.0.2.1", state: :established,
       received_prefixes: 0, remote_as: 65001, source_complete: true }
     abort "Installed BGP parser changed neighbor facts" unless observation.records == [ expected ]
   RUBY

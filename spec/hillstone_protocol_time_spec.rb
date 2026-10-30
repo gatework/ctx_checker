@@ -91,7 +91,7 @@ RSpec.describe "StoneOS protocol and time evidence" do
       "ntp server 192.0.2.20, key 1, prefer\n"
     result = parse(:ntp, text)
     expect(result.records.first[:synchronized]).to be_nil
-    expect(result.records.last).to include(peer: "192.0.2.20", synchronized: nil, last_sync_status: :unknown)
+    expect(result.records.last).to include(peer_address: "192.0.2.20", synchronized: nil, last_sync_status: :unknown)
     expect(result).not_to be_complete
   end
 

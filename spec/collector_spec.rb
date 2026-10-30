@@ -138,8 +138,8 @@ RSpec.describe CtxChecker::Collector do
     snapshot = collector.collect_session(target: target.merge(platform: "palo_alto"), session: session,
       dimensions: %i[cpu memory temperature environment power])
     expect(snapshot.observation(:cpu).records.first[:scope]).to eq("management_plane")
-    expect(snapshot.observation(:cpu).evidence).to eq(snapshot.observation(:memory).evidence)
-    expect(snapshot.observation(:temperature).evidence).to eq(snapshot.observation(:power).evidence)
+    expect(snapshot.observation(:cpu).evidence.map(&:to_h)).to eq(snapshot.observation(:memory).evidence.map(&:to_h))
+    expect(snapshot.observation(:temperature).evidence.map(&:to_h)).to eq(snapshot.observation(:power).evidence.map(&:to_h))
     expect(CtxChecker::Evaluator.new.call(snapshot).findings.map(&:dimension)).to include(:cpu, :memory, :temperature, :power)
   end
 

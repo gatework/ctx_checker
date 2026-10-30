@@ -53,7 +53,7 @@ RSpec.describe "NX-OS protocol summary variants" do
         4 65001 12 15 1 0 0 00:10:00 0
     TEXT
     expect(parse(:bgp, text)).to be_complete
-    expect(parse(:bgp, text).records.last).to include(vrf: "default", afi_safi: "ipv6_unicast", peer: "2001:db8:100:200::1")
+    expect(parse(:bgp, text).records.last).to include(vrf: "default", afi_safi: "ipv6_unicast", peer_address: "2001:db8:100:200::1")
     expect(parse(:bgp, text.sub("IPv6 Unicast config peers 1", "IPv6 Unicast config peers 2")).status).to eq(:partial)
   end
 
@@ -61,7 +61,7 @@ RSpec.describe "NX-OS protocol summary variants" do
     text = fixture(:bgp_summary).sub("00:10:00 0", "00:10:00 0 (No Cap)")
     result = parse(:bgp, text)
     expect(result.status).to eq(:partial)
-    expect(result.records).to include(include(peer: "192.0.2.2", vrf: "default", afi_safi: "ipv4_unicast",
+    expect(result.records).to include(include(peer_address: "192.0.2.2", vrf: "default", afi_safi: "ipv4_unicast",
       remote_as: 65002, state: :unknown, received_prefixes: nil))
     expect(result.issues).to include(include(code: :peer_capability_unavailable))
     expect(result.issues).not_to include(include(code: :count_mismatch), include(code: :unparsed_peer))
@@ -98,7 +98,7 @@ RSpec.describe "NX-OS protocol summary variants" do
     text = fixture(:bgp_summary).sub("VRF blue, address family IPv4 Unicast", "VRF blue, address family")
     result = parse(:bgp, text)
     expect(result.status).to eq(:partial)
-    expect(result.records).to include(include(peer: "192.0.2.1", vrf: "default", state: :established))
+    expect(result.records).to include(include(peer_address: "192.0.2.1", vrf: "default", state: :established))
     expect(result.records).not_to include(include(vrf: "default", state: :active))
   end
 

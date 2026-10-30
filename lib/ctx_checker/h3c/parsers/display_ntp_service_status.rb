@@ -10,7 +10,7 @@ module CtxChecker
       class DisplayNtpServiceStatus < CtxChecker::Parsers::Base
         include SystemValues
         FIELDS = { "clock status" => :synchronized, "clock stratum" => :stratum,
-          "reference clock id" => :reference, "system peer" => :peer,
+          "reference clock id" => :reference, "system peer" => :peer_address,
           "clock offset" => :offset_ms, "leap indicator" => :leap }.freeze
         AUXILIARY = /\A(?:Local mode|NTP version|Clock jitter|Stability|Clock precision|Root delay|Root dispersion|Peer dispersion|Nominal frequency|Actual frequency|Reference time|System poll interval):/i
 
@@ -41,7 +41,7 @@ module CtxChecker
           end
           @issues << { code: :missing_ntp_status } unless seen[:synchronized]
           apply_local_sync(row, local_sync) unless local_sync.empty?
-          if local_clock?(row[:peer]) || row[:peer].nil? && local_clock?(row[:reference])
+          if local_clock?(row[:peer_address]) || row[:peer_address].nil? && local_clock?(row[:reference])
             row[:synchronized] = false
             @issues << { code: :local_ntp_reference }
           end
@@ -73,9 +73,9 @@ module CtxChecker
           when :offset_ms
             match = /\A(-?\d+(?:\.\d+)?)\s*ms\z/i.match(value)
             measurement(match[1], field: field, component: "system") if match
-          when :reference, :peer then value unless /\A(?:none|--)\z/i.match?(value)
+          when :reference, :peer_address then value unless /\A(?:none|--)\z/i.match?(value)
           end
-          @issues << { code: :invalid_ntp_field, field: field } if parsed.nil? && !%i[reference peer].include?(field)
+          @issues << { code: :invalid_ntp_field, field: field } if parsed.nil? && !%i[reference peer_address].include?(field)
           parsed
         end
       end

@@ -8,7 +8,7 @@ require "ctx_checker/runtime_parser"
 RSpec.describe CtxChecker::Evaluator do
   let(:target) { { host: "192.0.2.1", platform: "cisco_nxos" } }
   let(:up) { { name: "Ethernet1/1", kind: :physical, admin_status: :up, oper_status: :up, protocol_status: :up } }
-  let(:bgp) { { vrf: "default", afi_safi: "ipv4_unicast", peer: "192.0.2.2", state: :established, received_prefixes: 0 } }
+  let(:bgp) { { vrf: "default", afi_safi: "ipv4_unicast", peer_address: "192.0.2.2", state: :established, received_prefixes: 0 } }
   let(:ospf) { { vrf: "default", process_id: "1", area: "0.0.0.0", interface: "Ethernet1/1", router_id: "192.0.2.2", state: :full } }
   let(:optic) { { interface: "Ethernet1/1", lane: 0, metric: :rx_power, value: -3.0, unit: :dbm, low_alarm: -18.0, low_warning: -14.0, high_warning: 0.5, high_alarm: 3.5, present: true, dom_supported: true } }
 
@@ -106,15 +106,15 @@ RSpec.describe CtxChecker::Evaluator do
 
   it "uses command sample times and retains proven deltas from partial evidence" do
     row = { interface: "Ethernet1/1", metric: :crc_errors, value: 10, unit: :packets, scope: :interface, discontinuity: "boot-1/clear-1" }
-    prior = observation(:counters, [ row ], status: :partial, evidence: [ { observed_at: "2026-10-15T01:59:45Z" } ])
+    prior = observation(:counters, [ row ], status: :partial, evidence: [ { reference: "test sample", observed_at: "2026-10-15T01:59:45Z" } ])
     earlier = snapshot(prior, time: Time.utc(2026, 10, 15, 1, 59))
-    current = observation(:counters, [ row.merge(value: 13) ], status: :partial, evidence: [ { observed_at: "2026-10-15T01:59:50Z" } ])
+    current = observation(:counters, [ row.merge(value: 13) ], status: :partial, evidence: [ { reference: "test sample", observed_at: "2026-10-15T01:59:50Z" } ])
     results = findings(evaluate(current, previous: earlier), :counters)
     expect(results.first.to_h).to include(status: :fail, actual: { delta: 3, seconds: 5.0 })
     expect(results.last.reason).to eq(:incomplete_evidence)
-    unchanged = observation(:counters, [ row ], evidence: [ { observed_at: "2026-10-15T01:59:50Z" } ])
+    unchanged = observation(:counters, [ row ], evidence: [ { reference: "test sample", observed_at: "2026-10-15T01:59:50Z" } ])
     expect(findings(evaluate(unchanged, previous: earlier), :counters).first.reason).to eq(:counter_evidence_incomplete)
-    old = observation(:counters, [ row.merge(value: 13) ], evidence: [ { observed_at: "2026-10-15T01:59:40Z" } ])
+    old = observation(:counters, [ row.merge(value: 13) ], evidence: [ { reference: "test sample", observed_at: "2026-10-15T01:59:40Z" } ])
     expect(findings(evaluate(old, previous: earlier), :counters).first.reason).to eq(:counter_sample_time_invalid)
   end
 
@@ -213,7 +213,7 @@ RSpec.describe CtxChecker::Evaluator do
   end
 
   it "detects missing expected peers only when their scope was observed completely" do
-    expected = bgp.slice(:vrf, :afi_safi, :peer).merge(peer: "192.0.2.9")
+    expected = bgp.slice(:vrf, :afi_safi, :peer_address).merge(peer_address: "192.0.2.9")
     policy = CtxChecker::Policy.new(expected_bgp: [ expected ])
     expect(findings(evaluate(observation(:bgp, [ bgp ]), policy: policy), :bgp).last.status).to eq(:fail)
     expect(findings(evaluate(observation(:bgp, [ bgp ], status: :partial), policy: policy), :bgp).last.status).to eq(:unknown)

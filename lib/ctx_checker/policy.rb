@@ -22,7 +22,7 @@ module CtxChecker
       unless minimum_active_members.is_a?(Hash) && minimum_active_members.all? { |group, count| text?(group) && count.is_a?(Integer) && count.positive? }
         raise ArgumentError, "Minimum active members must be positive integers"
       end
-      validate_neighbor_identities!(expected_bgp, %i[vrf afi_safi peer])
+      validate_neighbor_identities!(expected_bgp, %i[vrf afi_safi peer_address])
       validate_neighbor_identities!(expected_ospf, %i[vrf process_id interface router_id])
       expected_ospf = expected_ospf.map do |identity|
         identity[:process_id].is_a?(Integer) ? identity.merge(process_id: identity[:process_id].to_s) : identity

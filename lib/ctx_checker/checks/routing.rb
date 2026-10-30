@@ -28,7 +28,7 @@ module CtxChecker
       end
 
       # 返回用于跨采样匹配记录的稳定身份字段。
-      def identity_fields = @observation.name == :bgp ? %i[vrf afi_safi peer] : %i[vrf process_id interface router_id]
+      def identity_fields = @observation.name == :bgp ? %i[vrf afi_safi peer_address] : %i[vrf process_id interface router_id]
 
       # 仅在拓扑明确不要求建立邻接时，将 OSPF 2-Way 状态视为正常。
       def two_way_state(record)

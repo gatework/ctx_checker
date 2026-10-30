@@ -73,7 +73,7 @@ module CtxChecker
             entry[:scope] if section_empty?(entry) || entry[:header] && entry[:count].positive?
           end
           build_result(rows, complete: complete, recognized: recognized, issues: issues,
-            identity: %i[vrf afi_safi peer], covered_scopes: scopes)
+            identity: %i[vrf afi_safi peer_address], covered_scopes: scopes)
         end
 
         # 识别协议对等体记录，排除摘要和表头。
@@ -132,7 +132,7 @@ module CtxChecker
           state, prefixes = peer_state(match[3])
           return unless state
 
-          scope.merge(peer: CtxParser::Values.ip_address(match[1]), state: state, received_prefixes: prefixes, remote_as: remote_as)
+          scope.merge(peer_address: CtxParser::Values.ip_address(match[1]), state: state, received_prefixes: prefixes, remote_as: remote_as)
         end
 
         # 仅在不存在平台附加标记时，末列数字才能证明会话已建立。

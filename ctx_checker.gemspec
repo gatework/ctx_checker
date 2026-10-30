@@ -24,9 +24,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = [ "lib" ]
   spec.add_dependency "forwardable"
 
-  spec.add_dependency "ctx_runner", ">= 0.4.0", "< 0.5"
+  spec.add_dependency "ctx_runner", ">= 0.5.0", "< 0.6"
   spec.add_dependency "ctx_parser", ">= 0.4.0", "< 0.5"
-  spec.add_dependency "ctx_driver", ">= 0.4.0", "< 0.5"
+  spec.add_dependency "ctx_driver", ">= 0.5.0", "< 0.6"
   spec.add_dependency "date"
   spec.add_dependency "digest"
   spec.add_dependency "ipaddr"

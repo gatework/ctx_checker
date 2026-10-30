@@ -39,7 +39,7 @@ RSpec.describe "Cisco system runtime parsers" do
     expect(results.values).to all(be_complete)
     expect(results[:cpu].records.first).to include(utilization: 10, window_seconds: 1)
     expect(results[:memory].records.first).to include(utilization: 36.8, total_bytes: 1_024_000_000, basis: :used_minus_cache)
-    expect(results[:cpu].evidence).to eq(results[:memory].evidence)
+    expect(results[:cpu].evidence.map(&:to_h)).to eq(results[:memory].evidence.map(&:to_h))
   end
 
   it "retains NX memory alarms and distinguishes corrected memory usage from missing cache" do
@@ -164,7 +164,7 @@ RSpec.describe "Cisco system runtime parsers" do
     text = fixture(:cisco_nxos, :ntp)
     result = parse(:ntp, text, platform: :cisco_nxos)
     expect(result).to be_complete
-    expect(result.records.first).to include(synchronized: true, stratum: 3, peer: "192.0.2.20")
+    expect(result.records.first).to include(synchronized: true, stratum: 3, peer_address: "192.0.2.20")
     no_selected = parse(:ntp, text.sub("*192", "=192"), platform: :cisco_nxos)
     expect(no_selected.records.first[:synchronized]).to be(false)
     expect(parse(:ntp, text.sub("=192", "*192"), platform: :cisco_nxos).status).to eq(:partial)

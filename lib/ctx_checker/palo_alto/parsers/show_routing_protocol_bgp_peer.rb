@@ -8,7 +8,7 @@ module CtxChecker
       # 同一对等体可能报告多个地址族。
       class ShowRoutingProtocolBgpPeer < CtxChecker::Parsers::Base
         STATES = %w[established idle active connect opensent openconfirm shutdown].freeze
-        FIELDS = /\A(?:Peer:|virtual router:|Peer router id:|Remote AS:|Peer group:|Peer status:|Password set:|Passive:|Multi-hop TTL:|Remote Address:|Local Address:|\(R\) reflector client:|same confederation:|send aggr confed as-path:|peering type:|Connect-Retry interval:|Open Delay:|Idle Hold:|Prefix limit:|Holdtime:|Keep-Alive interval:|Update messages:|Total messages:|Last update age:|Last error:|Flap counts:|\(R\) ORF entries:|Nexthop set to self:|use 3rd party as next-hop:|override nexthop to peer:|remove private AS number:|Capability:|Prefix counter for:|Incoming Prefix:|Outgoing Prefix:|Advertised Prefix:|[-=]+\z)/i
+        FIELDS = /\A(?:Peer:|virtual router:|Peer router id:|Remote AS:|Peer group:|Peer status:|Password set:|Passive:|Multi-hop TTL:|Remote Address:|Local Address:|\(R\) reflector client:|same confederation:|send aggr confed as-path:|peering type:|Connect-Retry interval:|Open Delay:|Idle Hold:|Prefix limit:|Holdtime:|Keep-Alive interval:|Update messages:|Total messages:|Last update age:|Last error:|Flap counts:|\(R\) ORF entries:|Nexthop set to self:|use 3rd party as next-hop:|override nexthop to peer_address:|remove private AS number:|Capability:|Prefix counter for:|Incoming Prefix:|Outgoing Prefix:|Advertised Prefix:|[-=]+\z)/i
 
         private
 
@@ -45,7 +45,7 @@ module CtxChecker
               remote_as = nil
             end
             issues << { code: :bgp_peer_fields_missing } if state == :unknown || remote_as.nil?
-            base = { vrf: block[/^\s*virtual router:\s*(\S+)/i, 1], peer: peer, state: state, remote_as: remote_as }
+            base = { vrf: block[/^\s*virtual router:\s*(\S+)/i, 1], peer_address: peer, state: state, remote_as: remote_as }
             families = block.split(/(?=^\s*Prefix counter for:)/i).drop(1)
             if families.empty?
               rows << base.merge(afi_safi: nil, received_prefixes: nil)
@@ -58,7 +58,7 @@ module CtxChecker
               end
             end
           end
-          build_result(rows, complete: complete, recognized: rows.any?, issues: issues, identity: %i[vrf afi_safi peer])
+          build_result(rows, complete: complete, recognized: rows.any?, issues: issues, identity: %i[vrf afi_safi peer_address])
         end
       end
     end

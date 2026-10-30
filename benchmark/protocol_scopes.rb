@@ -16,7 +16,7 @@ end
 
 [ 500, 1000, 2000 ].each do |size|
   scopes = Array.new(size) { |index| { vrf: "v#{index}", afi_safi: "ipv4_unicast" } }
-  peers = scopes.map { |scope| scope.merge(peer: "192.0.2.1") }
+  peers = scopes.map { |scope| scope.merge(peer_address: "192.0.2.1") }
   observation = CtxChecker::Observation.new(name: :bgp, status: :complete, covered_scopes: scopes)
   snapshot = CtxChecker::Snapshot.new(target: { host: "192.0.2.1", platform: "cisco_ios" },
     observed_at: Time.utc(2026, 10, 18), observations: { bgp: observation })

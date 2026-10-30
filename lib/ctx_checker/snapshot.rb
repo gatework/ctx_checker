@@ -10,10 +10,10 @@ module CtxChecker
     include CtxRunner::Document::Value
     extend Forwardable
     def_delegators :@snapshot, :target, :observed_at, :observations, :issues, :collection_status,
-      :observation, :same_target?, :complete?, :to_h
+      :observation, :records, :same_target?, :complete?, :to_h
 
     def initialize(target:, observed_at:, observations:, issues: [])
-      target = CtxRunner::Target.snapshot(target)
+      target = CtxRunner::Target.coerce(target).to_h
       raise ArgumentError, "Checker target requires a platform" unless target[:platform].is_a?(String)
       unless observations.is_a?(Hash) && observations.all? { |name, row| Observation::NAMES.include?(name) && row.is_a?(Observation) && row.name == name }
         raise ArgumentError, "Snapshot observations must match their dimensions"
