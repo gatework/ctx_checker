@@ -23,12 +23,10 @@ RSpec.describe "CtxChecker bounded discovery collection" do
   let(:profile_class) do
     Class.new(CtxParser::Profile) do
       def initialize(declarations:, expansion: nil)
-        super()
-        @declarations, @expansion = declarations, expansion
+        super(declarations: declarations)
+        @expansion = expansion
       end
 
-      def commands = @declarations.by_dimension
-      def parser_for(_name, command:) = @declarations.parsers.fetch(command)
       def discovery_dimensions(requested) = requested.include?(:counters) ? [ :interfaces ] : []
       def expand(observations, dimensions:) = @expansion ? @expansion.call(observations, dimensions) : self
     end

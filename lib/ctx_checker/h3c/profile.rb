@@ -39,8 +39,6 @@ module CtxChecker
         { dimensions: [ :ntp ], command: "display ntp-service status", parser: Parsers::DisplayNtpServiceStatus },
         { dimensions: [ :alarms ], command: "display alarm active", parser: Parsers::DisplayAlarmActive }
       ], multi_command: true)
-      COMMANDS = DECLARATIONS.by_dimension
-      PARSERS = DECLARATIONS.parsers
 
       # 每个已观察接口都必须保留入站与出站两个方向的证据状态。
       def counter_metrics = %i[in_errors out_errors].freeze

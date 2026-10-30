@@ -41,34 +41,22 @@ module CtxChecker
         { dimensions: [ :clock ], command: "/info/sys/general", parser: Parsers::InfoSysGeneral },
         { dimensions: %i[ntp device_counters], command: "/stats/sys/ntp", parser: Parsers::StatsSysNtp }
       ], multi_command: true)
-      COMMANDS = DECLARATIONS.by_dimension
-      PARSERS = DECLARATIONS.parsers
 
       # 打开连接器前，拒绝已知不兼容的产品系列。
-      def initialize(model: nil)
+      def initialize(model: nil, declarations: self.class::DECLARATIONS)
         super
         raise ArgumentError, "DefensePro requires a separate checker profile" if /defen[cs]e[\s_-]*pro/i.match?(model.to_s)
-
-        @declarations = DECLARATIONS
       end
-
-      # 扩展后的实例保留不可变命令与实现索引。
-      def commands = @declarations.by_dimension
-
-      # 绑定端口的解析器复用基础型号覆盖及命令选择契约。
-      def parsers = @declarations.parsers
 
       # 已知光模块命令缺陷根据固件事实判断，不依据型号名称猜测。
       def with_software_version(value)
         raise ArgumentError, "Software version must be text" unless value.nil? || value.is_a?(String)
 
-        entries = @declarations.entries.reject { |entry| entry[:dimensions].include?(:optics) }
+        entries = declarations.entries.reject { |entry| entry[:dimensions].include?(:optics) }
         if transceiver_fixed?(value)
           entries += [ { dimensions: [ :optics ], command: "/info/transceiver", parser: Parsers::InfoTransceiver } ]
         end
-        expanded = dup
-        expanded.instance_variable_set(:@declarations, CtxParser::Commands.new(entries, multi_command: true))
-        expanded
+        with_declarations(CtxParser::Commands.new(entries, multi_command: true))
       end
 
       # Alteon 不提供全端口叶级查询，计数器采集必须依赖完整端口清单。
@@ -90,9 +78,7 @@ module CtxChecker
           [ { dimensions: [ :counters ], command: "/stats/port #{port}/if", parser: Parsers::StatsPortIf.for_port(port) },
             { dimensions: [ :counters ], command: "/stats/port #{port}/ether", parser: Parsers::StatsPortEther.for_port(port) } ]
         end
-        expanded = dup
-        expanded.instance_variable_set(:@declarations, CtxParser::Commands.new(@declarations.entries + additions, multi_command: true))
-        expanded
+        with_declarations(CtxParser::Commands.new(declarations.entries + additions, multi_command: true))
       end
 
       # 每个发现端口均需标准计数器和以太网错误计数器证据。

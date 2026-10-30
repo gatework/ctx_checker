@@ -118,3 +118,5 @@ Snapshot access uses `observations` and `observation(name)`: known missing dimen
 ## Domain contract migration (2026-10-30)
 
 Inherit shared Observation value semantics with domain validation on construction and replacement. Use `peer_address` for BGP/NTP endpoints and public Target values in snapshots; expose `records(name)`. Require Runner/Driver 0.5. See the [schema 4 migration and module contracts](https://github.com/gatework/ctx_runner/blob/main/docs/contracts-2026-10-30.md). Regenerate old collection reports and change plans; changing only their version number is not supported.
+
+Platform profiles use ctx_parser 0.5 `Commands` declarations. Replace `Profile::COMMANDS` / `Profile::PARSERS` with `Profile::DECLARATIONS.by_dimension` / `.parsers`; instance query methods remain available. See the [parser 0.5 migration](https://github.com/gatework/ctx_parser/blob/main/docs/contracts-0.5.md).

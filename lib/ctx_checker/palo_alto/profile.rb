@@ -32,8 +32,6 @@ module CtxChecker
         { dimensions: [ :alarms ], command: "show system state | match alarm", parser: Parsers::ShowSystemStateAlarms },
         { dimensions: [ :device_counters ], command: "show counter global", parser: Parsers::ShowCounterGlobal }
       ])
-      COMMANDS = DECLARATIONS.by_dimension
-      PARSERS = DECLARATIONS.parsers
     end
   end
 end

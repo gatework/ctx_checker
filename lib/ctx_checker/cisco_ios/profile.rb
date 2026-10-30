@@ -32,8 +32,6 @@ module CtxChecker
         { dimensions: [ :alarms ], command: "show facility-alarm status", parser: Parsers::ShowFacilityAlarmStatus },
         { dimensions: [ :device_counters ], command: "show ip traffic", parser: Parsers::ShowIpTraffic }
       ])
-      COMMANDS = DECLARATIONS.by_dimension
-      PARSERS = DECLARATIONS.parsers
     end
   end
 end

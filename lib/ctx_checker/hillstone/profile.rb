@@ -30,8 +30,6 @@ module CtxChecker
         { dimensions: [ :ntp ], command: "show ntp status", parser: Parsers::ShowNtpStatus },
         { dimensions: [ :device_counters ], command: "show cpu-cntr", parser: Parsers::ShowCpuCntr }
       ])
-      COMMANDS = DECLARATIONS.by_dimension
-      PARSERS = DECLARATIONS.parsers
 
       # 在线接口丢弃表不提供错误包或 CRC 测量。
       def counter_metrics = %i[in_errors out_errors crc_errors].freeze

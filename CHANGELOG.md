@@ -4,6 +4,12 @@ Changes to the public contract are recorded here. Versions follow Semantic Versi
 
 ## Unreleased
 
+## 0.7.0 (2026-10-30)
+
+- Migrate all platform profiles to ctx_parser 0.5 Commands declarations; remove Profile COMMANDS/PARSERS aliases.
+- Derive Alteon discovery and firmware profiles through with_declarations, preserving model overrides and the original catalog.
+- Require the parser-compatible ctx_driver/ctx_runner patch releases.
+
 ## 0.6.0 (2026-10-30)
 
 - Inherit shared Observation value semantics with domain validation on construction and replacement. Use `peer_address` for BGP/NTP endpoints and public Target values in snapshots; expose `records(name)`. Require Runner/Driver 0.5.

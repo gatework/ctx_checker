@@ -157,13 +157,9 @@ RSpec.describe CtxChecker::RuntimeParser, "failure isolation" do
 
   it "rejects broken command catalogs before collection can start" do
     profile = Class.new(CtxParser::Profile)
-    profile.const_set(:COMMANDS, { cpu: command })
-    profile.const_set(:PARSERS, {})
-    allow(CtxChecker::ParserRegistry).to receive(:fetch).and_return(profile.new)
-    # 兼容已发布 0.2.x 与候选解析库的参数错误契约；两者均须在采集前拒绝。
-    expect { CtxChecker::RuntimeParser.new(platform: :cisco_nxos) }.to raise_error do |error|
-      expect(error).to be_a(ArgumentError).or be_a(KeyError)
-    end
+    profile.const_set(:DECLARATIONS, { cpu: command })
+    allow(CtxChecker::ParserRegistry).to receive(:fetch) { profile.new }
+    expect { CtxChecker::RuntimeParser.new(platform: :cisco_nxos) }.to raise_error(ArgumentError, /Commands/)
   end
 
   it "rejects invalid model declarations instead of reporting a device parser failure" do

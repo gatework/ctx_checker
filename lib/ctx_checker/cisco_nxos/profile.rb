@@ -28,8 +28,6 @@ module CtxChecker
         { dimensions: [ :ntp ], command: "show ntp peer-status", parser: Parsers::ShowNtpPeerStatus },
         { dimensions: [ :device_counters ], command: "show ip traffic", parser: Parsers::ShowIpTraffic }
       ])
-      COMMANDS = DECLARATIONS.by_dimension
-      PARSERS = DECLARATIONS.parsers
     end
   end
 end
